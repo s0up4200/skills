@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "owner": "s0up4200",
+    "version": "1.0.0",
+    "pluginRoot": "./skills"
+  },
+  "plugins": [
+    {
+      "name": "ui-skills",
+      "description": "UI/UX and frontend adaptation skills",
+      "source": "./skills",
+      "skills": [
+        "./skills/mobile-adapt"
+      ]
+    }
+  ]
+}
