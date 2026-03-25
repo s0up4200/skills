@@ -2,15 +2,24 @@
 
 This is a personal skills repository for Claude Code and compatible AI coding tools. Skills are self-contained instruction sets that teach Claude how to perform specialized tasks.
 
+This is a content-only repo — no package.json, no build system, no tests, no dependencies. All work is editing Markdown files and JSON.
+
 ## Repository Structure
 
 ```
-skills/              # All skills live here, one directory per skill
+CLAUDE.md            # Project instructions (this file)
+AGENTS.md            # Symlink → CLAUDE.md (keeps both tools in sync)
+README.md            # Installation instructions and skill index
+LICENSE              # MIT
+.gitignore
 .claude-plugin/
   marketplace.json   # Plugin manifest — how Claude Code discovers installable bundles
+skills/              # All skills live here, one directory per skill
 template/
   SKILL.md           # Starter template for new skills
 ```
+
+**Note:** `AGENTS.md` is a symlink to `CLAUDE.md`. Edits to CLAUDE.md automatically apply to both. Do not break the symlink by replacing it with a regular file.
 
 ## How Skills Work
 
@@ -132,6 +141,24 @@ When adding a skill, add its path to the relevant plugin's `skills` array. Group
 - Preserve the `name` field — changing it breaks installed references.
 - When updating reference files with new platform information, use absolute dates (not "recently" or "last month").
 - After significant changes, verify the description still accurately reflects the skill's scope.
+
+## Common Operations
+
+Create a new skill:
+```
+cp template/SKILL.md skills/your-skill-name/SKILL.md
+```
+
+Verify a skill's frontmatter name matches its directory:
+```
+grep '^name:' skills/*/SKILL.md
+```
+
+Check marketplace.json lists all skills:
+```
+ls skills/*/SKILL.md
+cat .claude-plugin/marketplace.json
+```
 
 ## Quality Checklist
 
