@@ -93,6 +93,9 @@ High-signal rules and sources for mobile adaptation work. Use this file when the
 - iOS 26 `visualViewport` issue (2025, reported on Apple Forums): `visualViewport.offsetTop` does not reset to 0 after keyboard dismissal; `visualViewport.height` stays smaller than `window.innerHeight`. Workaround: force layout recalc on `focusout`, or rely on `dvh` units.
   Source: https://developer.apple.com/forums/thread/800125
 
+- **CSS `@layer` cascade vs iOS zoom prevention** (2026, confirmed in production): iOS Safari auto-zooms inputs with `font-size` below `16px`. The common fix (`font-size: 16px` on inputs) fails when placed inside `@layer base` because unlayered styles (including Tailwind utilities like `text-sm`) always beat layered styles in the CSS cascade — regardless of specificity. A `text-sm` utility class will override `@layer base { input { font-size: 16px } }`, restoring the zoom. Fix: place the iOS zoom-prevention rule **outside any `@layer`** so it participates in the unlayered cascade and matches or beats utility specificity.
+  Source: https://developer.mozilla.org/en-US/docs/Web/CSS/@layer (cascade ordering)
+
 Net: avoid designing critical flows around nested scroll regions and fixed bottom chrome without explicit device verification. Prefer `position: sticky` or inline flow over `position: fixed` for keyboard-adjacent UI.
 
 ## Keyboard handling on mobile web
