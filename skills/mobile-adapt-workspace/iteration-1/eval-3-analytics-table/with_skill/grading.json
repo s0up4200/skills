@@ -1,0 +1,35 @@
+{
+  "assertion_results": [
+    {
+      "text": "The 9-column data table is converted to a card or list layout on mobile, or wrapped in an isolated horizontal scroll container (not the document)",
+      "passed": true,
+      "evidence": "Lines 109-187: <ul role='list'> card list with md:hidden renders all customer data in stacked cards. Desktop table at lines 195-266 with hidden md:block."
+    },
+    {
+      "text": "Row actions (view, edit, delete) are always visible on mobile — not hidden behind hover/opacity-0 group-hover:opacity-100",
+      "passed": true,
+      "evidence": "Lines 153-178: Labeled buttons (View, Edit, Delete) are always visible on mobile cards with no opacity or hover gate. Desktop table preserves the original hover pattern at line 239."
+    },
+    {
+      "text": "Action buttons are at least 44x44 CSS px on mobile — the p-1 with w-3.5 h-3.5 icons (28px total) is enlarged",
+      "passed": false,
+      "evidence": "Lines 155-178: Action buttons use h-9 min-w-[44px]. h-9 = 36px height, which is below the 44px minimum. Width meets 44px via min-w-[44px], but height does not."
+    },
+    {
+      "text": "Toolbar icons (filter, download) are enlarged to at least 44x44 CSS px tap targets — the p-1.5 with w-4 h-4 (30px) originals are not adequate",
+      "passed": true,
+      "evidence": "Lines 85-99: Filter and Export buttons use w-11 h-11 (44px) on mobile, with md:w-9 md:h-9 on desktop. Search input uses h-11 (44px)."
+    },
+    {
+      "text": "The mobile layout does not cause horizontal document-level scroll",
+      "passed": true,
+      "evidence": "Mobile uses card list (no table), full-width search, and stacked toolbar. All elements use w-full or flex-1. No fixed-width elements that could overflow."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.80
+  }
+}

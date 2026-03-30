@@ -1,0 +1,40 @@
+{
+  "assertion_results": [
+    {
+      "text": "Navigation is converted to a bottom-positioned tab bar with 5 or fewer primary items, not a hamburger menu or vertically stacked sidebar links",
+      "passed": true,
+      "evidence": "Lines 131-146: fixed bottom-0 nav with 5 primaryNavItems rendered as NavTab components. 7 original items reduced to 5 primary + 2 overflow. Hamburger completely absent."
+    },
+    {
+      "text": "Output includes env(safe-area-inset-bottom) for bottom-positioned elements",
+      "passed": true,
+      "evidence": "Line 134: pb-[env(safe-area-inset-bottom)] on the bottom nav. Line 113: pb-[calc(3.5rem+env(safe-area-inset-bottom))] on main content."
+    },
+    {
+      "text": "Output uses dvh (100dvh or min-h-[100dvh]) instead of 100vh for the main layout container",
+      "passed": true,
+      "evidence": "Line 63: min-h-[100dvh] on the outer flex container. Comment explains 'dvh tracks the collapsing Safari toolbar; vh does not.'"
+    },
+    {
+      "text": "The transactions table is converted to a card or list layout for mobile, not left as a multi-column table",
+      "passed": true,
+      "evidence": "Lines 216-240: <ul role='list'> card list with md:hidden. Desktop table preserved at lines 243-269 with hidden md:table. Comment explains the rationale."
+    },
+    {
+      "text": "The chart section includes a text headline or summary number alongside or above the chart visualization",
+      "passed": true,
+      "evidence": "Lines 176-179: 'Peak in {peakMonth.month}: ${peakMonth.revenue.toLocaleString()}. Revenue trending upward over the last 6 months.' Computed from data, placed above the chart."
+    },
+    {
+      "text": "Interactive elements have a minimum touch target size of 44px in at least one dimension",
+      "passed": true,
+      "evidence": "NavTab: h-14 (56px). View All link: min-h-[44px]. Desktop nav items: min-h-[44px]. Transaction list items: min-h-[60px]. Mobile header: h-14 (56px)."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

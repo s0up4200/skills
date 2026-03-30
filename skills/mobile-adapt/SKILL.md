@@ -34,7 +34,7 @@ For the current high-signal rules and sources, read [references/mobile-ui-2026.m
 
 - **Use bottom-first mobile navigation for true top-level sections only.** Keep it to `3-5` primary destinations; move overflow to `More`, a sheet, or secondary flows. The bottom of the screen is the thumb's natural resting zone — putting primary nav there means the most common actions require the least effort. More than 5 items shrink tap targets below usable size and overwhelm scanning.
 
-- **Every interactive target should be at least `44x44 CSS px`.** Capacitive touchscreens register the center of a finger's contact patch, which is roughly 44pt. Smaller targets cause mispress frustration, especially in motion (walking, transit). This aligns with Apple HIG and exceeds WCAG 2.2's 24px minimum.
+- **Every interactive target should be at least `44x44 CSS px` in both dimensions.** This includes secondary elements that are easy to overlook: inline action buttons (edit, delete, view), expand/collapse toggles, filter chips, icon buttons in toolbars, close buttons on sheets, and checkbox/radio rows (use the `<label>` as the full tap target, not the input alone). Capacitive touchscreens register the center of a finger's contact patch at roughly 44pt — smaller targets cause mispress frustration, especially in motion. Common Tailwind classes that fall short: `h-8` (32px), `h-9` (36px), `p-1` on an icon (~24px), `p-1.5` (~28px), `p-2` (~32px). Use `h-11` (44px), `min-h-[44px]`, or equivalent as the baseline for every tappable element. This aligns with Apple HIG and exceeds WCAG 2.2's 24px minimum.
 
 - **Do not rely on hover, tiny icon taps, or hidden row actions.** There is no hover state on touch — anything that requires hover to discover is invisible. Use visible controls, swipe actions with a visual hint, or a contextual sheet/menu.
 
@@ -201,6 +201,7 @@ Use `inputmode="decimal"` instead of `type="number"` for currency — it shows t
 - Reserve stable space for prices, balances, and totals.
 - Prefer stacked metadata over squeezed inline metadata.
 - Expose actions with visible controls or a sheet/menu, not hover.
+- Size row action buttons (edit, delete, view, expand) to at least `44x44 CSS px` — not just primary nav and toolbar buttons.
 
 ### Forms
 

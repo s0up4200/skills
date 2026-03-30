@@ -1,0 +1,40 @@
+{
+  "assertion_results": [
+    {
+      "text": "Form layout is single-column on mobile — grid-cols-2 is either removed or gated behind a responsive breakpoint prefix (sm: or md:)",
+      "passed": true,
+      "evidence": "Lines 15 and 117: grid-cols-1 gap-4 sm:grid-cols-2. col-span-2 changed to sm:col-span-2."
+    },
+    {
+      "text": "Currency or numeric inputs use inputMode='decimal' or inputMode='numeric' instead of type='number'",
+      "passed": true,
+      "evidence": "ZIP: inputMode='numeric' (line 78). CVV: inputMode='numeric' (line 159). Tip: inputMode='decimal' (line 178). Card: inputMode='numeric' (line 128). All use type='text'. Comments explain why type='number' is an antipattern."
+    },
+    {
+      "text": "At least one input includes an enterKeyHint attribute ('next', 'done', or 'send')",
+      "passed": true,
+      "evidence": "All intermediate fields have enterKeyHint='next' (lines 29, 40, 53, 66, 80, 96, 108, 131, 145, 165). Last field (Tip) has enterKeyHint='done' (line 182). Comment explains chaining for keyboard flow."
+    },
+    {
+      "text": "The submit button is NOT position:fixed at the bottom — it flows inline with the form, or uses a keyboard-safe sticky pattern with safe-area padding",
+      "passed": true,
+      "evidence": "Lines 223-234: Submit footer is a plain <div> in flow, not fixed. Comment references WebKit bug #202120 explaining why fixed/sticky bottom fails during keyboard display. Has pb-[max(1rem,env(safe-area-inset-bottom))] for safe-area."
+    },
+    {
+      "text": "The form container uses dvh (min-h-[100dvh]) instead of vh",
+      "passed": true,
+      "evidence": "Line 6: min-h-[100dvh] on outer flex container. Comment explains 'dvh tracks the visual viewport (including keyboard collapse), unlike old vh which is fixed.'"
+    },
+    {
+      "text": "Form labels are above their inputs, not beside them in a horizontal layout",
+      "passed": true,
+      "evidence": "All labels use className='block text-sm font-medium mb-1' (e.g., lines 18, 35, 50). Block display with margin-bottom places them above the input."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

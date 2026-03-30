@@ -1,0 +1,40 @@
+{
+  "assertion_results": [
+    {
+      "text": "Form layout is single-column on mobile — grid-cols-2 is either removed or gated behind a responsive breakpoint prefix (sm: or md:)",
+      "passed": true,
+      "evidence": "Lines 10 and 78: grid-cols-1 sm:grid-cols-2. col-span-2 changed to sm:col-span-2."
+    },
+    {
+      "text": "Currency or numeric inputs use inputMode='decimal' or inputMode='numeric' instead of type='number'",
+      "passed": true,
+      "evidence": "ZIP: inputMode='numeric' (line 48). CVV: inputMode='numeric' (line 104). Tip: inputMode='decimal' (line 114). All changed from type='number' to type='text'."
+    },
+    {
+      "text": "At least one input includes an enterKeyHint attribute ('next', 'done', or 'send')",
+      "passed": false,
+      "evidence": "No enterKeyHint or enterkeyhint attribute appears anywhere in the file. Grep for 'enterKey' and 'enterkeyh' returns zero matches."
+    },
+    {
+      "text": "The submit button is NOT position:fixed at the bottom — it flows inline with the form, or uses a keyboard-safe sticky pattern with safe-area padding",
+      "passed": true,
+      "evidence": "Lines 144-152: Submit button is in a <div className='pt-2'>, inline in the form flow. No fixed positioning."
+    },
+    {
+      "text": "The form container uses dvh (min-h-[100dvh]) instead of vh",
+      "passed": false,
+      "evidence": "Line 3: max-w-4xl mx-auto p-4 sm:p-8 pb-28. No dvh or vh unit used. No viewport-height-aware container."
+    },
+    {
+      "text": "Form labels are above their inputs, not beside them in a horizontal layout",
+      "passed": true,
+      "evidence": "Labels use className='text-sm font-medium' with inputs on the next line. Single-column grid ensures vertical stacking."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 2,
+    "total": 6,
+    "pass_rate": 0.67
+  }
+}
