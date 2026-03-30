@@ -9,26 +9,20 @@ Fast local search over the official Claude Code documentation. Uses [QMD](https:
 
 ## How to search
 
-Use the QMD MCP tool to search the `claude-code-docs` collection:
+Use the QMD CLI via Bash to search the `claude-code-docs` collection:
 
-```json
-{
-  "searches": [
-    { "type": "lex", "query": "hooks PreToolUse" },
-    { "type": "vec", "query": "how to run a command before every tool call" }
-  ],
-  "collections": ["claude-code-docs"],
-  "limit": 5
-}
+```bash
+# Search (auto-expands query, reranks results)
+qmd query "hooks PreToolUse" -c claude-code-docs -n 5
+
+# Read a full doc
+qmd get qmd://claude-code-docs/hooks.md --full
+
+# List all available docs
+qmd ls claude-code-docs
 ```
 
-For quick keyword lookups (CLI flags, env var names, setting keys), `lex` alone is enough. For conceptual questions ("how does X work"), combine `lex` + `vec` or use a single-line expand query.
-
-After finding the right doc, use `get` to read the full page:
-
-```json
-{ "uri": "qmd://claude-code-docs/hooks.md" }
-```
+For quick keyword lookups (CLI flags, env var names, setting keys), a simple search is enough. For conceptual questions ("how does X work"), `qmd query` automatically expands and reranks.
 
 ## When the collection doesn't exist
 
