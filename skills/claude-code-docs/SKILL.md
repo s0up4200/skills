@@ -1,6 +1,6 @@
 ---
 name: claude-code-docs
-description: "Search and reference official Claude Code documentation locally. Use whenever the user asks about Claude Code features, configuration, hooks, MCP, settings, permissions, CLI flags, IDE integrations, plugins, skills, agent teams, scheduled tasks, or any other Claude Code capability. Also use when you need to look something up yourself mid-task — checking hook schemas, CLI flags, environment variables, settings format, etc. Prefer this over web fetching for Claude Code docs. If the QMD collection isn't set up yet, this skill includes setup instructions."
+description: "Search and reference official Claude Code documentation locally. Use whenever the user asks about Claude Code features, configuration, hooks, MCP, settings, permissions, CLI flags, IDE integrations, plugins, skills, agent teams, scheduled tasks, sub-agents, custom agents, worktrees, session management, Desktop app features, or any other Claude Code capability. Also use when you need to look something up yourself mid-task — checking hook schemas, CLI flags, environment variables, settings format, etc. Prefer this over web fetching for Claude Code docs. Claude Code evolves fast — features like custom agents (.claude/agents/), session forking (/branch), /batch, live app preview, and worktree support are newer and not reliably in model training data, so always check the docs rather than guessing."
 ---
 
 # Claude Code Docs
@@ -13,16 +13,21 @@ Use the QMD CLI via Bash to search the `claude-code-docs` collection:
 
 ```bash
 # Search (auto-expands query, reranks results)
-qmd query "hooks PreToolUse" -c claude-code-docs -n 5
+qmd query "hooks PreToolUse" -c claude-code-docs -n 3
 
-# Read a full doc
+# Read a full doc when you know which one you need
 qmd get qmd://claude-code-docs/hooks.md --full
 
 # List all available docs
 qmd ls claude-code-docs
 ```
 
-For quick keyword lookups (CLI flags, env var names, setting keys), a simple search is enough. For conceptual questions ("how does X work"), `qmd query` automatically expands and reranks.
+### Search strategy
+
+1. **Start with `qmd query`** using 2-3 keywords from the user's question. Request only 3 results (`-n 3`) — the top hits are almost always sufficient.
+2. **Read the most relevant doc in full** with `qmd get ... --full`. This is where the real answer lives. Skimming search snippets is not enough.
+3. **Check related docs when the question spans multiple features.** Many Claude Code features have both a CLI flag and an in-session command (e.g., `--add-dir` and `/add-dir`, `--worktree` and `/branch`). If your answer involves a Desktop feature, also check if there's a CLI equivalent, and vice versa. A second `qmd query` with different keywords often surfaces the complementary doc.
+4. **Stop searching once you have the answer.** Two or three doc reads should be enough for most questions. Don't keep searching for confirmation — synthesize what you found and respond.
 
 ## When the collection doesn't exist
 
@@ -59,7 +64,7 @@ cd "$(dirname "$DOCS_PATH")" && ./update.sh
 
 ## Doc coverage
 
-The collection mirrors all English pages from the sitemap (~70 pages), covering:
+The collection mirrors all English pages from the sitemap (~50 docs), covering:
 
 - Getting started (overview, quickstart, setup)
 - Core features (hooks, MCP, memory, permissions, settings, commands, skills, plugins)
@@ -69,3 +74,22 @@ The collection mirrors all English pages from the sitemap (~70 pages), covering:
 - Advanced (agent teams, sub-agents, headless mode, scheduled tasks, channels)
 - Reference (CLI, tools, env vars, keybindings)
 - Operations (costs, monitoring, analytics, network config, sandboxing)
+
+## Common doc mapping
+
+When you know roughly what topic you need, go straight to the doc instead of searching:
+
+| Topic | Doc file |
+|---|---|
+| Hooks (PreToolUse, PostToolUse, Stop) | `hooks.md`, `hooks-guide.md` |
+| MCP servers | `mcp.md` |
+| CLI flags and headless mode | `cli-reference.md`, `headless.md` |
+| Custom agents / sub-agents | `sub-agents.md` |
+| Settings and permissions | `settings.md`, `permissions.md` |
+| Desktop app (preview, browser) | `desktop.md` |
+| GitHub Actions / CI | `github-actions.md`, `gitlab-ci-cd.md` |
+| Environment variables | `env-vars.md` |
+| Plugins and skills | `plugins.md`, `skills.md` |
+| Session management, forking | `interactive-mode.md` |
+| Worktrees and parallel work | `common-workflows.md` |
+| Chrome DevTools / browser testing | `chrome.md` |
