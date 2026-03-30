@@ -46,12 +46,16 @@ If searching returns an error about the collection not existing, the user needs 
 
 ## Updating docs
 
-The docs mirror has an `update.sh` script that:
-1. Downloads the latest `llms-full.txt` from code.claude.com
-2. Splits it into individual markdown files in `docs/`
-3. Re-indexes and re-embeds the QMD collection
+To update to the latest docs, find the collection path and run the update script:
 
-Run `./update.sh` from the docs mirror repo, or trigger it via `qmd update --pull` (it's registered as the collection's update command).
+```bash
+# Easiest — triggers the registered update command
+qmd update claude-code-docs
+
+# Or manually: find the repo and run the script
+DOCS_PATH="$(qmd collection show claude-code-docs 2>/dev/null | awk '/Path:/{print $2}')"
+cd "$(dirname "$DOCS_PATH")" && ./update.sh
+```
 
 ## Doc coverage
 
