@@ -1,0 +1,8 @@
+{
+  "expectations": [
+    {"text": "The response mentions /branch as the in-session way to fork", "passed": false, "evidence": "Only mentions --continue --fork-session from the CLI. Does not mention /branch or /fork slash commands."},
+    {"text": "The response mentions claude --resume <session-id> --fork-session as the CLI way", "passed": true, "evidence": "'claude --continue --fork-session' and 'claude --resume my-session --fork-session' both documented."},
+    {"text": "The response explains that forking creates a copy of the conversation that diverges from that point", "passed": true, "evidence": "'creates a new session that starts with a copy of your full conversation history up to that point, while leaving the original session untouched'"}
+  ],
+  "summary": {"passed": 2, "failed": 1, "total": 3, "pass_rate": 0.67}
+}

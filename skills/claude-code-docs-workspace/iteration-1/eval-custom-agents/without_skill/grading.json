@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "The response mentions .claude/agents/ as the directory for defining custom agents",
+      "passed": false,
+      "evidence": "Points to '.claude/commands/' instead of '.claude/agents/'. This is the older slash commands system, not the newer custom agents system."
+    },
+    {
+      "text": "The response mentions claude --agent=<name> as the way to invoke a custom agent",
+      "passed": false,
+      "evidence": "Shows '/<name>' slash command invocation. Does not mention --agent flag at all."
+    },
+    {
+      "text": "The response explains the agent file format (markdown with frontmatter or specific structure)",
+      "passed": false,
+      "evidence": "Shows plain markdown files without YAML frontmatter. Does not describe the agent format with name, description, tools, model fields etc."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 3, "total": 3, "pass_rate": 0.0 }
+}

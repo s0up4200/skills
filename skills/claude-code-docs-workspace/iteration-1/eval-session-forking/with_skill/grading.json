@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "The response mentions /branch as the in-session way to fork",
+      "passed": true,
+      "evidence": "'/branch approach-a' shown as primary method. Also notes '/fork works as an alias for /branch'."
+    },
+    {
+      "text": "The response mentions claude --resume <session-id> --fork-session as the CLI way",
+      "passed": true,
+      "evidence": "'claude --continue --fork-session' documented as Option 2 with explanation."
+    },
+    {
+      "text": "The response explains that forking creates a copy of the conversation that diverges from that point",
+      "passed": true,
+      "evidence": "'creates a new session that copies your entire conversation history up to that point. The original session stays untouched.'"
+    }
+  ],
+  "summary": { "passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0 }
+}

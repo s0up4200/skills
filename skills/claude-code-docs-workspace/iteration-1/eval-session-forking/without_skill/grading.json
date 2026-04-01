@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "The response mentions /branch as the in-session way to fork",
+      "passed": false,
+      "evidence": "Explicitly states: 'Claude Code does not have a built-in fork session command'. Does not mention /branch at all."
+    },
+    {
+      "text": "The response mentions claude --resume <session-id> --fork-session as the CLI way",
+      "passed": false,
+      "evidence": "Mentions --resume and --continue but NOT --fork-session. Suggests workarounds instead of the actual feature."
+    },
+    {
+      "text": "The response explains that forking creates a copy of the conversation that diverges from that point",
+      "passed": false,
+      "evidence": "Describes manual workarounds (two terminals, --resume) but never describes true forking behavior since it doesn't know the feature exists."
+    }
+  ],
+  "summary": { "passed": 0, "failed": 3, "total": 3, "pass_rate": 0.0 }
+}

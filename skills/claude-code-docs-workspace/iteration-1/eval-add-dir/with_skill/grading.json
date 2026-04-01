@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "The response mentions --add-dir as a CLI flag for adding directories",
+      "passed": true,
+      "evidence": "'Use the --add-dir flag to give Claude access to additional directories'. Shows 'claude --add-dir ../frontend ../backend'."
+    },
+    {
+      "text": "The response mentions /add-dir as an in-session command alternative",
+      "passed": false,
+      "evidence": "Only mentions --add-dir CLI flag. Does not mention /add-dir as an in-session slash command."
+    },
+    {
+      "text": "The response explains that adding a directory gives Claude both visibility and permissions for that path",
+      "passed": true,
+      "evidence": "'--add-dir gives Claude file access to those directories'. Also mentions loading CLAUDE.md from added dirs."
+    }
+  ],
+  "summary": { "passed": 2, "failed": 1, "total": 3, "pass_rate": 0.67 }
+}

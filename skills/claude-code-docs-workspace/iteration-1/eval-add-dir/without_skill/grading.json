@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "The response mentions --add-dir as a CLI flag for adding directories",
+      "passed": false,
+      "evidence": "Only mentions /add-dir as an in-session command, not --add-dir as a CLI flag."
+    },
+    {
+      "text": "The response mentions /add-dir as an in-session command alternative",
+      "passed": true,
+      "evidence": "'/add-dir /path/to/other/folder' shown as the primary method with examples."
+    },
+    {
+      "text": "The response explains that adding a directory gives Claude both visibility and permissions for that path",
+      "passed": true,
+      "evidence": "'Adding a directory gives Claude visibility into those files but does not change the working directory.'"
+    }
+  ],
+  "summary": { "passed": 2, "failed": 1, "total": 3, "pass_rate": 0.67 }
+}

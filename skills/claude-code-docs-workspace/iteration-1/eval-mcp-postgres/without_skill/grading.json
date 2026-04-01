@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "The response references .mcp.json as the configuration file for MCP servers",
+      "passed": true,
+      "evidence": "Shows '.mcp.json in your project root' as project-level config location with full JSON example."
+    },
+    {
+      "text": "The response includes a concrete JSON config example for a postgres MCP server",
+      "passed": true,
+      "evidence": "Full JSON example with @modelcontextprotocol/server-postgres, plus Docker variant. Note: recommends @modelcontextprotocol/server-postgres while the official docs now recommend @bytebase/dbhub."
+    },
+    {
+      "text": "The response explains the mcpServers object structure (command, args, env fields)",
+      "passed": true,
+      "evidence": "JSON shows 'command': 'npx', 'args': [...], and 'env' block. Structure is correct."
+    },
+    {
+      "text": "The response mentions that Claude auto-discovers tools exposed by the MCP server",
+      "passed": true,
+      "evidence": "'Claude will automatically discover and use them' under 'What Tools Become Available' section."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

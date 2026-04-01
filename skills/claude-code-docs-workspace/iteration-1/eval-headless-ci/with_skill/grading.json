@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "The response explains the -p (--print) flag for non-interactive/headless mode",
+      "passed": true,
+      "evidence": "Opens with: 'The primary CLI flag for non-interactive (headless) mode is -p (or --print). This runs Claude Code without an interactive session — it processes the prompt and exits.'"
+    },
+    {
+      "text": "The response mentions --output-format for structured output (JSON/stream-json)",
+      "passed": true,
+      "evidence": "Table row: '--output-format | Control output: text (default), json (structured with metadata), stream-json (streaming)'. Both JSON and stream-json mentioned."
+    },
+    {
+      "text": "The response covers authentication via ANTHROPIC_API_KEY environment variable",
+      "passed": true,
+      "evidence": "Dedicated 'Option 1: Anthropic API Key (Direct)' section with export ANTHROPIC_API_KEY example and GitHub Actions secret usage."
+    },
+    {
+      "text": "The response provides a practical example of running claude in CI (e.g. a github actions snippet or shell command)",
+      "passed": true,
+      "evidence": "Multiple examples: GitHub Actions workflow YAML for auto-review on PR, @claude mention handler, raw CLI for generic CI, and GitLab CI mention. Also references anthropics/claude-code-action@v1."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "total": 4,
+    "pass_rate": 1.0
+  }
+}

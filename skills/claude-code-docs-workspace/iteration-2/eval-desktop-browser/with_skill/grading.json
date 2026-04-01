@@ -1,0 +1,8 @@
+{
+  "expectations": [
+    {"text": "The response mentions the Desktop app's built-in browser or Chrome DevTools integration for testing web servers", "passed": true, "evidence": "'built-in live app preview feature', 'embedded browser inside the Desktop app'. Also covers Chrome integration as a separate option."},
+    {"text": "The response explains how Claude can automatically start and interact with a web server", "passed": true, "evidence": "'Claude starts your dev server automatically', auto-verify with screenshots/DOM inspection/clicking/form filling. Includes .claude/launch.json config."},
+    {"text": "The response mentions how to set up similar functionality in the CLI (e.g. via MCP or chrome-devtools)", "passed": true, "evidence": "Dedicated 'What About Chrome Integration?' section: 'Install the Claude in Chrome extension', 'Launch Claude Code with --chrome or run /chrome in a session'."}
+  ],
+  "summary": {"passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0}
+}

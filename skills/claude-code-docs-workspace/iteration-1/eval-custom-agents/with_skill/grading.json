@@ -1,0 +1,20 @@
+{
+  "expectations": [
+    {
+      "text": "The response mentions .claude/agents/ as the directory for defining custom agents",
+      "passed": true,
+      "evidence": "'.claude/agents/code-reviewer.md' shown with table of project vs user scope locations."
+    },
+    {
+      "text": "The response mentions claude --agent=<name> as the way to invoke a custom agent",
+      "passed": true,
+      "evidence": "'claude --agent code-reviewer' documented under 'Run Entire Session as the Agent'."
+    },
+    {
+      "text": "The response explains the agent file format (markdown with frontmatter or specific structure)",
+      "passed": true,
+      "evidence": "Complete frontmatter reference table with 14 fields (name, description, tools, model, permissionMode, maxTurns, skills, mcpServers, hooks, memory, background, effort, disallowedTools). Full example with YAML frontmatter + markdown body."
+    }
+  ],
+  "summary": { "passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0 }
+}
