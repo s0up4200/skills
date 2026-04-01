@@ -1,8 +1,0 @@
-{
-  "expectations": [
-    {"text": "The response mentions /batch as the command for fanning out large changesets", "passed": false, "evidence": "Does not mention /batch. Recommends 'claude -p in a shell loop'. /batch likely not in docs yet."},
-    {"text": "The response explains that /batch uses worktree agents to parallelize the work", "passed": false, "evidence": "No mention of /batch. Mentions agent teams with git worktrees as a separate option."},
-    {"text": "The response mentions git worktrees or claude -w as the underlying mechanism for parallel isolation", "passed": false, "evidence": "Mentions git worktrees in the agent teams section but not claude -w flag specifically."}
-  ],
-  "summary": {"passed": 0, "failed": 3, "total": 3, "pass_rate": 0.0}
-}

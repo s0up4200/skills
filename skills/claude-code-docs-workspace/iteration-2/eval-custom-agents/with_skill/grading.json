@@ -1,8 +1,0 @@
-{
-  "expectations": [
-    {"text": "The response mentions .claude/agents/ as the directory for defining custom agents", "passed": true, "evidence": "Shows '.claude/agents/' for project and '~/.claude/agents/' for personal scope."},
-    {"text": "The response mentions claude --agent=<name> as the way to invoke a custom agent", "passed": true, "evidence": "'claude --agent code-reviewer' documented as one of four invocation methods."},
-    {"text": "The response explains the agent file format (markdown with frontmatter or specific structure)", "passed": true, "evidence": "Full frontmatter reference table with all supported fields. Complete example with YAML frontmatter + markdown body."}
-  ],
-  "summary": {"passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0}
-}
