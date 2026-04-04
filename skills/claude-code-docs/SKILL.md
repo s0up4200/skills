@@ -29,15 +29,6 @@ ls ~/github/*/claude-docs/claude-code/docs/*.md 2>/dev/null || ls ~/.claude/clau
 - Use Glob with `**/*.md` to list all available docs if you need to browse
 - When you know the topic, go straight to the file (see the mapping table below) instead of searching
 
-## Setup
-
-The docs are mirrored from Mintlify's `llms-full.txt` endpoint and split into per-page markdown files.
-
-1. Clone the docs mirror repo (contains `update.sh` and `docs/`)
-2. Run `./update.sh` to download and split docs into `docs/*.md`
-
-To update to the latest docs, re-run `./update.sh` in the repo.
-
 ## Doc coverage
 
 The docs directory contains all English pages from the sitemap (~74 docs), covering:
