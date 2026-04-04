@@ -13,7 +13,7 @@ The docs live in a local directory. Find it by checking common locations:
 
 ```bash
 # Check if there's a known docs path
-ls ~/github/*/claude-code-docs/docs/*.md 2>/dev/null || ls ~/.claude/claude-code-docs/docs/*.md 2>/dev/null
+ls ~/github/*/claude-docs/claude-code/docs/*.md 2>/dev/null || ls ~/.claude/claude-code-docs/docs/*.md 2>/dev/null
 ```
 
 ### Search strategy
