@@ -44,6 +44,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | Skill | Description |
 |---|---|
 | [mobile-adapt](skills/mobile-adapt/) | Adapt sites and apps for iPhone-class mobile web — audits navigation, safe areas, forms, tables, and charts for phone usability |
+| [release-announcement](skills/release-announcement/) | Write a Discord release announcement from everything on main since the latest release tag |
 
 ## Skill Structure
 

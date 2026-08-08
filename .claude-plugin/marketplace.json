@@ -21,6 +21,15 @@
         "./skills/claude-code-docs",
         "./skills/platform-docs"
       ]
+    },
+    {
+      "name": "release-skills",
+      "description": "Release tagging and announcement skills",
+      "source": "./skills",
+      "skills": [
+        "./skills/release-tag",
+        "./skills/release-announcement"
+      ]
     }
   ]
 }
