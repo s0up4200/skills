@@ -15,7 +15,7 @@ If the user does not specify a device or browser, optimize first for:
 
 - iPhone Pro Max class in portrait and landscape
 - iOS Safari
-- compact touch screens around `390-440 CSS px` wide
+- compact touch screens around `375-440 CSS px` wide
 - keyboard-open use, large text, safe areas, and reduced motion
 
 ## When to research
@@ -75,7 +75,7 @@ Apple HIG (confirmed current as of WWDC 2024/2025) recommends 3–5 tabs on iPho
 
 **After** — bottom tab bar with safe-area padding and 44x44 tap targets (WCAG 2.5.5 AAA, Apple HIG minimum). The `env(safe-area-inset-bottom)` value is ~34px on Face ID iPhones for the home indicator, but returns `0` without `viewport-fit=cover` in the viewport meta tag. Each `NavTab` renders at least `h-14` (56px) to clear the 44px minimum with comfortable padding:
 ```tsx
-<nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white
+<nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background
                 pb-[env(safe-area-inset-bottom)] md:hidden">
   <div className="flex items-center justify-around h-14">
     <NavTab href="/dashboard" icon={HomeIcon} label="Hjem" />
@@ -138,7 +138,7 @@ Use `inputmode="decimal"` instead of `type="number"` for currency — it shows t
 </form>
 ```
 
-**After** — inline submit that scrolls with form content, staying naturally reachable. The outer container uses `min-h-[100dvh]` (`dvh` tracks the visual viewport including keyboard, unlike old `vh`):
+**After** — inline submit that scrolls with form content, staying naturally reachable. The outer container uses `min-h-[100dvh]`. Note: `dvh` tracks the collapsing Safari toolbar, not the keyboard — no CSS unit follows the Visual Viewport. The `sticky bottom-0` footer will not pin while the keyboard is open (WebKit bug #202120), but it sits in normal flow at the end of the form, so it scrolls into reach:
 ```tsx
 <form className="flex flex-col min-h-[100dvh]">
   <div className="flex-1 space-y-4 p-4">
@@ -147,7 +147,7 @@ Use `inputmode="decimal"` instead of `type="number"` for currency — it shows t
     <Input label="Beskrivelse" enterKeyHint="next" autoComplete="off" />
     <Select label="Kategori" options={categories} />
   </div>
-  <div className="sticky bottom-0 p-4 border-t bg-white
+  <div className="sticky bottom-0 p-4 border-t bg-background
                   pb-[max(1rem,env(safe-area-inset-bottom))]">
     <Button type="submit" className="w-full h-12">Lagre</Button>
   </div>
@@ -228,7 +228,7 @@ Use `inputmode="decimal"` instead of `type="number"` for currency — it shows t
 
 For each check below, confirm the specific pass condition and use the suggested tooling. Real device testing is the gold standard — simulators are useful for iteration but cannot fully reproduce keyboard timing, scroll inertia, or touch precision.
 
-- **Portrait and landscape** — Phone stays in the mobile shell in both orientations. No layout breakage, no content overflow, no sudden switch to a desktop sidebar or multi-pane view. Test at 390px (iPhone Pro) and 430px (iPhone Pro Max) portrait, and their landscape equivalents. Use Chrome DevTools device toolbar or Xcode Simulator.
+- **Portrait and landscape** — Phone stays in the mobile shell in both orientations. No layout breakage, no content overflow, no sudden switch to a desktop sidebar or multi-pane view. Test at 375px (iPhone SE/mini class), 390px (iPhone Pro), and 430px (iPhone Pro Max) portrait, and their landscape equivalents. Use Chrome DevTools device toolbar or Xcode Simulator.
 
 - **iOS Safari safe areas** — Content is not clipped by the Dynamic Island, rounded corners, or home indicator. Bottom-fixed elements have visible `env(safe-area-inset-bottom)` padding (~34px on Face ID iPhones). Verify that `viewport-fit=cover` is set in the viewport meta tag — without it, all `env(safe-area-inset-*)` values return `0`. Best tested in Xcode Simulator (accurate per-device insets) or Polypane 26+ (desktop browser with real safe-area inset presets). Chrome DevTools 135+ supports `Emulation.setSafeAreaInsetsOverride` but requires manual configuration.
 
