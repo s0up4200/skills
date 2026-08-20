@@ -33,10 +33,11 @@
     },
     {
       "name": "review-skills",
-      "description": "Performance review skills",
+      "description": "Performance and design review skills",
       "source": "./skills",
       "skills": [
-        "./skills/perf-review"
+        "./skills/perf-review",
+        "./skills/go-proverbs"
       ]
     },
     {
