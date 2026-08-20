@@ -30,6 +30,14 @@
         "./skills/release-tag",
         "./skills/release-announcement"
       ]
+    },
+    {
+      "name": "github-skills",
+      "description": "GitHub pull request and issue workflow skills",
+      "source": "./skills",
+      "skills": [
+        "./skills/labels"
+      ]
     }
   ]
 }
