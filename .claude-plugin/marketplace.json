@@ -45,7 +45,8 @@
       "description": "GitHub pull request and issue workflow skills",
       "source": "./skills",
       "skills": [
-        "./skills/labels"
+        "./skills/labels",
+        "./skills/pr-conflicts"
       ]
     }
   ]
