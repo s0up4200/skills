@@ -32,6 +32,14 @@
       ]
     },
     {
+      "name": "review-skills",
+      "description": "Performance review skills",
+      "source": "./skills",
+      "skills": [
+        "./skills/perf-review"
+      ]
+    },
+    {
       "name": "github-skills",
       "description": "GitHub pull request and issue workflow skills",
       "source": "./skills",
