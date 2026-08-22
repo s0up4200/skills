@@ -10,7 +10,8 @@
       "description": "UI/UX and frontend adaptation skills",
       "source": "./skills",
       "skills": [
-        "./skills/mobile-adapt"
+        "./skills/mobile-adapt",
+        "./skills/native-web"
       ]
     },
     {
