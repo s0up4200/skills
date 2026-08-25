@@ -45,6 +45,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 |---|---|
 | [mobile-adapt](skills/mobile-adapt/) | Adapt sites and apps for iPhone-class mobile web — audits navigation, safe areas, forms, tables, and charts for phone usability |
 | [release-announcement](skills/release-announcement/) | Write a Discord release announcement from everything on main since the latest release tag |
+| [github-resolution-audit](skills/github-resolution-audit/) | Find open GitHub Issues and Discussions whose requested work has shipped, whose bugs are fixed, or which duplicate another item |
 | [labels](skills/labels/) | Label a GitHub PR or issue from the repo's existing labels, asking before it creates a new one |
 | [pr-conflicts](skills/pr-conflicts/) | Sweep open PRs for merge conflicts, apply the repo's conflict label, and remove it from PRs that merge cleanly again |
 | [perf-review](skills/perf-review/) | Review Go and TypeScript diffs, branches, or PRs for performance problems — allocations, O(n²) algorithms, N+1 queries, unbounded concurrency, re-render storms |
