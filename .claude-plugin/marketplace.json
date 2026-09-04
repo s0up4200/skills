@@ -48,7 +48,8 @@
       "skills": [
         "./skills/github-resolution-audit",
         "./skills/labels",
-        "./skills/pr-conflicts"
+        "./skills/pr-conflicts",
+        "./skills/post-review"
       ]
     }
   ]
