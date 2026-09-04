@@ -1,6 +1,6 @@
 ---
 name: post-review
-description: Post the last /code-review report on a GitHub pull request as a request-changes review, after the debuzz, unslop, and stop-slop passes and user approval. User-invoked only, as /post-review [pr-number] [--dry-run].
+description: Post the last /code-review report on a GitHub pull request as a request-changes review, after the unslop and stop-slop passes and user approval. User-invoked only, as /post-review [pr-number] [--dry-run].
 disable-model-invocation: true
 ---
 
@@ -55,13 +55,10 @@ While you copy the findings:
 
 ## Step 3: Prose passes, in this order
 
-1. Copy the body to `body-before-debuzz.md`. Then invoke the `debuzz` skill in `colleague` mode on the body. If `command -v agy` fails, or `agy` returns an error, skip this step and say so in the final report. Do not write your own substitute for it.
-2. Invoke the `unslop` skill on the body.
-3. Invoke the `stop-slop` skill on the body.
+1. Invoke the `unslop` skill on the body.
+2. Invoke the `stop-slop` skill on the body.
 
-Each pass edits `post-review-body.md` in place. Prose only: the disclosure line, the two headings, and the summary line stay.
-
-Debuzz is an external rewrite and can change a claim, not only its style: in testing it deleted the disclosure line, turned "the PR test masks it" into "the PR test passes", and made every piece of evidence passive. Diff the result against `body-before-debuzz.md`, restore any sentence whose meaning moved, and keep the first person on evidence you produced. Style changes stay. The two slop passes then remove the filler it adds.
+Each pass edits `post-review-body.md` in place. Prose only: the disclosure line, the two headings, and the summary line stay. Keep the first person on evidence you produced, and keep each finding's severity words ("overstates", "masks", "narrow") as they are. A pass that changes a claim has gone past style.
 
 ## Step 4: Check the code spans
 
@@ -86,4 +83,4 @@ gh pr review [N] --request-changes --body-file post-review-body.md
 
 Always request changes. The review exists because the report found something.
 
-Report the review URL, and whether the debuzz step ran or was skipped.
+Report the review URL.
