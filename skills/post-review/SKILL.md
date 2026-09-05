@@ -1,6 +1,6 @@
 ---
 name: post-review
-description: Post the last /code-review report on a GitHub pull request as a request-changes review, after the unslop and stop-slop passes and user approval. User-invoked only, as /post-review [pr-number] [--dry-run].
+description: Post the last /code-review report on a GitHub pull request as a request-changes review, after the unslop pass and user approval. User-invoked only, as /post-review [pr-number] [--dry-run].
 disable-model-invocation: true
 ---
 
@@ -53,12 +53,9 @@ While you copy the findings:
 <skill base directory>/scripts/code-spans.sh post-review-body.md > spans-before.txt
 ```
 
-## Step 3: Prose passes, in this order
+## Step 3: Prose pass
 
-1. Invoke the `unslop` skill on the body.
-2. Invoke the `stop-slop` skill on the body.
-
-Each pass edits `post-review-body.md` in place. Prose only: the disclosure line, the two headings, and the summary line stay. Keep the first person on evidence you produced, and keep each finding's severity words ("overstates", "masks", "narrow") as they are. A pass that changes a claim has gone past style.
+Invoke the `unslop` skill on the body. It edits `post-review-body.md` in place. Prose only: the disclosure line, the two headings, and the summary line stay. Keep the first person on evidence you produced, and keep each finding's severity words ("overstates", "masks", "narrow") as they are. A pass that changes a claim has gone past style.
 
 ## Step 4: Check the code spans
 
@@ -67,7 +64,7 @@ Each pass edits `post-review-body.md` in place. Prose only: the disclosure line,
 diff spans-before.txt spans-after.txt
 ```
 
-Any span in `before` that is missing from `after` was mangled by a prose pass. Restore it by hand from the original report. A rewritten `file:line` or error string sends the author to the wrong place.
+Any span in `before` that is missing from `after` was mangled by the prose pass. Restore it by hand from the original report. A rewritten `file:line` or error string sends the author to the wrong place.
 
 ## Step 5: Approval gate
 
