@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Collect the raw material for a qBittorrent upstream audit.
 #
-# Usage: upstream-diff.sh OUT_DIR [BASE] [HEAD]
-#   BASE  defaults to the newest stable release-X.Y.Z tag (alpha/beta/rc skipped)
+# Usage: upstream-diff.sh OUT_DIR BASE [HEAD]
+#   BASE  required: the release the consumers were last brought up to date with.
+#         No default on purpose - the newest tag is the wrong answer whenever
+#         that release has not been adapted to yet, and it hides the work.
 #   HEAD  defaults to origin/master (the fetched tip, not the local branch)
 #   NO_FETCH=1  skip `git fetch`
 #
@@ -24,7 +26,7 @@ if [[ -z "${NO_FETCH:-}" ]]; then
     git fetch -q origin master --tags
 fi
 
-base="${2:-$(git tag --list 'release-*' | grep -E '^release-[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)}"
+base="${2:?BASE required: the release the consumers were last brought up to date with}"
 head="${3:-origin/master}"
 range="$base...$head"
 log=(git log --cherry-pick --right-only --no-merges --format='%h %cd %s' --date=short "$range")

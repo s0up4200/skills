@@ -9,12 +9,26 @@ qBittorrent development moves fast and the WebAPI wiki lags the code. The contro
 
 ## Steps
 
-1. **Resolve the range.** Default is the newest stable `release-X.Y.Z` tag to `origin/master`. That tracks the next release on its own: once `release-5.3.0` exists the next run compares against it. Pre-release tags (`release-5.3.0beta1`) are skipped as a default base because they sit on master and would leave an empty range; pass one explicitly as head or base when the user asks about a specific alpha, beta, or rc. Take an explicit base or head when the user gives one (a tag, a SHA, or "since the last audit").
+1. **Resolve the range.** Head is `origin/master` unless the user names one. For the base, ask which release the consumers were last brought up to date with, and skip the question only when the user already named a base or a range.
+
+   Ask rather than assume, because the base is a fact about the consumer repos that upstream git cannot answer. The newest tag is the tempting default and the wrong one: the day 5.3.0 is tagged, every unadapted 5.3 change falls behind that base and drops out of the report, while a handful of early 5.4 commits keep the range looking healthy rather than empty. Silent under-reporting is the one failure this skill cannot afford.
+
+   Offer the newest few stable `release-X.Y.Z` tags with the `API_VERSION` each one shipped, so the choice is informed:
+
+   ```bash
+   for t in $(git tag --list 'release-*' | grep -E '^release-[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -4); do
+       printf '%s  API_VERSION %s\n' "$t" "$(git show "$t:src/webui/webapplication.h" | sed -n 's/.*API_VERSION {\(.*\)};/\1/p' | tr -d ' ' | tr ',' '.')"
+   done
+   ```
+
+   When the user does not know, take the older of the two newest stable tags. Over-reporting costs one re-read of work already done; under-reporting hides a breaking change until users find it.
+
+   Pre-release tags (`release-5.3.0beta1`) sit on master, so a pre-release is never a base. Pass one as head when the user asks about a specific alpha, beta, or rc.
 
 2. **Collect the material.** Run the bundled script into the scratchpad. It fetches `master` and tags first unless `NO_FETCH=1`.
 
    ```bash
-   scripts/upstream-diff.sh <scratchpad>/qbt-upstream [BASE] [HEAD]
+   scripts/upstream-diff.sh <scratchpad>/qbt-upstream <BASE> [HEAD]
    ```
 
    It writes `summary.md` (range, `API_VERSION` diff and bump commits, lines added to `WebAPI_Changelog.md` and `Changelog`, commit lists per watch path), `api, and the commit list for the bundled WebUI.patch` (every patch on the WebAPI surface).
@@ -34,6 +48,7 @@ qBittorrent development moves fast and the WebAPI wiki lags the code. The contro
    # qBittorrent upstream: <base> -> <head> (<short sha>, <date>)
 
    API_VERSION <old> -> <new>. <N> WebAPI commits, <M> bundled WebUI commits.
+   Newest release both consumers fully handle: <tag>.
 
    ## go-qbittorrent
    ### Breaking
@@ -58,6 +73,7 @@ Every commit in `api.patch` appears in the report exactly once: under a consumer
 
 ## Judgement calls
 
+- **A release does not clear the work.** The report tracks what the consumers have not adapted to, not what upstream has not shipped. A breaking change stays in the report after its release is tagged, and stays there every run until the consumer code references the new spelling. Report an item as done only on evidence in the consumer repo, never because the release that carried it is out.
 - **Cherry-picks and backports.** The script removes patches already in the base tag. A commit that also landed in a point release after the base tag (for example in 5.2.4 while the base is 5.2.3) is still new relative to the base and stays in the report. Say when it is already released.
 - **A rename inside upstream can fake a behaviour change.** `56bf1d0f7` renamed the `Http::METHOD_POST` constant, so 80 lines of the POST-only endpoint table in `webapplication.h` show up as additions in a commit titled "Allow to download completed files". Read the removed lines beside the added ones before concluding that an endpoint changed method or gained a restriction.
 - **Renames upstream are breaking for the library, not for users.** Follow the precedents at the end of this file: pick the name by WebAPI version rather than dropping support for older servers. qui users run every version from 4.x up.
