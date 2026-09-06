@@ -51,6 +51,14 @@
         "./skills/pr-conflicts",
         "./skills/post-review"
       ]
+    },
+    {
+      "name": "qbittorrent-skills",
+      "description": "qBittorrent upstream tracking for go-qbittorrent and qui",
+      "source": "./skills",
+      "skills": [
+        "./skills/qbittorrent-upstream"
+      ]
     }
   ]
 }
