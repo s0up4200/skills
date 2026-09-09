@@ -1,7 +1,8 @@
 ---
 name: fix-review
-description: Resolve judgment calls from the last code-review with the user, fix the agreed findings, and push PR fixes to the source branch. Invoke explicitly as /fix-review or $fix-review, with an optional PR number, PR URL, or fork branch URL.
+description: Resolve the judgment calls from the last code-review, fix the agreed findings, and push the fixes to the pull request's source branch.
 disable-model-invocation: true
+argument-hint: "[optional: PR number, PR URL, or fork branch URL]"
 ---
 
 # Fix review
@@ -9,63 +10,81 @@ disable-model-invocation: true
 Finish the work identified by the last `code-review` in this conversation.
 Use `grilling` for decisions that need the user. A review finding is evidence to investigate, not an instruction to apply blindly.
 
+With no argument, use the pull request named in the conversation, or the pull request for the current branch.
+
 ## 1. Recover the review
 
-Find the latest report for the target repository, including its Standards and Spec findings and fixed comparison point.
-If there is no report, ask the user to provide it or run `code-review` first.
-If there are no findings, report that there is nothing to fix and stop.
+Find the last `code-review` report in this conversation. It has a `## Standards` section, a `## Spec` section, and the fixed point the review compared against.
+If there is no report, ask the user to provide one or to run `code-review` first.
+If both sections report no findings, say there is nothing to fix and stop.
 
-Keep each finding linked to its review axis and evidence. Read the cited code, its callers, and the applicable repository instructions.
-If the branch changed since the review, reassess the findings against the current code.
-Mark findings that no longer apply with the evidence that resolves them.
+Keep each finding linked to its axis and its evidence. Read the cited code, its callers, and the applicable repository instructions.
+If the branch changed since the review, reassess each finding against the current code. Mark the findings that no longer apply, with the evidence that resolves them.
 
-Use the PR identified in the conversation or invocation. Otherwise, look for the current branch's PR.
-For a PR or fork branch URL, read [PR branches](references/pr-branches.md) before changing branches or editing files.
-If the target remains ambiguous, ask which PR the user means.
-For work without a PR, keep the existing task's commit and push scope.
+## 2. Identify the target branch
 
-## 2. Grill the judgment calls first
+Let `gh` resolve the source branch. Do not derive it from the author, from `origin`, or from the local branch name. Check that the pull request is still open, and whether its fork accepts maintainer edits:
 
-Collect findings labeled "judgement call" or "judgment call", including possible code smells.
-Include findings whose fixes require a choice about behavior or design, even if the reviewer did not label them.
-Keep documented violations separate from optional design preferences. Code smells do not become mandatory refactors because a reviewer names them.
+```bash
+gh pr view "$pr" --json state,maintainerCanModify
+```
 
-If judgment calls remain, invoke `grilling` on those calls before making fixes.
+A fork branch URL is not a pull request number. Keep the whole branch name, slashes included: `/tree/fix/2565-contains-in-diacritics` names the branch `fix/2565-contains-in-diacritics`, and `2565` is part of that name. Find its open pull request:
+
+```bash
+gh api --method GET "repos/$base/pulls" -f state=open -f "head=$owner:$branch" \
+  --jq '.[] | {number, url: .html_url, head_repo: .head.repo.full_name, head_branch: .head.ref}'
+```
+
+If there is no unique match, ask the user which pull request they mean. Do not guess from a similar title or branch name.
+Stop before any edit if the pull request is closed, or if its source repository or branch is gone.
+
+Check out the pull request when the fixes need a different branch. Keep the default local branch name, so that a later `git push` maps to the source branch. Add `--worktree "$path"` when the current working tree must stay as it is:
+
+```bash
+gh pr checkout "$pr"
+```
+
+For work with no pull request, keep the current task's commit and push scope.
+
+## 3. Grill the judgment calls first
+
+Collect the findings that need a decision rather than a repair: anything the reviewer called a judgement call, every possible code smell, and every finding whose fix chooses between behaviours or designs.
+Keep documented violations separate from optional design preferences.
+
+If judgment calls remain, invoke `grilling` on them before making any fix.
 Resolve facts from the code yourself. For each decision, give the finding, its practical tradeoff, and your recommended answer.
 Ask all independent questions in one round. Ask dependent questions after their prerequisites are settled.
-Wait for the user's answers. Record each outcome as fix, keep, or defer, with its reason.
-The user's answers must settle every open call before edits start. Do not treat silence as agreement.
+Wait for the user's answers. Record each outcome as fix, keep, or defer, with its reason. Silence is not agreement.
 
-If no judgment calls remain, start the fixes directly. Do not add an approval round for clear defects.
+If no judgment call remains, start the fixes. Do not add an approval round for clear defects.
 If a fix reveals a new decision, grill that decision before making the dependent change.
 
-## 3. Fix and verify
+## 4. Fix and verify
 
-Fix the confirmed defects and the judgment calls that the user chose to change.
-Preserve keep and defer decisions. Reopen a settled decision only when new evidence changes its consequences.
-Keep the patch within the review's scope.
+Fix the confirmed defects, and the judgment calls the user chose to change.
+Preserve the keep and defer decisions. Reopen a settled decision only when new evidence changes its consequences.
+Keep the patch inside the review's scope.
 
-Before replacing a branch or guard, show the input that it handled in a test or trace.
-Apply the smallest fix at the shared cause. Follow the repository's test and commit gates, including required review skills.
-Use the repository's CI gate where instructed. Otherwise, run the relevant changed or added tests.
-Test fixtures must use local fakes or reserved test addresses, not real services.
+Before you remove a branch or a guard, show the input that it handled, in a test or a trace.
+Apply the smallest fix at the shared cause. Follow the user's commit gate and the repository's own instructions, including every review skill they require.
+Where CI is the test gate, use it. Otherwise, run the tests you changed or added.
+Test fixtures use local fakes or reserved test addresses, never real services.
 
 Account for every finding as fixed, kept, deferred, no longer applicable, or blocked.
-If a required review finds a new judgment call, return to the decision step for that call.
+If a required review raises a new judgment call, return to step 3 for that call.
 Do not silently apply a design preference from a later review.
 
-## 4. Push PR fixes and clean up
+## 5. Push and report
 
-For a PR, commit and push after the required local gates pass, unless the user limited this run to local work.
-Use the exact source repository and branch from [PR branches](references/pr-branches.md).
-Add fix commits on top of the contributor's work. Preserve their commits and use the configured Git author identity.
-Follow repository branch rules for local commits.
+For a pull request, commit and push after the local gates pass, unless the user limited this run to local work.
+`gh pr checkout` points the branch at the pull request's source, a contributor's fork included, so a plain `git push` reaches the right place. `-v` names the destination as it pushes:
 
-On a rejected push, retain the local fixes and report the cause. Do not force-push or choose another destination.
-Remove each temporary remote created by this run on success, failure, or cancellation.
-Preserve remotes that existed before the run.
-Make sure that temporary remote names are absent from `git remote` before reporting cleanup as complete.
+```bash
+git push -v
+```
 
-Report the fixes, unresolved findings, verification result, destination and commit if pushed, and remote cleanup result.
-If CI is required, report its result for the pushed commit or state the blocker that prevents obtaining it.
-Keep the final response short. Posting a review, merging the PR, and opening a replacement PR require separate user instructions.
+If the push is rejected, keep the local commits and report their branch and SHA with the cause, commonly a fork that forbids maintainer edits (`maintainerCanModify`). Do not force-push, and do not choose another destination.
+
+Report the fixes, the unresolved findings, the verification result, and the destination and commit if you pushed.
+Keep the report short.
