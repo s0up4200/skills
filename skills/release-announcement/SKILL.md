@@ -53,6 +53,15 @@ Extract PR numbers from the `(#NNNN)` suffixes. Sort commits into two buckets:
 - **Analyze**: features, fixes, and anything plausibly user-visible.
 - **Skip**: `chore(deps)` bumps, CI-only changes, docs-only changes. Don't spend agents on these; at most they get a passing mention if something notable hides in them (a security bump users should know about, for example).
 
+Then collect the contributors, sorted by commit count. Use `main` or `develop` as the end ref (the API takes branch names, not `origin/...`); it returns at most 250 commits, more than any qui release:
+
+```bash
+gh api repos/autobrr/qui/compare/<tag>...<end> --jq '.commits[].author.login // empty' \
+  | sort | uniq -c | sort -rn | grep -v 's0up4200\|\[bot\]'
+```
+
+Credit every login left, docs-only PR authors included even though Step 4 skips their PRs.
+
 ## Step 5: Analyze with a workflow of Opus agents
 
 Spawn one agent per analyzed PR via the Workflow tool. Each agent reads the PR body and the actual diff, because PR bodies alone often undersell or oversell what changed, and the announcement needs concrete facts (exact option names, version requirements, real numbers).
@@ -112,8 +121,14 @@ You write it yourself in the main conversation, from the agent findings. Do not 
 - **Another theme.** ...
 - **Fixes and polish.** Catch-all for the smaller items, comma-chained.
 
+Thanks to **login1**, **login2**, and **login3** for contributing to this release.
+
 Full changelog: https://github.com/autobrr/qui/releases/tag/vX.Y.Z
 ```
+
+### Contributors
+
+List the Step 4 logins in that order, bold, as plain text: a `@login` on Discord looks like a broken ping because these are GitHub handles, not Discord ones. Names only, no per-person summaries.
 
 ### How to build the Highlights
 
@@ -128,7 +143,7 @@ Full changelog: https://github.com/autobrr/qui/releases/tag/vX.Y.Z
 
 - Never use em dashes. Commas, periods, or parentheses instead.
 - Discord markdown only: `#`, `##`, `**bold**`, `` `code` ``, lists. No tables, no links other than the changelog URL, no images.
-- Total length in the neighborhood of the example below (roughly 2500 characters). Discord posts should be scannable, not exhaustive; the changelog link carries the long tail.
+- Total length in the neighborhood of the example below (roughly 2500 characters), and never above Discord's 4000-character message limit. Discord posts should be scannable, not exhaustive; the changelog link carries the long tail. Count with `wc -m` on the draft (characters, not bytes, since `wc -c` overcounts anything non-ASCII). When a draft runs over, trim the Fixes and polish bullet and tighten the longer Highlights first; the contributor line is the cheapest part of the post and is not where the space comes from.
 - The `:qui:` emoji in the title is a custom server emoji; keep it verbatim.
 
 ### Reference example (v1.21.0)
@@ -144,11 +159,13 @@ Full changelog: https://github.com/autobrr/qui/releases/tag/vX.Y.Z
 - **Cross-seed matching fixes.** TV searches no longer append a resolution token that made some indexers (BTN, IPT) return zero results, "and"/"&" connector-spelling passes now reuse the Torznab cache and re-query indexers that returned only junk, and rootless single-file torrents matched into a foldered release are filed into the correct folder so qBittorrent stops reporting missing files.
 - **Fixes and polish.** Postgres hardening (fixed int4 sequence exhaustion in string interning and indexed `string_pool` columns so background GC stops timing out), all-instances exports now route to the owning instance, a new `GET /api/version` endpoint reports the running version, pprof binds to a configurable loopback address, and assorted UI polish (status bar back at the bottom, no more tab-indicator layout shifts).
 
+Thanks to **nitrobass24**, **jussaw**, **OlziYT**, **rodion981**, **luckylittle**, and **nasenov** for contributing to this release.
+
 Full changelog: https://github.com/autobrr/qui/releases/tag/v1.21.0
 ```
 
 ## Step 7: Deliver and hand off
 
-Print the finished announcement inside a fenced code block so the raw markdown can be copied straight into Discord (rendered markdown loses the formatting characters).
+Print the finished announcement inside a fenced code block so the raw markdown can be copied straight into Discord (rendered markdown loses the formatting characters). State the character count next to it so the user can see it fits before pasting.
 
 Then, if this was a real release run (not a preview), offer to cut the tag by invoking the `/release-tag` skill. That skill handles the signed tag and push with its own confirmation. The GitHub release page (and the changelog URL in the announcement) goes live once the tag is pushed and CI publishes the release.
