@@ -50,7 +50,8 @@
         "./skills/labels",
         "./skills/pr-conflicts",
         "./skills/post-review",
-        "./skills/fix-review"
+        "./skills/fix-review",
+        "./skills/verify-review"
       ]
     },
     {

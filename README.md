@@ -51,6 +51,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [perf-review](skills/perf-review/) | Review Go and TypeScript diffs, branches, or PRs for performance problems — allocations, O(n²) algorithms, N+1 queries, unbounded concurrency, re-render storms |
 | [post-review](skills/post-review/) | Post the last /code-review report on a PR as a request-changes review, after an AI disclosure line and the unslop pass; user-invoked, posts only after approval |
 | [fix-review](skills/fix-review/) | Resolve the judgment calls, fix the last code-review findings, and push the fixes to the PR's source branch. Explicit invocation only |
+| [verify-review](skills/verify-review/) | Verify the unresolved AI review threads on a PR against the code, fix the true findings, refute the false ones with approval. Explicit invocation only |
 | [go-proverbs](skills/go-proverbs/) | Question a Go plan or spec with the 19 Go proverbs from Rob Pike's Gopherfest 2015 talk before any code exists |
 | [native-web](skills/native-web/) | Replace custom JavaScript and UI libraries with native web platform features — 42 tips from htmlcat.net with support tiers and caveats |
 | [qbittorrent-upstream](skills/qbittorrent-upstream/) | Audit unreleased qBittorrent WebAPI and session changes and map each onto the work go-qbittorrent and qui need before the next release |
