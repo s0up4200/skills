@@ -7,6 +7,8 @@
 # of the first comment, for replies), url, body (first comment), replies (count),
 # outdated (bool).
 set -euo pipefail
+# A mise-managed gh wrapper prints status lines to stdout, which breaks jq.
+export MISE_QUIET=1
 repo="${1:?owner/repo}"; pr="${2:?pr number}"; all="${3:-}"
 owner="${repo%%/*}"; name="${repo##*/}"
 if [ "$all" = "--reviews" ]; then
