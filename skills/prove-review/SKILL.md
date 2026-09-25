@@ -1,6 +1,6 @@
 ---
 name: prove-review
-description: Prove every claim in a /code-review or /pr-review-toolkit:review-pr report with a probe test, a mutation, or an exact quote, then attack the proved report with two fresh verifier agents each round until neither finds a problem. User-invoked only, as /prove-review [pr].
+description: Prove every claim in a /code-review, /pr-review-toolkit:review-pr, or /verify-review report with a probe test, a mutation, or an exact quote, then attack the proved report with two fresh verifier agents each round until neither finds a problem. User-invoked only, as /prove-review [pr].
 disable-model-invocation: true
 argument-hint: "[optional: PR number or URL]"
 ---
@@ -21,22 +21,23 @@ The agent briefs sit next to this file: `<skill base directory>/references/agent
 
 A claim has proof when one of these shows it:
 
-- **Probe**: a test that passes on the reviewed head and shows the defect. Include the test code, the command, and the result.
+- **Probe**: a test that passes on the reviewed head and shows the claimed behavior. Include the test code, the command, and the result.
 - **Mutation**: one line changed in a throwaway copy, and the relevant test packages stay green. This proves that no test covers the line. The mutation must change behavior. A mutant that behaves the same as the original (an equivalent mutant) proves nothing.
-- **Quote**: an exact quote with its `file:line`, from the code, the issue, the design document, or the PR body, that shows the fact directly.
+- **Quote**: an exact quote with its `file:line`, from the code, the issue, the design document, the PR body, or a review thread, that shows the fact directly.
 
-Reasoning is not proof. A consequence claim ("this kills the connection after 15 s", "this makes X stale") needs a run that shows the consequence, even when a quote shows the cause.
+Reasoning is not proof. A consequence claim ("this kills the connection after 15 s", "this makes X stale") needs a run that shows the consequence, even when a quote shows the cause. Counter-evidence and the edge cases of a proposed fix need a run too. A "not run" label does not replace the run: run it, or remove the claim.
 
 A suggested fix and a suggested test recipe are claims too. A fix that names a field must name a field that exists. A recipe must pass on the head and fail under its matching mutation.
 
 ## 1. Find the reports and the target
 
-Find the review reports in this conversation. Two kinds count:
+Find the review reports in this conversation. Three kinds count:
 
 - A `/code-review` report, with a `## Standards` section and a `## Spec` section.
 - A `/pr-review-toolkit:review-pr` report, with findings grouped by severity (Critical, Important, Suggestions) and by agent.
+- A `/verify-review` report, with a verdict for each AI review thread. Read `<skill base directory>/references/verify-review-input.md` now. Its sections override the steps they name.
 
-If there is neither, stop and tell the user to run `/code-review` or `/pr-review-toolkit:review-pr` first. Do not run a review yourself. If more than one report of a kind exists and you cannot tell which one the user means, ask.
+If there is none, stop and tell the user to run `/code-review`, `/pr-review-toolkit:review-pr`, or `/verify-review` first. Do not run a review yourself. If more than one report of a kind exists, or a `/verify-review` report sits next to a review report, and you cannot tell which one the user means, ask.
 
 Record the target facts. For a PR:
 
@@ -99,7 +100,7 @@ Before each round, compare the PR head with the pinned SHA (`gh pr view "$pr" --
 
 Each round, dispatch two new Opus agents in parallel, in one message: the **factual verifier** and the **author's advocate**. Use new agents every round, never a resumed one. A resumed agent checks its own old findings again, and a new one finds new classes of problems. Round 2 of the first run found a test recipe that failed on the head. Round 3 found consumers that could not use the proposed interface. Neither was in round 1.
 
-Each prompt names the repository path, the head SHA, the merge-base, the PR number if any, the spec sources, the report path, the findings that are new or changed since the last round (from round 2 on), and this instruction: "Read `<skill base directory>/references/agents.md`. Follow the Common rules section and the <role> section."
+Each prompt names the repository path, the head SHA, the merge-base, the PR number if any, the kind of report, the spec sources, the report path, the findings that are new or changed since the last round (from round 2 on), and this instruction: "Read `<skill base directory>/references/agents.md`. Follow the Common rules section and the <role> section."
 
 When both agents return, take each finding in turn:
 
@@ -112,6 +113,8 @@ After each round, print one status line:
 ```text
 Round N: factual F, advocate A; applied X, refuted Y, dropped Z. Left: S Standards, P Spec.
 ```
+
+A point that both agents raise counts once in X or Y. Z counts the findings dropped in this round.
 
 The loop stops when both agents end with `NO FINDINGS` in the same round. There is no round limit.
 

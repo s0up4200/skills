@@ -11,6 +11,8 @@ An AI reviewer saw the diff. It did not run the code, read the callers, or know 
 
 Arguments: `/verify-review [pr] [--dry-run]`. With no PR, use the pull request named in the conversation, or the one for the current branch. `--dry-run` does everything up to the first write: no commit, no push, no comment, no thread resolution. The report at the end still lists what each write would have been.
 
+If a `/prove-review` report on these threads is in the conversation, its verdicts replace yours. Go on from step 3 with them.
+
 The thread script sits next to this file: `<skill base directory>/scripts/threads.sh`. The base directory is printed when the skill loads.
 
 ## 1. Collect the threads

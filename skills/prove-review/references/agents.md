@@ -50,7 +50,9 @@ Check every fact in the report. The report is wrong if a fact in it is wrong, ev
 - Count what the report counts ("four close sites", "three consumers") and compare.
 - Check each claim that the PR changed something against `git diff <merge-base> <head>`. A problem that existed before the branch is not "made by this PR".
 - Find words that claim more than the proof shows: every, all, only, always, never. One exception makes the word wrong.
+- Find each consequence claim that no run shows, including counter-evidence, fix claims, and claims labelled "not run".
 - Read each heading against its body. Headings drift after edits.
+- For a `/verify-review` report, compare each claim sentence with the first comment of its thread (`gh api repos/<owner>/<repo>/pulls/<pr>/comments`). A paraphrase that changes the scenario changes what the verdict answers.
 
 ## Author's advocate
 
@@ -62,3 +64,10 @@ Take the side of the author of the code. For each finding, ask: if the author ar
 - Look for missing context that changes the finding: a caller that already handles the case, a guard two calls up, a design document that chose this tradeoff.
 - Look for nits that cost the author more time than they are worth. Recommend dropping them.
 - If you find a real defect that the report misses, you can raise it only with proof.
+
+For a `/verify-review` report, there are two sides: the bot that made the claim, and the code. Take the side that each verdict ruled against:
+
+- `wrong`: argue that the bot was right. Restate the bot's scenario with its own inputs and order of events, and look for the neighbouring scenario that the refutation answered instead.
+- `confirmed`: argue that the code was fine. Look for a guard, a caller, or a documented choice that handles the case.
+- `stale`: argue that the behavior is still there at the head.
+- `judgment`: attack each fact under the recommendation and each claim that the proposed fix makes.
