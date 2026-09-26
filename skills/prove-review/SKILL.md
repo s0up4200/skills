@@ -1,8 +1,7 @@
 ---
 name: prove-review
 effort: high
-description: Prove every claim in a /code-review, /pr-review-toolkit:review-pr, or /verify-review report with a probe test, a mutation, or an exact quote, then attack the proved report with two fresh verifier agents each round until neither finds a problem. User-invoked only, as /prove-review [pr].
-disable-model-invocation: true
+description: Prove every claim in a /code-review, /pr-review-toolkit:review-pr, or /verify-review report with a probe test, a mutation, or an exact quote, then attack the proved report with two fresh verifier agents each round until neither finds a problem. Run it only when the user names it, as /prove-review [pr]; a chained request such as "when done, /prove-review" counts.
 argument-hint: "[optional: PR number or URL]"
 ---
 
@@ -65,7 +64,7 @@ If two reports name the same defect, keep one finding and the stronger evidence.
 
 Sort the findings into two groups.
 
-A finding that a quote can prove: open the file, the issue, or the PR body, and find the exact text. If the quote shows the fact directly, the finding is proved. If it shows only the cause of a claimed consequence, move the finding to the second group.
+A finding that a quote can prove: open the file, the issue, or the PR body, and find the exact text. Take its line number from the head, with `git show <head>:<path> | grep -n '<text>'`; a number read from the merge-base or any other revision is wrong at the head. If the quote shows the fact directly, the finding is proved. If it shows only the cause of a claimed consequence, move the finding to the second group.
 
 A finding that needs a probe or a mutation: dispatch prover agents on Opus, in parallel, in one message. Give each agent the findings that touch one file or one package, so that one throwaway copy serves them all. The prompt names the repository path, the head SHA, the merge-base, the findings in full, and this instruction: "Read `<skill base directory>/references/agents.md`. Follow the Common rules section and the Prover section."
 

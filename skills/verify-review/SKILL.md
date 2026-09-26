@@ -1,8 +1,7 @@
 ---
 name: verify-review
 effort: high
-description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), then fix the true findings and refute the false ones. User-invoked only, as /verify-review [pr] [--dry-run].
-disable-model-invocation: true
+description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), then fix the true findings and refute the false ones. Run it only when the user names it, as /verify-review [pr] [--dry-run]; a chained request such as "then /verify-review" counts.
 argument-hint: "[optional: PR number or URL] [--dry-run]"
 ---
 
@@ -32,7 +31,7 @@ scripts/threads.sh owner/repo "$pr" --all      # every unresolved thread
 scripts/threads.sh owner/repo "$pr" --reviews  # bot review bodies
 ```
 
-Each thread object carries the GraphQL thread id (for resolving), the REST comment id (for replying), path, line, author, the first comment's body, the reply count, and whether the thread is outdated. A thread counts as AI when its author is a bot account or its body carries an AI disclosure line. Human threads are out of scope for this skill, but count them in the report so the user knows they exist.
+Each thread object carries the GraphQL thread id (for resolving), the REST comment id (for replying), path, line, author, the first comment's body, the reply count, and whether the thread is outdated. A thread counts as AI when its author is a bot account or its body carries an AI disclosure line. Human threads are out of scope for this skill, but count them in the report so the user knows they exist. When the user names a human comment (a thread or a plain PR comment), verify its claim the same way and give it a verdict. A plain comment has no thread to resolve. Post a reply or edit the PR body only after the user approves that exact write.
 
 Some findings never become threads. CodeRabbit puts "Outside diff range" and "Nitpick" items in the review body, and Codex and Gemini summarise there too. `--reviews` prints those bodies. Treat each item in them as a finding like any other; there is no thread to resolve, so the fix commit or one reply on the review is the whole record.
 
