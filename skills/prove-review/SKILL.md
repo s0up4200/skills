@@ -39,6 +39,8 @@ Find the review reports in this conversation. Three kinds count:
 
 If there is none, stop and tell the user to run `/code-review`, `/pr-review-toolkit:review-pr`, or `/verify-review` first. Do not run a review yourself. If more than one report of a kind exists, or a `/verify-review` report sits next to a review report, and you cannot tell which one the user means, ask.
 
+When `/full-review` runs this skill, all four of its reports count, the design review included, and there is nothing to ask about which one. Read `<skill base directory>/references/full-review-input.md` now. Its sections override the steps they name.
+
 Record the target facts. For a PR:
 
 ```bash
@@ -107,16 +109,19 @@ When both agents return, take each finding in turn:
 1. Confirm it at the code before you change the report. Open the file, run the grep, or rerun the command. The verifiers are right most of the time, but a wrong change puts a wrong claim under the user's name.
 2. If it holds, change the report: correct the claim, narrow a word, fix the recipe, move the finding to the other axis, or drop the finding. Put each dropped finding on the dropped list with its reason.
 3. If it does not hold, keep the report as it is, and write down the evidence. If a later round raises the same point again, stop and ask the user. A disagreement that comes back twice is a judgment for the user, not for you.
+4. Mark each applied point **material** or **minor**. A material point adds a proved finding, drops a finding, changes a verdict, or corrects a wrong fact, count, `file:line`, quote, recipe, or fix that the report states. A minor point fixes the wording. Apply both kinds.
+
+The report is **frozen** after round 1. From round 2 on, a change corrects or removes a claim. It adds a new claim only when that claim is a proved finding the report missed, drops a finding, changes a verdict, or changes a decision the user must make. Without the freeze, each round adds supporting context, and the next round attacks that context. One run spent two rounds on a product's release history under a recommendation that never changed. A missed finding is different: in another run, round 2 found that the PR body promised a fresh read the code did not do.
 
 After each round, print one status line:
 
 ```text
-Round N: factual F, advocate A; applied X, refuted Y, dropped Z. Left: S Standards, P Spec.
+Round N: factual F, advocate A; applied X (M material), refuted Y, dropped Z. Left: S Standards, P Spec.
 ```
 
 A point that both agents raise counts once in X or Y. Z counts the findings dropped in this round.
 
-The loop stops when both agents end with `NO FINDINGS` in the same round. There is no round limit.
+The loop stops after a round with no material point. There is no round limit.
 
 ## 6. Report
 
