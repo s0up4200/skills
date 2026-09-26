@@ -1,5 +1,6 @@
 ---
 name: verify-review
+effort: high
 description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), then fix the true findings and refute the false ones. User-invoked only, as /verify-review [pr] [--dry-run].
 disable-model-invocation: true
 argument-hint: "[optional: PR number or URL] [--dry-run]"
@@ -10,6 +11,8 @@ argument-hint: "[optional: PR number or URL] [--dry-run]"
 An AI reviewer saw the diff. It did not run the code, read the callers, or know why a line is the way it is. Its findings are claims, and every claim on the pull request stays unverified until you have checked it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
 Arguments: `/verify-review [pr] [--dry-run]`. With no PR, use the pull request named in the conversation, or the one for the current branch. `--dry-run` does everything up to the first write: no commit, no push, no comment, no thread resolution. The report at the end still lists what each write would have been.
+
+If a `/prove-review` report on these threads is in the conversation, its verdicts replace yours. Go on from step 3 with them.
 
 The thread script sits next to this file: `<skill base directory>/scripts/threads.sh`. The base directory is printed when the skill loads.
 

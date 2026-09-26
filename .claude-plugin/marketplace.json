@@ -49,6 +49,7 @@
         "./skills/github-resolution-audit",
         "./skills/labels",
         "./skills/pr-conflicts",
+        "./skills/prove-review",
         "./skills/post-review",
         "./skills/fix-review",
         "./skills/verify-review"
