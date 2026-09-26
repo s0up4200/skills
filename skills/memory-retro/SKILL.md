@@ -1,10 +1,10 @@
 ---
-name: retro
+name: memory-retro
 description: >-
   End-of-task reflection that captures what worked, what didn't, and what to do
   differently next time. Saves actionable learnings to auto memory so they
   persist across sessions. Use when finishing a difficult task, after a long
-  debugging session, after completing a feature, or when the user says "retro",
+  debugging session, after completing a feature, or when the user says "memory retro",
   "what did we learn", "reflect on this session", or "save what you learned".
 disable-model-invocation: true
 argument-hint: "[optional: focus area or topic]"

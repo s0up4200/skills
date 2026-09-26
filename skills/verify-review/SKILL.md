@@ -1,5 +1,6 @@
 ---
 name: verify-review
+effort: high
 description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), then fix the true findings and refute the false ones. User-invoked only, as /verify-review [pr] [--dry-run].
 disable-model-invocation: true
 argument-hint: "[optional: PR number or URL] [--dry-run]"

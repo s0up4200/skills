@@ -1,5 +1,6 @@
 ---
 name: prove-review
+effort: high
 description: Prove every claim in a /code-review, /pr-review-toolkit:review-pr, or /verify-review report with a probe test, a mutation, or an exact quote, then attack the proved report with two fresh verifier agents each round until neither finds a problem. User-invoked only, as /prove-review [pr].
 disable-model-invocation: true
 argument-hint: "[optional: PR number or URL]"
