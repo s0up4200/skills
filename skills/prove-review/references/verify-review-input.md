@@ -14,7 +14,7 @@ Make one entry for each thread and each review-body item, in the order of the re
 
 ## Step 3: what proves each verdict
 
-- `confirmed`: a probe that shows the flagged behavior at the head, in the bot's scenario.
+- `confirmed`: a probe that shows the flagged behavior at the head, in the bot's scenario. State the consequence in the bot's terms: a wider or narrower severity is a new claim that the verdict does not need.
 - `wrong`: proof that the code handles the bot's scenario, with the bot's inputs and order of events. Proof about a neighbouring scenario (the other order, a different caller, a case the guard does cover) is not proof.
 - `stale`: the commit that removed the behavior, and a probe or a quote that shows the behavior is gone at the head.
 - `judgment`: as for `confirmed`, plus each fact and fix claim listed in step 2.
@@ -27,10 +27,12 @@ Write the report to the same file as in SKILL.md step 4. Keep the shape of the `
 
 1. A table with one row per thread: location, claim, verdict, proof.
 2. One section per thread: the claim, the proof, and for a judgment the proved facts, the recommendation, and the fix plan.
-3. "What a real run would write", updated to the proved verdicts.
-4. "Decisions for you", with one numbered question per judgment and your recommendation.
+3. "What a real run would write", updated to the proved verdicts. If `/verify-review` already ran without `--dry-run`, write one line that says what it did.
+4. "Decisions for you", with one numbered question per `judgment` verdict and your recommendation. With no `judgment` verdict, write "No decisions." A follow-up goes under `## Follow-ups`, as SKILL.md step 4 says.
 
 ## Step 5: the rounds
+
+A material point changes a verdict, or corrects a fact in a verdict's proof, a fact under a judgment's recommendation, or a claim that the report makes about a fix. Every other point is minor.
 
 Z counts the entries that this round added to the changed list:
 

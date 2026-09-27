@@ -11,7 +11,7 @@ A review finding is a claim, and the author of the code will argue with each one
 
 Dropped findings are the normal result. A run on a real PR started with ten findings and posted six. Each round removed more wrong fixes, test recipes that did not work, and claims the PR body already disclosed. A report that shrinks is working as intended.
 
-The skill is expensive. One run on a medium PR took four rounds and about 1.1M subagent tokens. The user asked for that cost when they typed the command.
+The skill is expensive. One run on a medium PR took four rounds and about 1.1M subagent tokens. The user asked for that cost when they typed the command, and after round 3 the user decides whether more rounds are worth it.
 
 Arguments: `/prove-review [pr]`. With no PR, use the PR named in the conversation. If the conversation names none, use the PR of the current branch. If the current branch has no PR, the target is the current branch against the merge-base with the default branch.
 
@@ -25,7 +25,7 @@ A claim has proof when one of these shows it:
 - **Mutation**: one line changed in a throwaway copy, and the relevant test packages stay green. This proves that no test covers the line. The mutation must change behavior. A mutant that behaves the same as the original (an equivalent mutant) proves nothing.
 - **Quote**: an exact quote with its `file:line`, from the code, the issue, the design document, the PR body, or a review thread, that shows the fact directly.
 
-Reasoning is not proof. A consequence claim ("this kills the connection after 15 s", "this makes X stale") needs a run that shows the consequence, even when a quote shows the cause. Counter-evidence and the edge cases of a proposed fix need a run too. A "not run" label does not replace the run: run it, or remove the claim.
+Reasoning is not proof. A consequence claim, a severity or a reach included ("this kills the connection after 15 s", "this makes X stale", "every caller sees it"), needs a run that shows the consequence, even when a quote shows the cause. Counter-evidence and the edge cases of a proposed fix need a run too. A "not run" label does not replace the run: run it, or remove the claim.
 
 A suggested fix and a suggested test recipe are claims too. A fix that names a field must name a field that exists. A recipe must pass on the head and fail under its matching mutation.
 
@@ -94,6 +94,10 @@ Write the report to `prove-review-report.md` in the scratchpad:
 
 If an axis has no proved findings, write "No findings." under its heading.
 
+Write only the parts the template shows. Each extra sentence is attack surface: a verifier checks it, and a wrong one buys another round.
+
+A defect you found outside the diff is not a finding against this PR. Put it under `## Follow-ups` at the end of the report: one line with its `file:line`, marked not proved. `/post-review` does not post it.
+
 If no finding survived step 3, stop. Tell the user that nothing was proved, and print the dropped list.
 
 ## 5. Verification rounds
@@ -107,9 +111,9 @@ Each prompt names the repository path, the head SHA, the merge-base, the PR numb
 When both agents return, take each finding in turn:
 
 1. Confirm it at the code before you change the report. Open the file, run the grep, or rerun the command. The verifiers are right most of the time, but a wrong change puts a wrong claim under the user's name.
-2. If it holds, change the report: correct the claim, narrow a word, fix the recipe, move the finding to the other axis, or drop the finding. Put each dropped finding on the dropped list with its reason. A finding the advocate shows costs the author more than it is worth takes the reason nit.
+2. If it holds, make the report smaller: narrow the claim to what the proof shows, remove the wrong sentence, take the fix or recipe that the verifier proved, move the finding to the other axis, or drop the finding. Each sentence you add while you apply a point is a new claim: write it only when the verifier's proof or your own run shows it. In one run, the correction of "AddTags is the only reject gate" listed the five other gates it had found, in code the PR did not touch. Rounds 2 to 5 then rewrote that list four times. Put each dropped finding on the dropped list with its reason. A finding the advocate shows costs the author more than it is worth takes the reason nit.
 3. If it does not hold, keep the report as it is, and write down the evidence. If a later round raises the same point again, stop and ask the user. A disagreement that comes back twice is a judgment for the user, not for you.
-4. Mark each applied point **material** or **minor**. A material point adds a proved finding, drops a finding, changes a verdict, or corrects a wrong fact, count, `file:line`, quote, recipe, or fix that the report states. A minor point fixes the wording. Apply both kinds.
+4. Mark each applied point **material** or **minor**. A material point adds a proved finding, drops a finding, or corrects a finding's claim, its "when it matters" text, its proof, its fix, or its recipe. Every other point is minor: the wording, and each fact outside a finding, such as background or a follow-up. Apply both kinds. Only material points change what is posted.
 
 The report is **frozen** after round 1. From round 2 on, a change corrects or removes a claim. It adds a new claim only when that claim is a proved finding the report missed, drops a finding, changes a verdict, or changes a decision the user must make. Without the freeze, each round adds supporting context, and the next round attacks that context. One run spent two rounds on a product's release history under a recommendation that never changed. A missed finding is different: in another run, round 2 found that the PR body promised a fresh read the code did not do.
 
@@ -121,7 +125,7 @@ Round N: factual F, advocate A; applied X (M material), refuted Y, dropped Z. Le
 
 A point that both agents raise counts once in X or Y. Z counts the findings dropped in this round.
 
-The loop stops after a round with no material point. There is no round limit.
+The loop stops after a round with no material point. If round 3 still has one, ask the user before round 4 and before each later round, with the status lines and each material point of the last round in one line.
 
 ## 6. Report
 

@@ -26,6 +26,8 @@ Proof is defined in the Proof section of `../SKILL.md`. Read that section only. 
 
 From round 2 on, the report is frozen: raise a missing fact only when it is a proved defect the report misses, drops a finding, changes a verdict, or changes a decision the user must make. Context that only supports a claim the report already proves is not a finding.
 
+Skip the `## Follow-ups` section: nothing in it is posted.
+
 End your final message with the exact line `NO FINDINGS` when you have nothing to report. Otherwise, list each finding with the report location it concerns, what is wrong, and your proof.
 
 ## Prover

@@ -15,7 +15,7 @@ Prove all of them in one run. The review findings follow SKILL.md. The threads f
 
 Merge the findings from `/code-review`, `review-pr`, and the design review's `## Findings` into one list, as SKILL.md says. Tag each finding with the promise it breaks, or "no promise". A finding that breaks a promise goes under Spec. A finding that breaks no promise goes under Standards.
 
-The walkthrough, the follow-ups, and the design questions are not claims to prove. Leave them out of the list. `/full-review` prints the walkthrough and the design questions. Copy the follow-ups, unproved, into a `## Follow-ups` section at the end of the report, marked as notes that are not posted.
+The walkthrough, the follow-ups, and the design questions are not claims to prove. Leave them out of the list. `/full-review` prints the walkthrough and the design questions. Copy the follow-ups into `## Follow-ups`, as SKILL.md step 4 says.
 
 Make one thread entry for each AI thread, as `verify-review-input.md` says. A `confirmed` thread is also a defect in the PR, so it goes on the finding list too:
 
@@ -35,8 +35,6 @@ If no finding survived and there are no AI threads, stop as SKILL.md says. If on
 ## Step 5: the rounds
 
 In each prompt, the kind of report is "a /full-review report: Standards and Spec findings, then an AI threads section". The advocate takes the author's side on the findings and the side each verdict ruled against on the threads.
-
-A point that changes only a promise's mark or its reason line, while every finding stays the same, is minor. The mark only sums up findings that the rounds already verify.
 
 The status line joins both forms:
 
