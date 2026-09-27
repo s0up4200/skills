@@ -36,7 +36,7 @@ If no finding survived and there are no AI threads, stop as SKILL.md says. If on
 
 In each prompt, the kind of report is "a /full-review report: Standards and Spec findings, then an AI threads section". The advocate takes the author's side on the findings and the side each verdict ruled against on the threads.
 
-A point that changes the status of a promise is material too.
+A point that changes only a promise's mark or its reason line, while every finding stays the same, is minor. The mark only sums up findings that the rounds already verify.
 
 The status line joins both forms:
 
