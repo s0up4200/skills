@@ -35,7 +35,7 @@ Write the report to the same file as in SKILL.md step 4. Keep the shape of the `
 Z counts the entries that this round added to the changed list:
 
 ```text
-Round N: factual F, advocate A; applied X, refuted Y, changed Z. Verdicts: C confirmed, W wrong, S stale, J judgment.
+Round N: factual F, advocate A; applied X (M material), refuted Y, changed Z. Verdicts: C confirmed, W wrong, S stale, J judgment.
 ```
 
 ## Step 6: the next step

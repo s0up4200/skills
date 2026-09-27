@@ -49,8 +49,9 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [labels](skills/labels/) | Label a GitHub PR or issue from the repo's existing labels, asking before it creates a new one |
 | [pr-conflicts](skills/pr-conflicts/) | Sweep open PRs for merge conflicts, apply the repo's conflict label, and remove it from PRs that merge cleanly again |
 | [perf-review](skills/perf-review/) | Review Go and TypeScript diffs, branches, or PRs for performance problems — allocations, O(n²) algorithms, N+1 queries, unbounded concurrency, re-render storms |
+| [full-review](skills/full-review/) | Check that a PR does what it promises: /code-review, review-pr, a design pass for architecture and negative space, and /verify-review --dry-run, then /prove-review, then post or fix. Explicit invocation only |
 | [prove-review](skills/prove-review/) | Prove every claim in a review report with a probe, a mutation, or a quote, then attack it with two fresh verifier agents each round until neither finds a problem. Explicit invocation only |
-| [post-review](skills/post-review/) | Post the last review report on a PR as a request-changes review, after an AI disclosure line and the unslop pass; user-invoked, posts only after approval |
+| [post-review](skills/post-review/) | Post the last review report on a PR as a request-changes review, after an AI disclosure line and the unslop pass. Explicit invocation only, posts only after approval |
 | [fix-review](skills/fix-review/) | Resolve the judgment calls, fix the last code-review findings, and push the fixes to the PR's source branch. Explicit invocation only |
 | [verify-review](skills/verify-review/) | Verify the unresolved AI review threads on a PR against the code, fix the true findings, refute the false ones with approval. Explicit invocation only |
 | [go-proverbs](skills/go-proverbs/) | Question a Go plan or spec with the 19 Go proverbs from Rob Pike's Gopherfest 2015 talk before any code exists |

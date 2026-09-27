@@ -1,7 +1,6 @@
 ---
 name: post-review
-description: Post the last review report (/prove-review, /code-review, or /pr-review-toolkit:review-pr) on a GitHub pull request as a request-changes review, after the unslop pass and user approval. User-invoked only, as /post-review [pr-number] [--dry-run].
-disable-model-invocation: true
+description: Post the last review report (/prove-review, /code-review, or /pr-review-toolkit:review-pr) on a GitHub pull request as a request-changes review, after the unslop pass and user approval. Run it only when the user names it, as /post-review [pr-number] [--dry-run]; a chained request, or the "post" answer at the end of /full-review, counts.
 ---
 
 # Post review
@@ -16,7 +15,7 @@ The span script sits next to this file: `<skill base directory>/scripts/code-spa
 
 Find the review report in this conversation. Three kinds count:
 
-- A `/prove-review` report. Its findings are already proved. If one exists, use it and ignore the reports it was made from.
+- A `/prove-review` report. Its findings are already proved. If one exists, use it and ignore the reports it was made from. Post its `## Standards` and `## Spec` sections only. An `## AI threads` section stays out of the review: those threads are already on the PR, and `/verify-review` answers them there.
 - A `/code-review` report, with a `## Standards` section and a `## Spec` section.
 - A `/pr-review-toolkit:review-pr` report, with findings grouped by severity. Put each finding under `## Spec` when it compares the code with the linked issue or a design document, and under `## Standards` otherwise.
 
@@ -61,7 +60,7 @@ While you copy the findings:
 
 ## Step 3: Prose pass
 
-Invoke the `unslop` skill on the body. It edits `post-review-body.md` in place. Prose only: the disclosure line, the two headings, and the summary line stay. Keep the first person on evidence you produced, and keep each finding's severity words ("overstates", "masks", "narrow") as they are. A pass that changes a claim has gone past style.
+Read `~/.claude/skills/unslop/SKILL.md` and apply its process to the body, editing `post-review-body.md` in place. `unslop` runs only when the user types it, so the Skill tool cannot start it. Prose only: the disclosure line, the two headings, and the summary line stay. Keep the first person on evidence you produced, and keep each finding's severity words ("overstates", "masks", "narrow") as they are. A pass that changes a claim has gone past style.
 
 ## Step 4: Check the code spans
 
