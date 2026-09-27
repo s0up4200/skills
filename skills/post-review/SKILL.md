@@ -60,7 +60,7 @@ While you copy the findings:
 
 ## Step 3: Prose pass
 
-Invoke the `unslop` skill on the body. It edits `post-review-body.md` in place. Prose only: the disclosure line, the two headings, and the summary line stay. Keep the first person on evidence you produced, and keep each finding's severity words ("overstates", "masks", "narrow") as they are. A pass that changes a claim has gone past style.
+Read `~/.claude/skills/unslop/SKILL.md` and apply its process to the body, editing `post-review-body.md` in place. `unslop` runs only when the user types it, so the Skill tool cannot start it. Prose only: the disclosure line, the two headings, and the summary line stay. Keep the first person on evidence you produced, and keep each finding's severity words ("overstates", "masks", "narrow") as they are. A pass that changes a claim has gone past style.
 
 ## Step 4: Check the code spans
 

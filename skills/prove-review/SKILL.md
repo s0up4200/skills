@@ -107,7 +107,7 @@ Each prompt names the repository path, the head SHA, the merge-base, the PR numb
 When both agents return, take each finding in turn:
 
 1. Confirm it at the code before you change the report. Open the file, run the grep, or rerun the command. The verifiers are right most of the time, but a wrong change puts a wrong claim under the user's name.
-2. If it holds, change the report: correct the claim, narrow a word, fix the recipe, move the finding to the other axis, or drop the finding. Put each dropped finding on the dropped list with its reason.
+2. If it holds, change the report: correct the claim, narrow a word, fix the recipe, move the finding to the other axis, or drop the finding. Put each dropped finding on the dropped list with its reason. A finding the advocate shows costs the author more than it is worth takes the reason nit.
 3. If it does not hold, keep the report as it is, and write down the evidence. If a later round raises the same point again, stop and ask the user. A disagreement that comes back twice is a judgment for the user, not for you.
 4. Mark each applied point **material** or **minor**. A material point adds a proved finding, drops a finding, changes a verdict, or corrects a wrong fact, count, `file:line`, quote, recipe, or fix that the report states. A minor point fixes the wording. Apply both kinds.
 
