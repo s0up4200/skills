@@ -1,7 +1,7 @@
 ---
 name: full-review
 effort: high
-description: Check that a pull request does what it promises, in one run. It runs /code-review, /pr-review-toolkit:review-pr, a design pass for architecture and negative space, and /verify-review --dry-run on the unresolved AI threads, then /prove-review on all of it, then asks whether to post with /post-review or to fix it yourself. Run it only when the user names it, as /full-review [pr] [-- intent note].
+description: Check that a pull request does what it promises, in one run. It runs /code-review, /pr-review-toolkit:review-pr, a design pass for architecture and negative space, and /verify-review on the unresolved AI threads, then /prove-review on all of it, then asks whether to post with /post-review or to fix it yourself. Run it only when the user names it, as /full-review [pr] [-- intent note].
 argument-hint: "[optional: PR number or URL] [-- intent note, e.g. pure refactor, no functional change]"
 ---
 
@@ -14,7 +14,7 @@ Each reviewer sees a different part of the change:
 - `/code-review` checks the diff against the repository's standards and the linked spec.
 - `/pr-review-toolkit:review-pr` checks the tests, the error handling, and the comments.
 - The **design reviewer** reads past the diff. It explains what the change does, checks the architecture, and looks at the **negative space**: what else must change for each promise to hold. A diff reviewer cannot see a line that is not in the diff.
-- `/verify-review --dry-run` checks the unresolved AI review threads that are already on the PR.
+- `/verify-review` checks the unresolved AI review threads that are already on the PR.
 
 Then `/prove-review` keeps only the findings it can prove, and the user decides what happens next.
 
@@ -53,7 +53,7 @@ Load `/code-review` and `/pr-review-toolkit:review-pr` with the Skill tool. Then
 - The `/pr-review-toolkit:review-pr` agents for the `tests errors comments` aspects only. In trial runs these found defects no other reviewer did. The code reviewer and the type analyzer only repeated what `/code-review` and the design reviewer found, and the simplifier proposes polish that tests no promise. Their scope is `git diff <merge-base>...<head>`, not the uncommitted changes, which are empty here. Give them the promise list as context.
 - The design reviewer, on Opus. The prompt names the repository or worktree path, the PR number, the head SHA, the merge-base, the spec and the promise list from step 1, and this instruction: "Read `<skill base directory>/references/design-reviewer.md` and follow it."
 
-While the agents run, run `/verify-review "$pr" --dry-run`. Hold its judgment questions: they go to the user once, in the final report, not in the middle of the run. If the PR has no unresolved AI threads, note that and go on.
+While the agents run, run `/verify-review "$pr"`. Hold its judgment questions: they go to the user once, in the final report, not in the middle of the run. If the PR has no unresolved AI threads, note that and go on.
 
 When all agents are back, print each report under its own heading: `/code-review`, `/pr-review-toolkit:review-pr`, design review, `/verify-review`. Each report stays whole. `/prove-review` merges them in the next step, and a merge here would hide which reviewer found what.
 

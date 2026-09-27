@@ -5,7 +5,7 @@
 - A `/code-review` report.
 - A `/pr-review-toolkit:review-pr` report.
 - A design review, with `## Walkthrough`, `## Findings`, `## Follow-ups`, and `## Design questions` sections. Its findings are about the negative space (what else must change for a promise to hold) and the architecture.
-- A `/verify-review --dry-run` report on the unresolved AI threads, or a note that there are none.
+- A `/verify-review` report on the unresolved AI threads, or a note that there are none.
 
 You also get `promises.md`: a numbered list of what the PR says it does. The review exists to show whether each promise holds.
 

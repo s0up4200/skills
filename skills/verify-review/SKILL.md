@@ -1,15 +1,15 @@
 ---
 name: verify-review
 effort: high
-description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), then fix the true findings and refute the false ones. Run it only when the user names it, as /verify-review [pr] [--dry-run]; a chained request such as "then /verify-review" counts.
-argument-hint: "[optional: PR number or URL] [--dry-run]"
+description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), then report which findings to fix and which to refute. With --fix, it also commits the fixes and posts the refutations. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
+argument-hint: "[optional: PR number or URL] [--fix]"
 ---
 
 # Verify review
 
 An AI reviewer saw the diff. It did not run the code, read the callers, or know why a line is the way it is. Its findings are claims, and every claim on the pull request stays unverified until you have checked it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
-Arguments: `/verify-review [pr] [--dry-run]`. With no PR, use the pull request named in the conversation, or the one for the current branch. `--dry-run` does everything up to the first write: no commit, no push, no comment, no thread resolution. The report at the end still lists what each write would have been.
+Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write: no commit, no push, no comment, no thread resolution. `--fix` lets the run make the writes in steps 3 and 4.
 
 If a `/prove-review` report on these threads is in the conversation, its verdicts replace yours. Go on from step 3 with them.
 
@@ -92,6 +92,6 @@ gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$
 
 ## 5. Report
 
-Account for every thread. The report is a short table with one row per thread: path and line, the claim in one sentence, the verdict, the evidence, and the action taken (commit SHA, reply posted, resolved, left open with the reason). Follow it with the human threads you skipped, if any, and the pushes and posts a dry run would have made.
+Account for every thread. The report is a short table with one row per thread: path and line, the claim in one sentence, the verdict, the evidence, and the action taken (commit SHA, reply posted, resolved, left open with the reason). Follow it with the human threads you skipped, if any, and, without `--fix`, the commits, pushes, and posts that `--fix` would make.
 
 Where a judgment call is still open, say so. Do not resolve those threads.

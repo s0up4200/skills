@@ -27,7 +27,7 @@ Write the report to the same file as in SKILL.md step 4. Keep the shape of the `
 
 1. A table with one row per thread: location, claim, verdict, proof.
 2. One section per thread: the claim, the proof, and for a judgment the proved facts, the recommendation, and the fix plan.
-3. "What a real run would write", updated to the proved verdicts. If `/verify-review` already ran without `--dry-run`, write one line that says what it did.
+3. "What a `--fix` run would write", updated to the proved verdicts. If `/verify-review` already ran with `--fix`, write one line that says what it did.
 4. "Decisions for you", with one numbered question per `judgment` verdict and your recommendation. With no `judgment` verdict, write "No decisions." A follow-up goes under `## Follow-ups`, as SKILL.md step 4 says.
 
 ## Step 5: the rounds
@@ -42,4 +42,4 @@ Round N: factual F, advocate A; applied X (M material), refuted Y, changed Z. Ve
 
 ## Step 6: the next step
 
-Tell the user to answer the decisions. `/verify-review` then goes on with the proved verdicts, which replace the ones in its own table.
+Tell the user to answer the decisions. `/verify-review --fix` then goes on with the proved verdicts, which replace the ones in its own table.
