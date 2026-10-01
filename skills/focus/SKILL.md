@@ -15,7 +15,14 @@ Requires the `gh` CLI, authenticated.
 
 - The user named an issue: that issue is the epic.
 - The user named a repo, or the current directory is a GitHub repo: find every open epic there.
-- Neither: ask which repo. Do not guess. A sweep of every repo the user can see is slow and mostly noise.
+- Neither, or the remote is not GitHub (Forgejo, GitLab): start from the user's own claims. Their open assigned issues show which repos they work in:
+
+  ```bash
+  gh search issues --assignee @me --state open --limit 100 --json repository \
+    --jq '[.[].repository.nameWithOwner]|group_by(.)|map("\(.[0]) \(length)")[]'
+  ```
+
+  Find the epics in each repo it lists. Ask which repo only when the search is empty. Do not sweep every repo the user can see: that is slow and mostly noise.
 
 Find the open epics in a repo. An epic is an open issue with at least one sub-issue:
 
