@@ -22,7 +22,7 @@ Requires the `gh` CLI, authenticated.
     --jq '[.[].repository.nameWithOwner]|group_by(.)|map("\(.[0]) \(length)")[]'
   ```
 
-  Find the epics in each repo it lists. Ask which repo only when the search is empty. Do not sweep every repo the user can see: that is slow and mostly noise.
+  Find the epics in each repo it lists. On a Forgejo remote, also read that repo with `fj` (see "Forgejo repos" below). Ask which repo only when both come back empty. Do not sweep every repo the user can see: that is slow and mostly noise.
 
 Find the open epics in a repo. An epic is an open issue with at least one sub-issue:
 
@@ -37,6 +37,18 @@ query($owner:String!,$name:String!){repository(owner:$owner,name:$name){
 A sub-issue can itself be an epic (in qui, #2902 sits under #2916). Report it inside its parent, not as a second epic.
 
 Get the user's login with `gh api user --jq .login`.
+
+### Forgejo repos
+
+The `fj` CLI (forgejo-cli) reads a Forgejo repo. Inside a clone, it finds the host and repo from the git remote. `fj whoami` shows the login.
+
+```bash
+fj issue search --state open                 # open issues in this repo
+fj issue search --state open --assignee USER # the user's claims
+fj issue view N                              # body, assignees, state
+```
+
+Forgejo has no sub-issues. A tracking issue there lists its children as a task list in its body (`- [ ] #12`), so read the body to build the tree. Forgejo does have "blocked by" dependencies, but `fj` cannot show them. When the body or the comments do not name the blockers, say that the blocked bucket is incomplete. Do not guess the edges. Then sort and report as in steps 3 to 5.
 
 ## 2. Read each epic
 
