@@ -47,6 +47,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [release-announcement](skills/release-announcement/) | Write a Discord release announcement from everything on main since the latest release tag |
 | [github-resolution-audit](skills/github-resolution-audit/) | Find open GitHub Issues and Discussions whose requested work has shipped, whose bugs are fixed, or which duplicate another item |
 | [labels](skills/labels/) | Label a GitHub PR or issue from the repo's existing labels, asking before it creates a new one |
+| [file-issue](skills/file-issue/) | Draft an upstream GitHub issue from the repo's template, bots, and a reproduction, and post it only after the user reads the draft |
 | [pr-conflicts](skills/pr-conflicts/) | Sweep open PRs for merge conflicts, apply the repo's conflict label, and remove it from PRs that merge cleanly again |
 | [perf-review](skills/perf-review/) | Review Go and TypeScript diffs, branches, or PRs for performance problems — allocations, O(n²) algorithms, N+1 queries, unbounded concurrency, re-render storms |
 | [full-review](skills/full-review/) | Check that a PR does what it promises: /code-review, review-pr, a design pass for architecture and negative space, and /verify-review, then /prove-review, then post or fix. Explicit invocation only |
