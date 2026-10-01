@@ -45,7 +45,9 @@ The `fj` CLI (forgejo-cli) reads a Forgejo repo. Inside a clone, it finds the ho
 ```bash
 fj issue search --state open                 # open issues in this repo
 fj issue search --state open --assignee USER # the user's claims
-fj issue view N                              # body, assignees, state
+fj issue view N                              # title and body
+fj issue view N assignees                    # who claimed it
+fj issue view N comments                     # blockers named in comments
 ```
 
 Forgejo has no sub-issues. A tracking issue there lists its children as a task list in its body (`- [ ] #12`), so read the body to build the tree. Forgejo does have "blocked by" dependencies, but `fj` cannot show them. When the body or the comments do not name the blockers, say that the blocked bucket is incomplete. Do not guess the edges. Then sort and report as in steps 3 to 5.
