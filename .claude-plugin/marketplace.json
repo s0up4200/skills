@@ -50,6 +50,7 @@
         "./skills/labels",
         "./skills/file-issue",
         "./skills/pr-conflicts",
+        "./skills/focus",
         "./skills/full-review",
         "./skills/prove-review",
         "./skills/post-review",
