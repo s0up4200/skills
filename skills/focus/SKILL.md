@@ -62,10 +62,10 @@ query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){
   issue(number:$n){title body updatedAt
     subIssues(first:100){nodes{
       number title state updatedAt
-      assignees(first:10){nodes{login}}
+      assignees(first:10){nodes{login}} labels(first:20){nodes{name}}
       blockedBy(first:20){nodes{number state}}
       blocking(first:20){nodes{number state}}
-      subIssues(first:50){nodes{number title state assignees(first:5){nodes{login}}
+      subIssues(first:50){nodes{number title state assignees(first:5){nodes{login}} labels(first:20){nodes{name}}
         blockedBy(first:10){nodes{number state}} blocking(first:20){nodes{number state}}
         closedByPullRequestsReferences(first:5){nodes{number state isDraft reviewDecision author{login}}}}}
       closedByPullRequestsReferences(first:5,includeClosedPrs:true){nodes{
@@ -89,7 +89,7 @@ Put each open sub-issue in exactly one bucket. Check them in this order:
 Then mark two things across the buckets:
 
 - **Gates**: an open issue that blocks two or more others. Count its `blocking` edges that are open. Finishing a gate frees the most work, so it outranks equal work elsewhere.
-- **Needs spec**: the epic body or the issue body says the issue needs a spec, a grill, or a design pass. Do not report it as ready to code. The first step is the spec.
+- **Needs spec**: the epic body, the issue body, or a label says the issue needs a spec, a grill, or a design pass. In qui, `wayfinder:grilling` means decide first, and `wayfinder:task` means ready to build. Do not report it as ready to code. The first step is the spec.
 
 ## 4. Recommend
 
