@@ -53,6 +53,14 @@ Extract PR numbers from the `(#NNNN)` suffixes. Sort commits into two buckets:
 - **Analyze**: features, fixes, and anything plausibly user-visible.
 - **Skip**: `chore(deps)` bumps, CI-only changes, docs-only changes. Don't spend agents on these; at most they get a passing mention if something notable hides in them (a security bump users should know about, for example).
 
+A breaking change always goes in **Analyze**, whatever its type. Find them by label, since a `chore` or `docs` PR can still break a setup. qui uses the `BREAKING CHANGE` label:
+
+```bash
+gh pr list --repo autobrr/qui --state merged --label "BREAKING CHANGE" --limit 100 --json number,title
+```
+
+Keep the PR numbers from that list that are also in the range. Also treat a commit subject with `!` before the colon (`feat!:`, `fix(api)!:`) as breaking. The Step 5 agents catch the rest from the PR body.
+
 Then collect the contributors, sorted by commit count. Use `main` or `develop` as the end ref (the API takes branch names, not `origin/...`); it returns at most 250 commits, more than any qui release:
 
 ```bash
@@ -90,15 +98,18 @@ const SCHEMA = {
     area: { type: 'string', description: 'one of: torrents, cross-seed, automations, i18n, sse/realtime, backend/db, api, ui-polish, other' },
     summary: { type: 'string', description: '2-4 sentences: what changed from the USER perspective, the problem it solves, who hit it' },
     facts: { type: 'string', description: 'concrete details worth quoting: option/setting names as they appear in the UI, version requirements (e.g. needs qBittorrent 5.1+), measured numbers, issue/discussion refs. Empty string if none.' },
+    breaking: { type: 'boolean', description: 'true if the PR has the BREAKING CHANGE label, or the body or diff shows a change that makes users act: removed or renamed option, changed default, changed API or config format, dropped support' },
+    breaking_details: { type: 'string', description: 'if breaking: what breaks, who is affected, and what the user must do. Empty string if not breaking.' },
   },
-  required: ['pr', 'user_facing', 'area', 'summary', 'facts'],
+  required: ['pr', 'user_facing', 'area', 'summary', 'facts', 'breaking', 'breaking_details'],
 }
 const results = await parallel(prs.map(p => () =>
   agent(
     `You are analyzing PR #${p.num} ("${p.subject}") in autobrr/qui for a user-facing release announcement.\n` +
     `1. Read the PR body: gh pr view ${p.num} --repo autobrr/qui --json title,body,labels\n` +
     `2. Read the actual change: find the commit for #${p.num} in \`git log ${range} --oneline\` and inspect it with git show. Read enough of the touched code to know what really changed, not just what the body claims.\n` +
-    `3. Report the change as a qui USER would experience it. qui users are self-hosters managing qBittorrent instances; they care about what they can now do, what stopped breaking, and any requirements. Internal refactors, test changes, and code structure are irrelevant unless they change behavior.`,
+    `3. Report the change as a qui USER would experience it. qui users are self-hosters managing qBittorrent instances; they care about what they can now do, what stopped breaking, and any requirements. Internal refactors, test changes, and code structure are irrelevant unless they change behavior.\n` +
+    `4. Decide if the change is breaking. Check the labels for "BREAKING CHANGE" and the body for a breaking-change section or note, then confirm it in the diff. If it is breaking, say exactly what the user must change.`,
     { label: `pr-${p.num}`, model: 'opus', schema: SCHEMA }
   )
 ))
@@ -116,6 +127,9 @@ You write it yourself in the main conversation, from the agent findings. Do not 
 ```markdown
 # New qui release: `vX.Y.Z`! :qui:
 
+## Breaking changes
+- **What changed.** Who it affects and what they must do before or after upgrading.
+
 ## Highlights
 - **Theme lead-in.** Two to four sentences expanding on it.
 - **Another theme.** ...
@@ -129,6 +143,15 @@ Full changelog: https://github.com/autobrr/qui/releases/tag/vX.Y.Z
 ### Contributors
 
 List the Step 4 logins in that order, bold, as plain text: a `@login` on Discord looks like a broken ping because these are GitHub handles, not Discord ones. Names only, no per-person summaries.
+
+### Breaking changes
+
+Add this section only when an agent reported `breaking: true`. Leave it out when nothing breaks; do not write "None".
+
+- One bullet per breaking change, not grouped by theme: each one can need its own action from the user.
+- Lead with the bolded change, then the action the user must take. Use the `breaking_details` facts: exact option names, old and new values, the version that dropped support.
+- No emojis, no warning icons, no all-caps shouting. The heading alone marks the section.
+- A breaking change can also appear in Highlights when it brings a benefit, but do not repeat the migration steps there.
 
 ### How to build the Highlights
 
