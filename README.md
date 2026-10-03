@@ -49,6 +49,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [labels](skills/labels/) | Label a GitHub PR or issue from the repo's existing labels, asking before it creates a new one |
 | [file-issue](skills/file-issue/) | Draft an upstream GitHub issue from the repo's template, bots, and a reproduction, and post it only after the user reads the draft |
 | [pr-conflicts](skills/pr-conflicts/) | Sweep open PRs for merge conflicts, apply the repo's conflict label, and remove it from PRs that merge cleanly again |
+| [branch-cleanup](skills/branch-cleanup/) | Find dead local branches and worktrees, including squash-merged PRs and local-only branches, and write a backed-up cleanup script for the user to run. Explicit invocation only |
 | [focus](skills/focus/) | Show the state of large chained work (epics with sub-issues and blocked-by edges) and recommend what to work on next |
 | [findability](skills/findability/) | Read the last 10 Claude Code and Codex sessions in a repo, find where agents searched too long or followed stale docs, and propose navigation fixes. Requires Matt Pocock's [`retro`](https://github.com/mattpocock/skills) skill |
 | [perf-review](skills/perf-review/) | Review Go and TypeScript diffs, branches, or PRs for performance problems — allocations, O(n²) algorithms, N+1 queries, unbounded concurrency, re-render storms |
