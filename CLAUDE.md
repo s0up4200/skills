@@ -4,6 +4,8 @@ This is a personal skills repository for Claude Code and compatible AI coding to
 
 This is a content-only repo — no package.json, no build system, no tests, no dependencies. All work is editing Markdown files and JSON.
 
+Before you create or edit a skill, run the `writing-for-agents` skill. It sets how to write the description, the body, and the reference files.
+
 ## Repository Structure
 
 ```
