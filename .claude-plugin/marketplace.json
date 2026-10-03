@@ -67,6 +67,14 @@
       "skills": [
         "./skills/qbittorrent-upstream"
       ]
+    },
+    {
+      "name": "writing-skills",
+      "description": "Skills that rewrite replies for the reader",
+      "source": "./skills",
+      "skills": [
+        "./skills/tldr"
+      ]
     }
   ]
 }

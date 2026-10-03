@@ -58,6 +58,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [post-review](skills/post-review/) | Post the last review report on a PR as a request-changes review, after an AI disclosure line and the unslop pass. Explicit invocation only, posts only after approval |
 | [fix-review](skills/fix-review/) | Resolve the judgment calls, fix the last code-review findings, and push the fixes to the PR's source branch. Explicit invocation only |
 | [verify-review](skills/verify-review/) | Verify the unresolved AI review threads on a PR against the code and report the fixes and refutations. `--fix` commits the fixes and posts the refutations with approval. Explicit invocation only |
+| [tldr](skills/tldr/) | Rewrite the last reply as a short version in simple terms, with the simple-english reply rules and an unslop pass. Explicit invocation only |
 | [go-proverbs](skills/go-proverbs/) | Question a Go plan or spec with the 19 Go proverbs from Rob Pike's Gopherfest 2015 talk before any code exists |
 | [native-web](skills/native-web/) | Replace custom JavaScript and UI libraries with native web platform features — 42 tips from htmlcat.net with support tiers and caveats |
 | [qbittorrent-upstream](skills/qbittorrent-upstream/) | Audit unreleased qBittorrent WebAPI and session changes and map each onto the work go-qbittorrent and qui need before the next release |
