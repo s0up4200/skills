@@ -159,3 +159,7 @@ Use one line. Add a sentence only when the risk is not clear from the line.
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
 
 The blast radius is the potential impact or scope of the changes introduced by this PR. Consider all possibilities. Examples are layout shift, breakages for consumers, mobile responsiveness, etc.
+
+## Prose
+
+Before you show or post the body, write all of its prose with the `simple-english` skill. Then read `~/.claude/skills/unslop/SKILL.md` and apply its process to the body. `unslop` runs only when the user types it, so the Skill tool cannot start it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.
