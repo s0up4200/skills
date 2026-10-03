@@ -8,6 +8,8 @@ Implement the work described by the user in the spec or tickets.
 
 Use /tdd where possible, at pre-agreed seams.
 
+Write the Domain Docs that the spec or tickets list to `GLOSSARY.md` (or `CONTEXT.md`) and `docs/adr/` on this branch, with the code. Call the Skill tool with "domain-modeling" for the formats.
+
 Run typechecking regularly, single test files regularly, and the full test suite once at the end.
 
 Once done, use /code-review to review the work.

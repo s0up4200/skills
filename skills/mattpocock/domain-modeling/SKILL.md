@@ -39,6 +39,10 @@ If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The m
 
 Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
 
+## Planning versus implementation
+
+While you plan (grilling, a wayfinder ticket, a spec), record each glossary entry and ADR as **Domain Docs** in the plan: the ticket resolution or the spec. Write `GLOSSARY.md` (some repos call it `CONTEXT.md`) and `docs/adr/` files only on the implementation branch, during `/implement` or `/implement-spec`, with the code.
+
 ## During the session
 
 ### Challenge against the glossary
@@ -57,9 +61,9 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
 
-### Update GLOSSARY.md inline
+### Record glossary changes inline
 
-When a term is resolved, update `GLOSSARY.md` right there. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
+When a term is resolved, record its entry right there, as Domain Docs while you plan. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
 
 `GLOSSARY.md` should be totally devoid of implementation details. Do not treat `GLOSSARY.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 
