@@ -1,7 +1,6 @@
 ---
 name: tldr
-description: Rewrite the previous reply as a short version in simple terms, with the simple-english reply rules. Run it only when the user names it, as /tldr [focus].
-disable-model-invocation: true
+description: Rewrite the previous reply as a short version in simple terms, with the simple-english reply rules. Use it when the user types /tldr [focus], or sends a message that is only "tldr", "tl;dr", or "tldr <focus>". Do not use it when "tldr" is part of a longer request.
 argument-hint: "[optional: the part to shorten, for example \"q1\" or \"the bugs\"]"
 ---
 
