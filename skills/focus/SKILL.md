@@ -89,7 +89,7 @@ Put each open sub-issue in exactly one bucket. Check them in this order:
 Then mark two things across the buckets:
 
 - **Gates**: an open issue that blocks two or more others. Count its `blocking` edges that are open. Finishing a gate frees the most work, so it outranks equal work elsewhere.
-- **Needs spec**: the epic body, the issue body, or a label says the issue needs a spec, a grill, or a design pass. In qui, `wayfinder:grilling` means decide first, and `wayfinder:task` means ready to build. Do not report it as ready to code. The first step is the spec.
+- **Needs spec**: the epic body, the issue body, or a label says the issue needs a spec, a grill, or a design pass. Read the repo's labels once with `gh label list --json name,description`, and treat each label that means spec, grill, design, or RFC as "needs spec". In qui, `wayfinder:grilling` means decide first, and `wayfinder:task` means ready to build. Do not report it as ready to code. The first step is the spec.
 
 ## 4. Recommend
 
