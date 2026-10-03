@@ -164,7 +164,7 @@ The blast radius is the potential impact or scope of the changes introduced by t
 
 Before you show or post the body, write all of its prose with the `simple-english` skill, then apply the `unslop` skill to it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.
 
-If the Skill tool cannot start a skill, find its `SKILL.md` in the installed skills folder, read it, and apply it. `unslop` runs only when the user types it, so this is the usual path for it.
+If the Skill tool cannot start a skill, find its `SKILL.md` in the installed skills folder, read it, and apply it. The upstream `unslop` sets `disable-model-invocation`, so this is the path for it.
 
 If a skill is not installed, ask the user if they want to install it:
 
