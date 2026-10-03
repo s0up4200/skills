@@ -78,6 +78,10 @@ Present the two reports under `## Standards` and `## Spec` headings, verbatim or
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
 
+### 6. Act on the findings
+
+A finding is a hypothesis until its citation checks out: read the rule or the spec line before changing code. When a finding proposes replacing a branch or a guard with something simpler, name the input the old branch handled and show it in a test or a trace before the replacement lands. The reviewer saw the diff, not that input, and a cleaner branch can drop the one case the old guard existed for.
+
 ## Why two axes
 
 A change can pass one axis and fail the other:
