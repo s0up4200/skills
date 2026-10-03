@@ -11,12 +11,13 @@ CLAUDE.md            # Project instructions (this file)
 AGENTS.md            # Symlink → CLAUDE.md (keeps both tools in sync)
 README.md            # Installation instructions and skill index
 LICENSE              # MIT
-UPSTREAM.md          # Upstream commit and license of the skills copied from mattpocock/skills
+UPSTREAM.md          # Upstream commit and license of the copied skills
 .gitignore
 .claude-plugin/
   marketplace.json   # Plugin manifest — how Claude Code discovers installable bundles
 skills/              # All skills live here, one directory per skill
   mattpocock/        # Skills copied from mattpocock/skills (see UPSTREAM.md)
+  cursor/            # Skills copied from cursor/plugins (see UPSTREAM.md)
 template/
   SKILL.md           # Starter template for new skills
 ```

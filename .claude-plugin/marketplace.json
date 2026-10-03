@@ -73,7 +73,8 @@
       "description": "Skills that rewrite replies for the reader",
       "source": "./skills",
       "skills": [
-        "./skills/tldr"
+        "./skills/tldr",
+        "./skills/cursor/unslop"
       ]
     },
     {

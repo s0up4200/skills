@@ -94,6 +94,14 @@ Copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 | [teach](skills/mattpocock/teach/) | Teach the user a new skill or concept, within this workspace. |
 | [writing-for-agents](skills/mattpocock/writing-for-agents/) | Writing documents for agents. |
 
+### From cursor/plugins
+
+Copies of skills from [cursor/plugins](https://github.com/cursor/plugins). See [UPSTREAM.md](UPSTREAM.md) for the upstream commit and the local changes.
+
+| Skill | Description |
+|---|---|
+| [unslop](skills/cursor/unslop/) | Cut AI tells from any writing. |
+
 ## Skill Structure
 
 Each skill is a self-contained directory under `skills/`:
