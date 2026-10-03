@@ -1,6 +1,6 @@
 ---
 name: focus
-description: Give an overview of large chained work on GitHub (tracking issues with sub-issues and blocked-by dependencies) and recommend where the user should put their focus next. Use when the user types "/focus", or asks "what should I work on next", "where do I focus", "what is free to pick up", "what is blocked", "is my ticket unblocked yet", "status of the epic", "where does the rollout stand", or names a tracking issue such as autobrr/qui#2916 and wants to know its state. Not for a sweep of every open issue for fixed or stale ones, which github-resolution-audit covers, and not for PR merge conflicts, which pr-conflicts covers.
+description: Give an overview of large chained work on GitHub (tracking issues with sub-issues and blocked-by dependencies) and recommend where the user should put their focus next. Use when the user types "/focus", or asks "what should I work on next", "where do I focus", "what is free to pick up", "what is blocked", "is my ticket unblocked yet", "status of the epic", "where does the rollout stand", or names a tracking issue such as owner/repo#123 and wants to know its state. Not for a sweep of every open issue for fixed or stale ones, which github-resolution-audit covers, and not for PR merge conflicts, which pr-conflicts covers.
 ---
 
 # Focus
@@ -34,7 +34,7 @@ query($owner:String!,$name:String!){repository(owner:$owner,name:$name){
   --jq '.data.repository.issues.nodes[]|select(.subIssuesSummary.total>0)'
 ```
 
-A sub-issue can itself be an epic (in qui, #2902 sits under #2916). Report it inside its parent, not as a second epic.
+A sub-issue can itself be an epic. Report it inside its parent, not as a second epic.
 
 Get the user's login with `gh api user --jq .login`.
 
@@ -72,7 +72,7 @@ query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){
         number state isDraft reviewDecision author{login} updatedAt}}}}}}}'
 ```
 
-Sort the grandchildren like the children. In qui#2916 the main gate, #2906, is a grandchild under #2902.
+Sort the grandchildren like the children. A gate can be a grandchild, so count its edges too.
 
 Read the epic body too. Maintainers write things there that the graph does not hold: "needs a fresh grill", "no spec yet", "owned by X". A body note that contradicts the graph is a finding. Report it, because one of the two is stale.
 
@@ -89,7 +89,7 @@ Put each open sub-issue in exactly one bucket. Check them in this order:
 Then mark two things across the buckets:
 
 - **Gates**: an open issue that blocks two or more others. Count its `blocking` edges that are open. Finishing a gate frees the most work, so it outranks equal work elsewhere.
-- **Needs spec**: the epic body, the issue body, or a label says the issue needs a spec, a grill, or a design pass. Read the repo's labels once with `gh label list --json name,description`, and treat each label that means spec, grill, design, or RFC as "needs spec". In qui, `wayfinder:grilling` means decide first, and `wayfinder:task` means ready to build. Do not report it as ready to code. The first step is the spec.
+- **Needs spec**: the epic body, the issue body, or a label says the issue needs a spec, a grill, or a design pass. Read the repo's labels once with `gh label list --json name,description`, and treat each label that means spec, grill, design, or RFC as "needs spec". Do not report it as ready to code. The first step is the spec.
 
 ## 4. Recommend
 
@@ -110,13 +110,13 @@ Give one recommendation and at most two alternatives, each with a one-line reaso
 Lead with the recommendation. Then one block per epic:
 
 ```
-qui#2916 Remote filesystem backend rollout: 2/14 done
-  In review: #2906 (PR #2929 by s0up4200, approved), gates #2917 #2918 #2919 #2920
-  Yours:     #2902 (1/2 sub-issues done)
-  Others:    #2918 com6056 (blocked by #2906), #2930 com6056 (blocked by #2918)
-  Free:      #2725 needs spec, #2726 needs spec, #2738, #2792, #2921
-  Blocked:   #2917 #2919 #2920 by #2906
-  Drift:     body says "#2918 needs a spec", graph shows it claimed
+owner/repo#100 Example epic title: 2/9 done
+  In review: #104 (PR #120 by alice, approved), gates #105 #106 #107
+  Yours:     #102 (1/2 sub-issues done)
+  Others:    #106 bob (blocked by #104), #108 bob (blocked by #106)
+  Free:      #110 needs spec, #111
+  Blocked:   #105 #107 by #104
+  Drift:     body says "#106 needs a spec", graph shows it claimed
 ```
 
 Link each number. Leave empty buckets out.
