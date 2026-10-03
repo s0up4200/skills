@@ -9,7 +9,7 @@ argument-hint: "[optional: PR number or URL] [--fix]"
 
 An AI reviewer saw the diff. It did not run the code, read the callers, or know why a line is the way it is. Its findings are claims, and every claim on the pull request stays unverified until you have checked it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
-Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write: no commit, no push, no comment, no thread resolution. `--fix` lets the run make the writes in steps 3 and 4.
+Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write: no commit, no push, no comment, no thread resolution. `--fix` lets the run make the writes in steps 3 to 5.
 
 If a `/prove-review` report on these threads is in the conversation, its verdicts replace yours. Go on from step 3 with them.
 
@@ -92,8 +92,23 @@ Then resolve the thread:
 gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -F id="$thread_id"
 ```
 
-## 5. Report
+## 5. Rate the Codex findings
 
-Account for every thread. The report is a short table with one row per thread: path and line, the claim in one sentence, the verdict, the evidence, and the action taken (commit SHA, reply posted, resolved, left open with the reason). Follow it with the human threads you skipped, if any, and, without `--fix`, the commits, pushes, and posts that `--fix` would make.
+Codex ends each comment with "Useful? React with 👍 / 👎." Add one reaction to the first comment of each Codex thread:
+
+- 👍 for a finding that led to a fix: **confirmed**, or a **judgment** that the user chose to fix.
+- 👎 for a finding that did not: **wrong**, or a **judgment** that the user declined.
+- For a **stale** finding, rate the claim at the commit that the bot reviewed.
+- Add no reaction to an open judgment call.
+
+```bash
+gh api "repos/$repo/pulls/comments/$comment_id/reactions" -f content=+1   # or -1
+```
+
+The reaction is a write, so it needs `--fix` or the user's request. It is not a comment, so it needs no approval for each post. Rate only Codex comments (author `chatgpt-codex-connector`). Other bots do not ask for a rating.
+
+## 6. Report
+
+Account for every thread. The report is a short table with one row per thread: path and line, the claim in one sentence, the verdict, the evidence, and the action taken (commit SHA, reply posted, reaction added, resolved, left open with the reason). Follow it with the human threads you skipped, if any, and, without `--fix`, the commits, pushes, posts, and reactions that `--fix` would make.
 
 Where a judgment call is still open, say so. Do not resolve those threads.
