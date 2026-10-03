@@ -34,7 +34,7 @@ The user must not miss a decision or an action that waits for them. Put each one
 
 Do not start with "TL;DR" or a heading, and do not repeat or link the long version.
 
-Before you send it, read `references/unslop.md` and fix each pattern from it in the draft. It is a snapshot of the `unslop` skill. Rules 27 (say what it does), 32 (mannered prose), and 33 (over-compression) catch the most problems in a short reply.
+Before you send it, apply the `unslop` skill to the draft. Rules 27 (say what it does), 32 (mannered prose), and 33 (over-compression) catch the most problems in a short reply.
 
 Write in the language that the user writes in. For Norwegian, use the `norsk-tekst` skill instead of `simple-english`.
 
