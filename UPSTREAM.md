@@ -74,7 +74,7 @@ The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https:
 
 ### Local changes
 
-None.
+- `unslop`: the frontmatter drops `disable-model-invocation: true`, so that the model can load the skill by itself.
 
 ### Compare with upstream
 
