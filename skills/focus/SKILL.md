@@ -1,6 +1,6 @@
 ---
 name: focus
-description: Give an overview of large chained work on GitHub (tracking issues with sub-issues and blocked-by dependencies) and recommend where the user should put their focus next. Use when the user types "/focus", or asks "what should I work on next", "where do I focus", "what is free to pick up", "what is blocked", "is my ticket unblocked yet", "status of the epic", "where does the rollout stand", or names a tracking issue such as owner/repo#123 and wants to know its state. Not for a sweep of every open issue for fixed or stale ones, which github-resolution-audit covers, and not for PR merge conflicts, which pr-conflicts covers.
+description: Give an overview of large chained work on GitHub (tracking issues with sub-issues and blocked-by dependencies) and recommend where the user should put their focus next. When the repo has no epic, it picks a pull request to review or merge, or an issue to implement or triage. Use when the user types "/focus", or asks "what should I work on next", "where do I focus", "what is free to pick up", "what is blocked", "is my ticket unblocked yet", "status of the epic", "where does the rollout stand", or names a tracking issue such as owner/repo#123 and wants to know its state. Not for a sweep of every open issue for fixed or stale ones, which github-resolution-audit covers, and not for PR merge conflicts, which pr-conflicts covers.
 ---
 
 # Focus
@@ -14,7 +14,7 @@ Requires the `gh` CLI, authenticated.
 ## 1. Find the scope
 
 - The user named an issue: that issue is the epic.
-- The user named a repo, or the current directory is a GitHub repo: find every open epic there.
+- The user named a repo, or the current directory is a GitHub repo: find every open epic there. When the repo has no open epic, go to "No epics" below. Do not go to the user's claims in other repos.
 - Neither, or the remote is not GitHub (Forgejo, GitLab): start from the user's own claims. Their open assigned issues show which repos they work in:
 
   ```bash
@@ -128,3 +128,37 @@ Ask after the report, not before, and only when the answer changes the recommend
 - More than one epic is open: which one matters most this week?
 - The best free issue is a gate: should the user claim it? Assign it only on a yes, with `gh issue edit N --add-assignee @me`.
 - A claim by someone else is stale: should the user ask that person, or leave it?
+
+## No epics
+
+A repo with no open epic still has work. Read its open pull requests and issues, and pick one item:
+
+```bash
+gh pr list --state open --json number,title,author,isDraft,reviewDecision,mergeable,updatedAt,statusCheckRollup
+gh issue list --state open --limit 100 --json number,title,assignees,labels,updatedAt
+```
+
+The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. An issue with no triage label has the role `needs-triage`.
+
+Rank, best first:
+
+1. Merge: a pull request that is approved, has green checks, and has no conflicts.
+2. Review: a pull request from another contributor that has no review from the user, or has new commits since the user's last review. Next step: `/code-review`.
+3. Implement: an open `ready-for-agent` issue with no assignee. Bugs come before enhancements. Next step: `/implement`, on a new branch.
+4. Triage: a `needs-triage` issue, or a `needs-info` issue that has a reply from the reporter after the last maintainer comment. Read the comments to find that reply. Next step: `/triage`.
+5. `ready-for-human`: name it. The user does this work, not an agent.
+
+Ignore drafts, `wontfix`, and `needs-info` issues with no reply. The user's own open pull request that waits for a review is not an item, but name it in the report.
+
+Give one recommendation and at most two alternatives, then one block:
+
+```
+owner/repo: no epics
+  Merge:     #120 (approved, CI green)
+  Review:    #118 by alice (no review, 9 days)
+  Implement: #104 bug, #98
+  Triage:    #130 (no label), #81 needs-info (reporter replied)
+  Yours:     PR #122 waits for a review
+```
+
+Link each number. Leave empty lines out.
