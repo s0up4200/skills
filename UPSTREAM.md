@@ -14,7 +14,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 ## Local changes
 
 - `code-review`: the frontmatter adds `effort: high`. Step 6, "Act on the findings", comes from [mattpocock/skills#1044](https://github.com/mattpocock/skills/issues/1044). If upstream merges that issue, keep the upstream text.
-- `pr`: the skill uses the PR template of the repository. The default body is one sentence. The evidence section lists only checks that CI cannot see. The prose goes through `simple-english` and `unslop`.
+- `pr`: the skill uses the PR template of the repository. The default body is one sentence. The evidence section lists only checks that CI cannot see. The prose goes through `simple-english` and `unslop`, and the skill offers to install them when they are missing.
 
 Upstream refers to some skills that are not copied here, for example `grill-me`, `to-questionnaire`, and `wait-what` in `ask-matt`.
 

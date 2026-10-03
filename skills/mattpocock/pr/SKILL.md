@@ -162,4 +162,13 @@ The blast radius is the potential impact or scope of the changes introduced by t
 
 ## Prose
 
-Before you show or post the body, write all of its prose with the `simple-english` skill. Then read `~/.claude/skills/unslop/SKILL.md` and apply its process to the body. `unslop` runs only when the user types it, so the Skill tool cannot start it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.
+Before you show or post the body, write all of its prose with the `simple-english` skill, then apply the `unslop` skill to it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.
+
+If the Skill tool cannot start a skill, find its `SKILL.md` in the installed skills folder, read it, and apply it. `unslop` runs only when the user types it, so this is the usual path for it.
+
+If a skill is not installed, ask the user if they want to install it:
+
+- `simple-english`: `npx skills add aminblg/simpleenglish --skill simple-english` ([skills.sh](https://www.skills.sh/aminblg/simpleenglish/simple-english))
+- `unslop`: `npx skills add cursor/plugins --skill unslop` ([skills.sh](https://www.skills.sh/cursor/plugins/unslop))
+
+If the user says no, write the body without that skill and tell the user which pass you skipped.
