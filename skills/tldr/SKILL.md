@@ -28,7 +28,9 @@ Load the `simple-english` skill and follow its rules for The Reply. These rules 
 
 Keep these exactly as they are: code identifiers, file paths, commands, numbers, commit hashes, quoted error text, and warnings. A shorter version that loses a warning or changes a number is worse than the long one.
 
-Aim for a third of the original length or less. Use prose for one or two points. For three or more parallel items, such as decisions, findings, or steps, use a short numbered list with a plain label and a colon. This is the one place where the reply may use a list, because the user answers by number ("q8 a, q9 ok").
+Aim for a third of the original length or less. Use prose for one or two points of information. For three or more parallel items, such as findings or steps, use a short numbered list with a plain label and a colon. These lists are the exceptions to the no-list rule of `simple-english`, because the user answers by number ("q8 a, q9 ok").
+
+The user must not miss a decision or an action that waits for them. Put each one in its own numbered list, even when there is only one, under the lead-in line "You need to decide:" or "You need to do:". Each item names the choice and gives your pick. Keep the information above the list and the decisions in the list, so that the user can find every decision without reading the rest. When nothing waits for the user, leave out the list.
 
 Do not start with "TL;DR" or a heading, and do not repeat or link the long version.
 
@@ -42,7 +44,9 @@ Long version (excerpt): "You have one decision now and three smaller ones for th
 
 Short version:
 
-> Four decisions, each with my pick:
+> You need to decide four things. Each has my pick.
+>
+> You need to decide:
 >
 > 1. Commit: write `nogate`. All four review steps already ran, but the gate missed them. Only whitespace changed since then.
 > 2. GUI source tag: the GUI never adds the tracker tag (for example "ANT") when the source field is empty, but the form shows it. My pick: the GUI fills the field with the tag.
