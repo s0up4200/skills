@@ -1,7 +1,7 @@
 ---
 name: verify-review
 effort: high
-description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), then report which findings to fix and which to refute. With --fix, it also commits the fixes and posts the refutations. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
+description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. With --fix, it also commits the fixes and posts the refutations. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
 argument-hint: "[optional: PR number or URL] [--fix]"
 ---
 
@@ -14,6 +14,8 @@ Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named
 If a `/prove-review` report on these threads is in the conversation, its verdicts replace yours. Go on from step 3 with them.
 
 The thread script sits next to this file: `<skill base directory>/scripts/threads.sh`. The base directory is printed when the skill loads.
+
+If the `origin` remote is a Forgejo host, read `references/forgejo.md` before step 1. It replaces the `gh` reads in step 1 and the writes in steps 4 and 5.
 
 ## 1. Collect the threads
 
