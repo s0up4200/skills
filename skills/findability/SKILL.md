@@ -58,7 +58,7 @@ The first line of each digest gives the raw JSONL path. Use jq/grep on it only w
 
 Find friction: places where the agent took too long to find information, or relied on information that was wrong. Look for:
 1. Search runs: 4 or more SEARCH calls that hunt for one fact. Name the fact, count the calls, and say where the fact actually lives.
-2. Stale docs: a doc, skill, comment, or memory the agent read (AGENTS.md, CLAUDE.md, docs/, ADRs, CONTEXT.md, README, skills) that disagreed with the code, named a removed file or command, or sent the agent the wrong way.
+2. Stale docs: a doc, skill, comment, or memory the agent read (AGENTS.md, CLAUDE.md, docs/, ADRs, GLOSSARY.md, README, skills) that disagreed with the code, named a removed file or command, or sent the agent the wrong way.
 3. Missing pointers: the fact lived in a doc that nothing pointed the agent to, or in a file it found only by luck.
 4. Late coupling: change X needed change Y elsewhere, and the agent learned that only from a failed check, a review, or the user.
 5. Repeated lookups: the same fact looked up more than once in a session, or a command that failed and was retried in a different form.

@@ -41,7 +41,7 @@ Create files lazily: only when you have something to write. If no `GLOSSARY.md` 
 
 ## Planning versus implementation
 
-While you plan (grilling, a wayfinder ticket, a spec), record each glossary entry and ADR as **Domain Docs** in the plan: the ticket resolution or the spec. Write `GLOSSARY.md` (some repos call it `CONTEXT.md`) and `docs/adr/` files only on the implementation branch, during `/implement` or `/implement-spec`, with the code.
+While you plan (grilling, a wayfinder ticket, a spec), record each glossary entry and ADR as **Domain Docs** in the plan: the ticket resolution or the spec. Write `GLOSSARY.md` and `docs/adr/` files only on the implementation branch, during `/implement` or `/implement-spec`, with the code.
 
 ## During the session
 
