@@ -1,6 +1,6 @@
 # Forgejo pull requests
 
-On Forgejo, the AI review comes from the reusable workflow `soup/workflows/.forgejo/workflows/claude-review.yml`. It posts one plain PR comment per run as user `forgejo-actions`. It makes no review threads. Each comment ends with `<!-- reviewed-sha: <sha> -->`, and the next run reviews only the commits after that SHA.
+On Forgejo, the AI review comes from a Forgejo Actions workflow that runs Claude. It posts one plain PR comment per run as user `forgejo-actions`. It makes no review threads. Each comment ends with `<!-- reviewed-sha: <sha> -->`, and the next run reviews only the commits after that SHA.
 
 The next run also reads every `forgejo-actions` comment and every comment by the repository owner. It does not report again a finding that the owner replied is fixed or accepted, unless the code at head shows that it is not fixed. Thus an owner reply is the record on Forgejo. There is no thread to resolve and no reaction to add.
 
@@ -8,10 +8,9 @@ The next run also reads every `forgejo-actions` comment and every comment by the
 
 Use `fj` from the repository root. It finds the repository from the `origin` remote. Read the PR with `fj pr view <n> body`, and read a closed issue with `fj issue view <n>` and `fj issue view <n> comments`. Check out the branch with `fj pr checkout <n>`.
 
-`fj` does not show comment IDs, so read the comments from the API. The token is in `~/.local/share/forgejo-cli/keys.json`. Read it inside the command so that it never prints:
+`fj` does not show comment IDs, so read the comments from the API. Take the host, the owner, and the repository from the `origin` remote. `fj` keeps the token in `~/.local/share/forgejo-cli/keys.json`. Read it inside the command so that it never prints:
 
 ```bash
-host=forgejo.pizzly-dinosaur.ts.net
 curl -fsS -H "Authorization: token $(jq -r --arg h "$host" '.hosts[$h].token' ~/.local/share/forgejo-cli/keys.json)" \
   "https://$host/api/v1/repos/$owner/$repo/issues/$pr/comments?limit=50"
 ```
