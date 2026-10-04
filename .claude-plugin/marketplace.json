@@ -38,6 +38,7 @@
       "source": "./skills",
       "skills": [
         "./skills/findability",
+        "./skills/sync-upstream",
         "./skills/perf-review",
         "./skills/go-proverbs"
       ]
