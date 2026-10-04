@@ -22,6 +22,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - Glossary entries and ADRs are Domain Docs in the plan until implementation. `domain-modeling`, `grill-with-docs`, `wayfinder`, and `improve-codebase-architecture` record them in the ticket resolution or the spec. `to-spec` has a Domain Docs section, and `to-tickets` adds each entry to the ticket whose code it describes. `implement` and `implement-spec` write them on the implementation branch with the code.
 
 Upstream refers to some skills that are not copied here, for example `grill-me`, `to-questionnaire`, and `wait-what` in `ask-matt`.
+- `implement` uses the latest Agent Brief comment on an issue as the spec. The issue body and the other comments are context only.
 
 ### Compare with upstream
 
