@@ -57,7 +57,8 @@
         "./skills/prove-review",
         "./skills/post-review",
         "./skills/fix-review",
-        "./skills/verify-review"
+        "./skills/verify-review",
+        "./skills/challenge-request"
       ]
     },
     {

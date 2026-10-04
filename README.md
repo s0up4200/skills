@@ -62,6 +62,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [go-proverbs](skills/go-proverbs/) | Question a Go plan or spec with the 19 Go proverbs from Rob Pike's Gopherfest 2015 talk before any code exists |
 | [native-web](skills/native-web/) | Replace custom JavaScript and UI libraries with native web platform features — 42 tips from htmlcat.net with support tiers and caveats |
 | [qbittorrent-upstream](skills/qbittorrent-upstream/) | Audit unreleased qBittorrent WebAPI and session changes and map each onto the work go-qbittorrent and qui need before the next release |
+| [challenge-request](skills/challenge-request/) | Challenge a feature request from Discord or GitHub: find the real problem, check for existing features and duplicates, and give a verdict of yes, not now, already possible, no, or need more info. Explicit invocation only |
 
 ### From mattpocock/skills
 
