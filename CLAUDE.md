@@ -6,6 +6,10 @@ This is a content-only repo — no package.json, no build system, no tests, no d
 
 Before you create or edit a skill, run the `writing-for-agents` skill. It sets how to write the description, the body, and the reference files.
 
+This repo is public. A skill gets hosts, repository names, and paths from the environment, for example the `origin` remote, and never names private ones.
+
+When another session asks for a skill change, read the source it cites (a workflow, a script, a doc) and make sure that each claim about it is true before you write it into the skill.
+
 ## Repository Structure
 
 ```
