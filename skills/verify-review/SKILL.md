@@ -110,6 +110,38 @@ The reaction is a write, so it needs `--fix` or the user's request. It is not a 
 
 ## 6. Report
 
-Account for every thread. The report is a short table with one row per thread: path and line, the claim in one sentence, the verdict, the evidence, and the action taken (commit SHA, reply posted, reaction added, resolved, left open with the reason). Follow it with the human threads you skipped, if any, and, without `--fix`, the commits, pushes, posts, and reactions that `--fix` would make.
+Account for every thread. Use the same layout every run, so each part is always in the same place. The user often has several pull requests open, so the first line names the repository and the pull request. Keep the sections in this order, and leave out a section that is empty:
 
-Where a judgment call is still open, say so. Do not resolve those threads.
+```markdown
+**owner/repo#123** · 4 AI threads: 2 confirmed, 1 wrong, 1 judgment · 1 human thread skipped
+**State:** fixes in the working tree, not committed (run without `--fix`)
+
+**Your call**
+1. core/sync.go:40 (#4): retry forever, or fail after 3 tries? I recommend 3 tries, because the caller already shows the error.
+
+**Next:** `/verify-review 123 --fix` commits `fix(services): redact URLs in errors` (4 files), pushes, resolves 2 threads, and adds 👍 to 1 Codex comment.
+
+| # | Where | Bot | Verdict | Claim | Action |
+|---|---|---|---|---|---|
+| 1 | arr/health.go:75 | Codex | confirmed | error log shows the API key | fixed, not committed |
+| 2 | arr/common.go:77 (review body) | CodeRabbit | confirmed | same as #1 | same fix as #1 |
+| 3 | core/service.go:193 | CodeRabbit | wrong | fragment reaches the log | reply below |
+| 4 | core/sync.go:40 | Codex | judgment | retry loop never ends | open, your call |
+
+**Evidence**
+1. arr/common.go:77: errors from `arrHTTPClient.Do` return the raw URL. Fix: `MakeArrRequest` wraps both error returns with `core.RedactURLError`. Test: `TestMakeArrRequest_ErrorOmitsQuerySecret`.
+3. core/service.go:190: `RedactURL` clears `Fragment` before `String()`.
+
+**Reply to #3** (needs your yes)
+> ...
+
+**Not in the patch:** defects that no bot named, with file and line.
+
+**Checks:** `make precommit` passes. CI is running.
+```
+
+- **State** is one of: committed and pushed as `<sha>`, fixes in the working tree and not committed, or no changes.
+- **Your call** holds only the open judgment calls, one question each, with your recommendation. It is the only part that needs the user, so it comes before the details. Do not resolve those threads.
+- **Next** is the one command or approval that moves the pull request forward. After a `--fix` run with nothing open, it says what is left, for example "wait for CI".
+- Keep each table cell to a few words and each claim under ten words. The table rows and the evidence items use the same numbers.
+- Each evidence item starts with a file and line, and has two sentences at most. For a fix, it names the change and the test. An item whose evidence is "same as #N" needs no entry.
