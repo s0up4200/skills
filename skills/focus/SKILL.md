@@ -14,15 +14,15 @@ Requires the `gh` CLI, authenticated.
 ## 1. Find the scope
 
 - The user named an issue: that issue is the epic.
-- The user named a repo, or the current directory is a GitHub repo: find every open epic there. When the repo has no open epic, go to "No epics" below. Do not go to the user's claims in other repos.
-- Neither, or the remote is not GitHub (Forgejo, GitLab): start from the user's own claims. Their open assigned issues show which repos they work in:
+- The user named a repo, or the current directory is a GitHub or Forgejo repo: that repo is the whole scope. Find every open epic there. On Forgejo, read it with `fj` (see "Forgejo repos" below). When the repo has no open epic, go to "No epics" below. A repo with no open issues and no open PRs is a complete answer: report it and stop.
+- Neither: start from the user's own claims. Their open assigned issues show which repos they work in:
 
   ```bash
   gh search issues --assignee @me --state open --limit 100 --json repository \
     --jq '[.[].repository.nameWithOwner]|group_by(.)|map("\(.[0]) \(length)")[]'
   ```
 
-  Find the epics in each repo it lists. On a Forgejo remote, also read that repo with `fj` (see "Forgejo repos" below). Ask which repo only when both come back empty. Do not sweep every repo the user can see: that is slow and mostly noise.
+  Find the epics in each repo it lists. Ask which repo only when it comes back empty. Do not sweep every repo the user can see: that is slow and mostly noise.
 
 Find the open epics in a repo. An epic is an open issue with at least one sub-issue:
 
@@ -136,6 +136,13 @@ A repo with no open epic still has work. Read its open pull requests and issues,
 ```bash
 gh pr list --state open --json number,title,author,isDraft,reviewDecision,mergeable,updatedAt,statusCheckRollup
 gh issue list --state open --limit 100 --json number,title,assignees,labels,updatedAt
+```
+
+On a Forgejo repo, use `fj`:
+
+```bash
+fj pr search --state open
+fj issue search --state open
 ```
 
 The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. An issue with no triage label has the role `needs-triage`.
