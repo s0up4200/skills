@@ -38,7 +38,7 @@ If the working tree is dirty, that's fine as long as you don't need to check out
 
 ## Step 2: Ask about merging develop into main
 
-Skip this step when the repo has no `develop` branch (mkbrr has none): announce what is on main.
+Skip this step when the repo has no `develop` branch: announce what is on main.
 
 Otherwise always ask, every run, even if develop has zero pending commits (then just say so and skip ahead). Use AskUserQuestion with these options:
 
