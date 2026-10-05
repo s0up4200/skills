@@ -211,7 +211,18 @@ Thanks to **nitrobass24**, **jussaw**, **OlziYT**, **rodion981**, **luckylittle*
 Full changelog: https://github.com/autobrr/qui/releases/tag/v1.21.0
 ```
 
-## Step 7: Deliver and hand off
+## Step 7: Run the prose passes
+
+Every draft goes through two passes before the user sees it, in this order:
+
+1. Call the Skill tool with "simple-english" and apply its Document rules to the prose.
+2. Call the Skill tool with "unslop" and apply it to the result. It runs last, so no later edit adds a tell back.
+
+The passes change the sentences, not the template. Keep the title, the headings, the bold lead-in on each bullet, the contributor line, and the changelog URL. Keep option names, version numbers, and other facts exact.
+
+The step is done when both passes ran on the final draft. If you edit the draft after the unslop pass, run unslop again. Then count the characters again for Step 8.
+
+## Step 8: Deliver and hand off
 
 Print the finished announcement inside a fenced code block so the raw markdown can be copied straight into Discord (rendered markdown loses the formatting characters). State the character count next to it so the user can see it fits before pasting.
 
