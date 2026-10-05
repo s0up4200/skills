@@ -20,7 +20,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `code-review`: the frontmatter adds `effort: high`. Step 6, "Act on the findings", comes from [mattpocock/skills#1044](https://github.com/mattpocock/skills/issues/1044). If upstream merges that issue, keep the upstream text.
 - `pr`: the skill uses the PR template of the repository. The default body is one sentence. The evidence section lists only checks that CI cannot see. The prose goes through `simple-english` and `unslop`, and the skill offers to install them when they are missing.
 - Glossary entries and ADRs are Domain Docs in the plan until implementation. `domain-modeling`, `grill-with-docs`, `wayfinder`, and `improve-codebase-architecture` record them in the ticket resolution or the spec. `triage` records them in the agent brief. `to-spec` has a Domain Docs section, and `to-tickets` adds each entry to the ticket whose code it describes. `implement` and `implement-spec` write them on the implementation branch with the code.
-- `to-spec` posts the spec as a `## Spec` comment when the conversation started from an existing issue. `implement` uses the latest Agent Brief or Spec comment on an issue as the spec. The issue body and the other comments are context only.
+- `implement` uses the latest Agent Brief comment on an issue as the spec. The issue body and the other comments are context only.
 - `setup-matt-pocock-skills` renames an old `CONTEXT.md` or `CONTEXT-MAP.md` to the `GLOSSARY` name with `git mv`, and updates the references to it. Upstream v1.3 tells users to do this rename by hand.
 
 Upstream refers to some skills that are not copied here, for example `grill-me`, `to-questionnaire`, and `wait-what` in `ask-matt`.

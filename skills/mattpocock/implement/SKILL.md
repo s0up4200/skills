@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 Implement the work described by the user in the spec or tickets.
 
-If the issue has an Agent Brief or Spec comment, the latest one is the spec. The issue body and the other comments are context only.
+If the issue has an Agent Brief comment, the latest brief is the spec. The issue body and the other comments are context only.
 
 Use /tdd where possible, at pre-agreed seams.
 
