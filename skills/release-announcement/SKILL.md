@@ -151,9 +151,9 @@ You write it yourself in the main conversation, from the agent findings. Do not 
 - **What changed.** Who it affects and what they must do before or after upgrading.
 
 ## Highlights
-- **Theme lead-in.** Two to four sentences expanding on it.
+- **Theme lead-in.** One sentence on what users get, two at most.
 - **Another theme.** ...
-- **Fixes and polish.** Catch-all for the smaller items, comma-chained.
+- **Fixes and polish.** The smaller items, named and comma-chained.
 
 Thanks to **login1**, **login2**, and **login3** for contributing to this release.
 
@@ -171,24 +171,28 @@ List the Step 4 logins in that order, bold, as plain text: a `@login` on Discord
 Add this section only when an agent reported `breaking: true`. Leave it out when nothing breaks; do not write "None".
 
 - One bullet per breaking change, not grouped by theme: each one can need its own action from the user.
-- Lead with the bolded change, then the action the user must take. Use the `breaking_details` facts: exact option names, old and new values, the version that dropped support.
+- Lead with the bolded change, then the action the user must take, in one or two sentences. From the `breaking_details`, keep only what the user needs to act: the option name, the new value, the error text they will see.
+
+  ```markdown
+  - **A config file with a syntax error now stops startup.** If an agent stops after the update, fix the file named in the "failed to decode config file" error. The usual cause is an API key with a `"`, written by an older agent installer.
+  ```
 - No emojis, no warning icons, no all-caps shouting. The heading alone marks the section.
 - A breaking change can also appear in Highlights when it brings a benefit, but do not repeat the migration steps there.
 
 ### How to build the Highlights
 
-- **Group by theme, never by PR.** A theme bundles related PRs into one story ("Cross-seed matching fixes" might cover three PRs). Aim for 4-7 bullets. The last bullet is always **Fixes and polish.**, sweeping up everything real but small.
+- **Group by theme, never by PR.** A theme bundles related PRs into one story ("Cross-seed matching fixes" might cover three PRs). Aim for 3-6 bullets. The last bullet is always **Fixes and polish.**, a comma-chained list of the small items, each named in a few words.
 - **Order by impact.** The first bullet is the headline: the thing most users will feel. Big reliability or performance work usually outranks new toggles.
-- **Lead each bullet with a bolded benefit phrase**, then explain. "Real-time updates that hold up under load." not "SSE refactor."
-- **Write for users, not developers.** Name the problem they experienced ("stalls and black screens some users hit on big instances"), then what changed. UI option names in bold or quotes as they appear in the app. No internal jargon: "sync manager mutex" means nothing to a user, "large instances no longer freeze the UI" does.
-- **Use the concrete facts the agents dug up**: real numbers ("~26x less data per tick"), version requirements ("needs qBittorrent 5.1+"), instance sizes ("18k+ torrents"). Specifics are what make the announcement feel substantial instead of generic.
+- **Lead each bullet with a bolded benefit phrase**, then one sentence, two at most. "Real-time updates that hold up under load." not "SSE refactor."
+- **State the outcome**: what users can do now, or what stopped breaking. The mechanism, the old behaviour, test numbers, and edge cases belong to the changelog link. Name UI options in bold or quotes as they appear in the app.
+- **Keep one fact per bullet**, the one a user acts on or remembers: a version requirement ("needs qBittorrent 5.1+"), an option name, a striking number ("~26x less data").
 - **Honest hedging is fine**: "is hopefully gone" for a hard-to-reproduce fix reads better than overclaiming.
 
 ### Style rules
 
 - Never use em dashes. Commas, periods, or parentheses instead.
 - Discord markdown only: `#`, `##`, `**bold**`, `` `code` ``, lists. No tables, no links other than the changelog URL, no images.
-- Total length in the neighborhood of the example below (roughly 2500 characters), and never above Discord's 4000-character message limit. Discord posts should be scannable, not exhaustive; the changelog link carries the long tail. Count with `wc -m` on the draft (characters, not bytes, since `wc -c` overcounts anything non-ASCII). When a draft runs over, trim the Fixes and polish bullet and tighten the longer Highlights first; the contributor line is the cheapest part of the post and is not where the space comes from.
+- Aim for 1000 to 1500 characters, the length of the example below, plus a breaking-changes section when there is one. Discord posts are scannable; the changelog link carries the long tail. Count with `wc -m` on the draft (characters, not bytes, since `wc -c` overcounts anything non-ASCII). When a draft runs over, cut whole sentences from the longest Highlights first; the contributor line is not where the space comes from.
 - The title emoji (such as `:qui:`) is a custom server emoji; keep it verbatim.
 
 ### Reference example (qui v1.21.0)
@@ -199,12 +203,12 @@ Use it for the voice and the length in every repo.
 # New qui release: `v1.21.0`! :qui:
 
 ## Highlights
-- **Real-time updates that hold up under load.** The server-sent-events stream introduced in v1.20 is now far more resilient on large and slow qBittorrent instances. Torrent updates are sent as small deltas instead of full page snapshots (~26x less data per tick), fixing the stalls and black screens some users hit on big instances or backgrounded tabs. A sync timeout that could permanently disconnect very large instances (18k+ torrents) until a restart is hopefully gone.
-- **Per-file download priority.** You can now set download priority per file and per folder (Do not download / Normal / High / Maximum) right in the torrent Content tab, matching qBittorrent's WebUI. Previously only include/exclude was reachable, so High and Maximum were unavailable.
-- **Three more languages, now seven total.** Added Italian, Korean, and Ukrainian, joining English, German, French, and Simplified Chinese, with improved French coverage and more previously-hardcoded strings cleaned up.
-- **Smarter automations.** New tracker conditions match on tracker **Status** and **Message** (act on errored trackers or specific messages; needs qBittorrent 5.1+), a new **Year** condition filters by the release year parsed from the torrent name, and trackers configured on the Indexers page are now selectable in workflow rules even before any torrent uses them.
-- **Cross-seed matching fixes.** TV searches no longer append a resolution token that made some indexers (BTN, IPT) return zero results, "and"/"&" connector-spelling passes now reuse the Torznab cache and re-query indexers that returned only junk, and rootless single-file torrents matched into a foldered release are filed into the correct folder so qBittorrent stops reporting missing files.
-- **Fixes and polish.** Postgres hardening (fixed int4 sequence exhaustion in string interning and indexed `string_pool` columns so background GC stops timing out), all-instances exports now route to the owning instance, a new `GET /api/version` endpoint reports the running version, pprof binds to a configurable loopback address, and assorted UI polish (status bar back at the bottom, no more tab-indicator layout shifts).
+- **Real-time updates that hold up under load.** Updates now arrive as small deltas (~26x less data), so big instances and background tabs stop stalling or going black.
+- **Per-file download priority.** Set Normal, High, Maximum, or Do not download per file and folder in the Content tab.
+- **Three more languages.** Italian, Korean, and Ukrainian, seven in total.
+- **Smarter automations.** New tracker **Status** and **Message** conditions (needs qBittorrent 5.1+), and a **Year** condition parsed from the torrent name.
+- **Cross-seed matching fixes.** TV searches return results on BTN and IPT again, and rootless single-file matches land in the right folder.
+- **Fixes and polish.** Postgres hardening, a `GET /api/version` endpoint, all-instances exports to the right instance, and UI polish.
 
 Thanks to **nitrobass24**, **jussaw**, **OlziYT**, **rodion981**, **luckylittle**, and **nasenov** for contributing to this release.
 
@@ -218,7 +222,7 @@ Every draft goes through two passes before the user sees it, in this order:
 1. Call the Skill tool with "simple-english" and apply its Document rules to the prose.
 2. Call the Skill tool with "unslop" and apply it to the result. It runs last, so no later edit adds a tell back.
 
-The passes change the sentences, not the template. Keep the title, the headings, the bold lead-in on each bullet, the contributor line, and the changelog URL. Keep option names, version numbers, and other facts exact.
+The passes change the sentences, not the template or the length. Keep the title, the headings, the bold lead-in on each bullet, the contributor line, and the changelog URL. Keep option names, version numbers, and other facts exact. The users know their own app, so its terms need no definition; when a pass splits a sentence, cut words so the bullet stays as short as before.
 
 The step is done when both passes ran on the final draft. If you edit the draft after the unslop pass, run unslop again. Then count the characters again for Step 8.
 
