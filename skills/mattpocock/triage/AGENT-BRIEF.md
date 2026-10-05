@@ -65,6 +65,9 @@ Be specific about edge cases and error conditions.
 **Out of scope:**
 - Thing that should NOT be changed or addressed in this issue
 - Adjacent feature that might seem related but is separate
+
+**Domain Docs:**
+The glossary entries and ADRs that this work adds or changes, in final text. Omit this section when there are none.
 ```
 
 ## Examples
