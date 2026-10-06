@@ -36,7 +36,8 @@ Stale lines are facts, not a level, so every variant fixes the same ones. Audit 
 1. List every **checkable claim** in the set: a path, a command, a `make` target, a script name, a flag, an environment variable, a config key, a version, a type or function name, and every statement of how the code behaves.
 2. Check each claim against the base SHA. Run the command with `--help` or a dry run, open the path, grep for the name, read the code for a behaviour claim.
 3. Check the configs that repeat steering text, for example `.coderabbit.yaml` path instructions or a reviewer prompt. A stale claim there gets the same fix.
-4. Compare the files with each other. A nested file that repeats a root line is a duplicate. A nested file that contradicts a root line, or two lines that contradict each other, is a **conflict**.
+4. Find the links into the set from outside it, for example `AGENTS.md#<heading>` in a PR template or `CONTRIBUTING.md` (`git grep -n 'AGENTS.md#'`). A variant that moves a linked section updates each link.
+5. Compare the files with each other. A nested file that repeats a root line is a duplicate. A nested file that contradicts a root line, or two lines that contradict each other, is a **conflict**.
 
 Record each finding as: file:line, the claim, the evidence, and the fix. Do not resolve a conflict yourself, because only the user knows which side is the current rule. Mark it for the user.
 
