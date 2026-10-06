@@ -23,7 +23,7 @@ A verdict without proof becomes `judgment`, marked "not proved" with the reason.
 
 ## Step 4: the report shape
 
-Write the report to the same file as in SKILL.md step 4. Keep the shape of the `/verify-review` report, so that `/verify-review` can go on from it:
+Write the report to the same file as in SKILL.md step 4. Use this shape, so that `/verify-review` can go on from it:
 
 1. A table with one row per thread: location, claim, verdict, proof.
 2. One section per thread: the claim, the proof, and for a judgment the proved facts, the recommendation, and the fix plan.
@@ -42,4 +42,4 @@ Round N: factual F, advocate A; applied X (M material), refuted Y, changed Z. Ve
 
 ## Step 6: the next step
 
-Tell the user to answer the decisions. `/verify-review --fix` then goes on with the proved verdicts, which replace the ones in its own table.
+Tell the user to answer the decisions. `/verify-review --fix` then goes on with the proved verdicts, which replace the ones in its own report.

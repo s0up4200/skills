@@ -1,7 +1,7 @@
 ---
 name: verify-review
 effort: high
-description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. With --fix, it also commits the fixes and posts the refutations. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
+description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. After the user answers the report, or with --fix, it also commits the fixes and posts the approved refutations. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
 argument-hint: "[optional: PR number or URL] [--fix]"
 ---
 
@@ -9,7 +9,7 @@ argument-hint: "[optional: PR number or URL] [--fix]"
 
 An AI reviewer saw the diff. It did not run the code, read the callers, or know why a line is the way it is. Its findings are claims, and every claim on the pull request stays unverified until you have checked it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
-Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write: no commit, no push, no comment, no thread resolution. `--fix` lets the run make the writes in steps 3 to 5.
+Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write, then reports and waits: no commit, no push, no comment, no thread resolution. The user's reply to the report is the go-ahead for the writes in steps 3 to 5 (step 7). `--fix` gives the go-ahead at the start, so the run makes the writes for the settled findings before it reports.
 
 If a `/prove-review` report on these threads is in the conversation, its verdicts replace yours. Go on from step 3 with them.
 
@@ -63,7 +63,7 @@ The verification ends in one of four verdicts, each with the evidence that produ
 - **confirmed**: the claim holds at head and the fix is clear. Goes to step 3.
 - **wrong**: the premise fails at head, for the scenario the bot described. Goes to step 4.
 - **stale**: already addressed by a commit after the review. Resolve without a reply.
-- **judgment**: the claim holds, or might, and what to do about it is the maintainer's call. This covers a fix that chooses between designs, a true claim whose fix costs more than the failure it prevents, and a defect that predates the pull request. Bring it to the user with the finding, the practical tradeoff, and your recommendation. Ask all independent questions in one round. Silence is not agreement.
+- **judgment**: the claim holds, or might, and what to do about it is the maintainer's call. This covers a fix that chooses between designs, a true claim whose fix costs more than the failure it prevents, and a defect that predates the pull request. Bring it to the user with the finding, a risk score, the practical tradeoff, and your recommendation (step 6). Silence is not agreement.
 
 The line between wrong and judgment matters more than any other in this skill. A true claim that is not worth fixing is a judgment, and the reply, if the user wants one, says the risk is accepted. Calling it wrong puts a false statement on the record under the maintainer's name. Before you write "wrong", restate the bot's scenario in its own terms, the ordering of events and the inputs it named, and show the code handling that scenario. The most common wrong refutation argues against a neighbouring scenario: the other ordering, a different caller, a case the guard does cover. If the code handles only the neighbour, the bot was right.
 
@@ -108,42 +108,50 @@ Codex ends each comment with "Useful? React with 👍 / 👎." Add one reaction 
 gh api "repos/$repo/pulls/comments/$comment_id/reactions" -f content=+1   # or -1
 ```
 
-The reaction is a write, so it needs `--fix` or the user's request. It is not a comment, so it needs no approval for each post. Rate only Codex comments (author `chatgpt-codex-connector`). Other bots do not ask for a rating.
+The reaction is a write, so it needs `--fix` or the user's reply to the report. It is not a comment, so it needs no approval for each post. Rate only Codex comments (author `chatgpt-codex-connector`). Other bots do not ask for a rating.
 
 ## 6. Report
 
-Account for every thread. Use the same layout every run, so each part is always in the same place. The user often has several pull requests open, so the first line names the repository and the pull request. Keep the sections in this order, and leave out a section that is empty:
+Account for every thread. Write for a person who has several pull requests open and reads the report once: friendly plain sentences, a short list in each section, and no table. Use the same layout every run, so each part is always in the same place. Keep the sections in this order, and leave out a section that is empty:
 
 ```markdown
-**owner/repo#123** · 4 AI threads: 2 confirmed, 1 wrong, 1 judgment · 1 human thread skipped
-**State:** fixes in the working tree, not committed (run without `--fix`)
+**owner/repo#123** · I checked 4 AI comments · I skipped 1 human comment
+**Status:** the fixes are in your working tree. Nothing is committed yet.
+
+**Fixed**
+- **Risk 8/10**: error logs leak the API key (`arr/common.go:77`). Both error paths now strip the query string. Test: `TestMakeArrRequest_ErrorOmitsQuerySecret`. Codex and CodeRabbit flagged the same bug.
+
+**Already fixed:** 1 comment, by `2c95de28`.
+
+**The bot was wrong**
+- CodeRabbit says the URL fragment reaches the log. It doesn't, because `RedactURL` clears it first (`core/service.go:190`). Reply (needs your yes):
+  > `RedactURL` clears `Fragment` before `String()` (core/service.go:190), so the fragment never reaches the log.
 
 **Your call**
-1. core/sync.go:40 (#4): retry forever, or fail after 3 tries? I recommend 3 tries, because the caller already shows the error.
 
-**Next:** `/verify-review 123 --fix` commits `fix(services): redact URLs in errors` (4 files), pushes, resolves 2 threads, and adds 👍 to 1 Codex comment.
+❓ **Q1** - **Should sync retry forever?** · Risk 4/10
 
-| # | Where | Bot | Verdict | Claim | Action |
-|---|---|---|---|---|---|
-| 1 | arr/health.go:75 | Codex | confirmed | error log shows the API key | fixed, not committed |
-| 2 | arr/common.go:77 (review body) | CodeRabbit | confirmed | same as #1 | same fix as #1 |
-| 3 | core/service.go:193 | CodeRabbit | wrong | fragment reaches the log | reply below |
-| 4 | core/sync.go:40 | Codex | judgment | retry loop never ends | open, your call |
+`core/sync.go:40` retries a failed sync with no limit. Codex wants a cap. The claim is true. The UI already shows the error, though, so a stuck loop costs log noise and one goroutine. It loses no data.
+- A: Stop after 3 tries, then show the error. That's about 5 lines and 1 test.
+- B: Leave it as it is and accept the risk.
 
-**Evidence**
-1. arr/common.go:77: errors from `arrHTTPClient.Do` return the raw URL. Fix: `MakeArrRequest` wraps both error returns with `core.RedactURLError`. Test: `TestMakeArrRequest_ErrorOmitsQuerySecret`.
-3. core/service.go:190: `RedactURL` clears `Fragment` before `String()`.
+➡️ **A.** The fix is cheap, and an endless loop is hard to spot in production.
 
-**Reply to #3** (needs your yes)
-> ...
+---
 
-**Not in the patch:** defects that no bot named, with file and line.
+**Not in the patch:** `arr/sonarr.go:212` drops the error from `json.Unmarshal`. No bot flagged it.
 
-**Checks:** `make precommit` passes. CI is running.
+**Checks:** `make precommit` passes.
+
+**Reply with** your answer to Q1, and yes or no to the reply. Then I commit `fix(services): redact URLs in errors`, push, resolve 3 threads, and add 👍 to 1 Codex comment.
 ```
 
-- **State** is one of: committed and pushed as `<sha>`, fixes in the working tree and not committed, or no changes.
-- **Your call** holds only the open judgment calls, one question each, with your recommendation. It is the only part that needs the user, so it comes before the details. Do not resolve those threads.
-- **Next** is the one command or approval that moves the pull request forward. After a `--fix` run with nothing open, it says what is left, for example "wait for CI".
-- Keep each table cell to a few words and each claim under ten words. The table rows and the evidence items use the same numbers.
-- Each evidence item starts with a file and line, and has two sentences at most. For a fix, it names the change and the test. An item whose evidence is "same as #N" needs no entry.
+- **Risk N/10** tells how bad it is if the pull request ships with the finding unfixed: 1 to 3 is cosmetic or unlikely, 4 to 6 is a real but contained problem, and 7 to 10 is security, data loss, or a crash. Give a score to each confirmed finding and each judgment call. A wrong or stale finding has no risk, so it gets no score. The report shows only the score, not this legend.
+- **Status** is one of: committed and pushed as `<sha>`, fixes in the working tree and not committed, or no changes.
+- Each finding is one list item: the claim in plain words, one file and line, and two more sentences at most. For a fix, name the change and the test. Put duplicate findings in one item and name each bot.
+- **Your call** uses the `grilling` round format: one numbered question for each open judgment call, the options with what each costs, and your recommendation with its reason after ➡️. Ask all the questions in one round. Leave those threads unresolved.
+- The last line tells the user what to reply with and lists the writes that the reply starts. When nothing is open after a `--fix` run, it says what is left, for example "wait for CI".
+
+## 7. Act on the reply
+
+The user's reply to the report is the go-ahead for the writes in steps 3 to 5, the same as `--fix`. Fix the confirmed findings and each judgment call that the user chose to fix, then commit, push, post, resolve, and rate. Post a reply only after a yes to that reply. An answer to a judgment question is not a yes to a reply. If the user answers only part of the round, act on the answered part and ask again about the rest. Then report again in the same layout, with the new status.
