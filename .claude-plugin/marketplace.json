@@ -39,6 +39,7 @@
       "skills": [
         "./skills/findability",
         "./skills/review-retro",
+        "./skills/trim-agents-md",
         "./skills/sync-upstream",
         "./skills/perf-review",
         "./skills/go-proverbs"
