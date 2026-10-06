@@ -180,3 +180,17 @@ Before committing a new or updated skill:
 - [ ] Examples are grounded in authoritative sources
 - [ ] Reference files have dated citations with URLs
 - [ ] Skill path is listed in marketplace.json
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues on this repo. Agents use the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+This repo uses the six default triage labels. Each label string is the same as its role name. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+The repo is single-context. It has one `GLOSSARY.md` and one `docs/adr/` at the root. See `docs/agents/domain.md`.
