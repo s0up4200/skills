@@ -17,6 +17,8 @@ The thread script sits next to this file: `<skill base directory>/scripts/thread
 
 If the `origin` remote is a Forgejo host, read `references/forgejo.md` before step 1. It replaces the `gh` reads in step 1 and the writes in steps 4 and 5.
 
+If `gh api repos/$repo/pulls/$pr --jq .stack` is not empty, the pull request is in a stack. Read `references/stacks.md` before step 1. It changes the checkout, the stale verdict, where a fix goes, and the push.
+
 ## 1. Collect the threads
 
 Resolve the pull request with `gh`, never from the local branch name or the author:
