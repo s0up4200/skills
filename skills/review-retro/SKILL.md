@@ -70,7 +70,7 @@ Get the default branch and its HEAD first. Check every proposal against that com
 5. **Rank by damage**, not by count. A rule that would have stopped data loss ranks above one that saves review time.
 6. **Calibration.** Bot claims that the team refuted in 2 or more PRs become a `known-false-positives` standards file, which the reviewer reads before it reports.
 7. **Wiring.** Find where the standards files go: an existing `CODING_STANDARDS.md` or `docs/`. Check `.gitignore` for that path. Check the configs of the AI reviewers in the repo (for example `.coderabbit.yaml` `knowledge_base.code_guidelines.filePatterns`) and propose that they read the same files.
-8. **Steering files.** Apply retro's Global AGENTS.md and No-ops categories to `AGENTS.md` / `CLAUDE.md`: move the review rules to the standards files, and delete the lines that a linter enforces or that the model obeys by default.
+8. **Steering files.** Apply retro's Global AGENTS.md and No-ops categories to `AGENTS.md` / `CLAUDE.md`: move the review-only rules to the standards files, and delete the lines that a linter enforces or that the model obeys by default. Keep the `## Code Review Rules` section in `AGENTS.md` under that heading, because the Codex GitHub review reads only that section and follows no pointer.
 
 Done when each theme is a proposal, "Already covered", or "Dropped", with a reason.
 

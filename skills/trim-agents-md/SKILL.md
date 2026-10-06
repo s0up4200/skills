@@ -17,7 +17,7 @@ Call the Skill tool with `writing-for-agents`. Its terms govern this run: no-op,
 
 The **set** is every steering file in the repo (`git ls-files '*AGENTS.md' '*CLAUDE.md'`), plus the docs they point to, one hop deep. With a path argument, the set is that file and the docs it points to. A pointed doc that is not steering (a design doc, an ADR) gets the audit only, never a restructure. Collect these facts before any subagent starts, because each subagent needs all of them:
 
-- **Readers.** For each file, record whether it is a symlink, an import (`@AGENTS.md`), or a real file. Codex reads `AGENTS.md`, and Claude Code reads `CLAUDE.md`. An `AGENTS.md` with no `CLAUDE.md` beside it is a finding. A nested file loads only when the agent works in its directory, and Codex reads only the files on the path from the repo root to its working directory. So a nested file is the place for rules about that area alone, and the root file keeps a pointer to it.
+- **Readers.** For each file, record whether it is a symlink, an import (`@AGENTS.md`), or a real file. Codex reads `AGENTS.md`, and Claude Code reads `CLAUDE.md`. An `AGENTS.md` with no `CLAUDE.md` beside it is a finding. A nested file loads only when the agent works in its directory, and Codex reads only the files on the path from the repo root to its working directory. So a nested file is the place for rules about that area alone, and the root file keeps a pointer to it. The Codex GitHub review reads only the `## Code Review Rules` section of the root `AGENTS.md` and of the nested file that covers each changed file, and follows no pointer ([docs](https://learn.chatgpt.com/docs/third-party/github)). That section stays in `AGENTS.md`, under that heading, at every level.
 - **Enforcers.** The linter configs, pre-commit config, CI workflows, and `Makefile` or `package.json` scripts. A line that one of these enforces is a no-op. A lint rule enforces only at error level, or when CI fails on warnings.
 - **Standards home.** An existing `CODING_STANDARDS.md` or `docs/` folder. Use the layout of the `review-retro` skill when nothing exists: `CODING_STANDARDS.md` as an index of pointers, and the rules in `docs/standards/<area>.md`. Check `.gitignore` for that path.
 - **Size.** Lines and bytes of each file (`wc -lc`). Estimate tokens as bytes / 4.
@@ -69,6 +69,8 @@ Every line you delete or move gets exactly one tag:
 A line with no tag that you can prove stays where it is.
 
 Write-time rules: a rule that prevents damage while code is written (data loss, real network calls in tests, editing migrations, secrets, destructive commands) must stay readable at write time. Keep it in a steering file, move it to the nested file beside the code it governs with a pointer from the root file, or propose a check that enforces it. Never delete it, and never move it to a file that only review reads.
+
+The `## Code Review Rules` section of each AGENTS.md stays there under that heading, because the Codex GitHub review reads only that section. An area-only review rule moves to the `## Code Review Rules` section of the nested file.
 
 Each pointer names the material and the condition for reading it, with the condition first. The Edit tool refuses to write through a symlink, so edit the real file.
 
