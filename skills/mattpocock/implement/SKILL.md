@@ -16,4 +16,6 @@ Run typechecking regularly, single test files regularly, and the full test suite
 
 Once done, use /code-review to review the work.
 
+Before you commit, list each place where the code departs from the spec: a requirement that you changed or left out, and each spec question that you answered yourself, for example a term that the spec did not define. Add the departures that /code-review found. Ask the user about each departure with AskUserQuestion, one question for each, and change the code to match the answers. A spec question that you answer alone stays hidden until after the commit.
+
 Commit your work to the current branch.

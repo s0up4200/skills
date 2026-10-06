@@ -19,7 +19,15 @@ The issue tracker should have been provided to you. If `docs/agents/issue-tracke
 
 Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
 
-Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
+If the fixed point is the default branch, run `git fetch origin <branch>` and use `origin/<branch>` as the fixed point. The local default branch is often stale, and a diff against it includes changes from pull requests that are already merged.
+
+Capture the diff command once:
+
+- If the work is committed, use `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base).
+- If the work is not committed yet, use `git diff HEAD`.
+- If the branch has commits and uncommitted changes, use `git diff $(git merge-base <fixed-point> HEAD)`.
+
+`git diff` leaves out untracked files. List them with `git status --short` and give them to the sub-agents with the diff. Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
 
 Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
 
@@ -68,6 +76,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 - The diff command and commit list.
 - The path or fetched contents of the spec.
+- Nothing else about the work: no reasons from the author, no plan, and no view of your own on a departure. A brief that calls a departure deliberate tells the reviewer to approve it, and the reviewer then judges the reason instead of the code against the spec.
 - The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
