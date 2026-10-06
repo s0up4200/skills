@@ -18,6 +18,8 @@ Check with the user that these seams match their expectations.
 
 3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
 
+4. If the conversation grilled a parked `needs-grilling` issue, comment "Specced in #<spec>" on that issue and close it.
+
 <spec-template>
 
 ## Problem Statement

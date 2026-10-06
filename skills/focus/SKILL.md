@@ -145,7 +145,7 @@ fj pr search --state open
 fj issue search --state open
 ```
 
-The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. An issue with no triage label has the role `needs-triage`.
+The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `needs-grilling`. An issue with no triage label has the role `needs-triage`.
 
 Rank, best first:
 
@@ -154,6 +154,7 @@ Rank, best first:
 3. Implement: an open `ready-for-agent` issue with no assignee. Bugs come before enhancements. Next step: `/implement`, on a new branch.
 4. Triage: a `needs-triage` issue, or a `needs-info` issue that has a reply from the reporter after the last maintainer comment. Read the comments to find that reply. Next step: `/triage`.
 5. `ready-for-human`: name it. The user does this work, not an agent.
+6. Grill: a `needs-grilling` issue, the maintainer's own parked idea. Next step: `/grill-with-docs`, then `/to-spec`.
 
 Ignore drafts, `wontfix`, and `needs-info` issues with no reply. The user's own open pull request that waits for a review is not an item, but name it in the report.
 
@@ -165,6 +166,7 @@ owner/repo: no epics
   Review:    #118 by alice (no review, 9 days)
   Implement: #104 bug, #98
   Triage:    #130 (no label), #81 needs-info (reporter replied)
+  Grill:     #95, #97
   Yours:     PR #122 waits for a review
 ```
 
