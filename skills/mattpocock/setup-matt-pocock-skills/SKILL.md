@@ -1,12 +1,12 @@
 ---
 name: setup-matt-pocock-skills
-description: "Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills."
+description: "Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run before first use, or rerun to upgrade an existing setup."
 disable-model-invocation: true
 ---
 
 # Setup Matt Pocock's Skills
 
-Scaffold the per-repo configuration that the engineering skills assume:
+Configure or upgrade the per-repo configuration that the engineering skills assume:
 
 - **Issue tracker**: where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels**: the strings used for the six canonical triage roles
@@ -28,6 +28,25 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `.scratch/`: a sign that a local-markdown issue tracker convention is already in use
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. These are present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
+
+### Existing setup: audit for upgrades
+
+If `docs/agents/` contains prior setup files, compare them with the current seed templates before step 2.
+Use the template for the configured tracker. Read the existing `## Agent skills` block and the tracker's actual labels too.
+
+Preserve the tracker choice, label mappings, domain layout, request-surface flag, and custom workflow instructions.
+Keep existing files and pointers when an optional skill such as `triage` is no longer installed.
+Templates supply missing conventions, not replacements for customized files.
+
+List each missing convention, stale reference, and missing mapped label.
+For example, an older setup can map five triage roles while the current template adds `needs-grilling`.
+Retain the five mappings, propose the missing role, and update the summary that still says five.
+If existing instructions conflict with a new convention, ask about that conflict instead of replacing them.
+
+Reuse recorded choices in step 2. Ask only about unresolved choices or conflicts.
+In step 3, show the proposed changes instead of drafting every file again.
+Apply changes already authorized in this session without asking again.
+If the setup already matches, report that result and leave it unchanged.
 
 ### 2. Present findings and ask
 
@@ -117,4 +136,8 @@ For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch us
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later; re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
+Compare the resulting setup with the proposed changes. Make sure that every mapped label exists on the tracker,
+every document pointer resolves, and the `## Agent skills` block appears once.
+On an upgrade, make sure that recorded choices and custom instructions remain intact.
+
+Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later; rerun this skill after skill updates to audit an existing setup, or to change its configuration.
