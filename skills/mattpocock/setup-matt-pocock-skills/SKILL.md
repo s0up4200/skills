@@ -29,24 +29,7 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. These are present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
-### Existing setup: audit for upgrades
-
-If `docs/agents/` contains prior setup files, compare them with the current seed templates before step 2.
-Use the template for the configured tracker. Read the existing `## Agent skills` block and the tracker's actual labels too.
-
-Preserve the tracker choice, label mappings, domain layout, request-surface flag, and custom workflow instructions.
-Keep existing files and pointers when an optional skill such as `triage` is no longer installed.
-Templates supply missing conventions, not replacements for customized files.
-
-List each missing convention, stale reference, and missing mapped label.
-For example, an older setup can map five triage roles while the current template adds `needs-grilling`.
-Retain the five mappings, propose the missing role, and update the summary that still says five.
-If existing instructions conflict with a new convention, ask about that conflict instead of replacing them.
-
-Reuse recorded choices in step 2. Ask only about unresolved choices or conflicts.
-In step 3, show the proposed changes instead of drafting every file again.
-Apply changes already authorized in this session without asking again.
-If the setup already matches, report that result and leave it unchanged.
+If `docs/agents/` already has this skill's files, this run is an upgrade. Keep the recorded choices and any custom text in those files. In step 2, ask only about a convention that is missing or that conflicts with the files. In step 3, show only the changes, not full drafts. If nothing is missing, say so and change nothing.
 
 ### 2. Present findings and ask
 
@@ -136,8 +119,4 @@ For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch us
 
 ### 5. Done
 
-Compare the resulting setup with the proposed changes. Make sure that every mapped label exists on the tracker,
-every document pointer resolves, and the `## Agent skills` block appears once.
-On an upgrade, make sure that recorded choices and custom instructions remain intact.
-
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later; rerun this skill after skill updates to audit an existing setup, or to change its configuration.
+Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later; rerun this skill after a skill update to upgrade the setup.
