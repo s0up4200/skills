@@ -155,6 +155,7 @@ Account for every thread. Write for a person who has several pull requests open 
 - **Status** is one of: committed and pushed as `<sha>`, fixes in the working tree and not committed, or no changes.
 - Each finding is one list item: the claim in plain words, one file and line, and two more sentences at most. For a fix, name the change and the test. Put duplicate findings in one item and name each bot.
 - **Your call** uses the `grilling` round format: one numbered question for each open judgment call, the options with what each costs, and your recommendation with its reason after ➡️. Ask all the questions in one round. Leave those threads unresolved.
+- Keep each question body near 100 words, because the user reads it once and then picks. Start with the verdict. Then give one concrete case, for example the two names that match by mistake, and the cause at one file and line. Name the proof in a few words, without its steps. Say what the pull request changes and what was already there. Give each option one line with its cost.
 - The last line tells the user what to reply with and lists the writes that the reply starts. When nothing is open after a `--fix` run, it says what is left, for example "wait for CI".
 
 ## 7. Act on the reply
