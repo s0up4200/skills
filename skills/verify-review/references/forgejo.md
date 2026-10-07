@@ -4,6 +4,8 @@ On Forgejo, the AI review comes from a Forgejo Actions workflow that runs Claude
 
 The next run also reads every `forgejo-actions` comment and every comment by the repository owner. It does not report again a finding that the owner replied is fixed or accepted, unless the code at head shows that it is not fixed. Thus an owner reply is the record on Forgejo. There is no thread to resolve and no reaction to add.
 
+The workflow runs on each push to the PR, and it reads the comments when the run starts. A reply posted after the push misses that run, so the run reports each finding again. Post the owner reply before the push.
+
 ## Step 1 on Forgejo
 
 Use `fj` from the repository root. It finds the repository from the `origin` remote. Read the PR with `fj pr view <n> body`, and read a closed issue with `fj issue view <n>` and `fj issue view <n> comments`. Check out the branch with `fj pr checkout <n>`.
@@ -19,7 +21,7 @@ Each run reviews only new commits, so the open findings can be in more than one 
 
 ## Steps 2 and 3
 
-Do them as in SKILL.md. Leave out "Resolve the thread after the push".
+Do them as in SKILL.md, but commit and do not push yet. Leave out "Resolve the thread after the push".
 
 ## Steps 4 and 5 become one owner reply
 
@@ -33,3 +35,7 @@ Write one PR comment that lists every finding you collected, one line each:
 Leave an open judgment call out of the reply. The next run then reports it again.
 
 The reply goes out under the user's account. Show the full text to the user and wait for an explicit yes before you post it. Post it with `fj pr comment <n> --body-file <file>`.
+
+Then push. Until the push, the SHAs in the reply exist only in the local repository. Push those commits unchanged. An amend or a rebase between the reply and the push makes new SHAs, and then the reply cites commits that the PR does not have. If the push fails, fix the cause and push the same commits. If the user says no to the reply, push without it.
+
+The order of the writes on Forgejo is commit, reply, push. The last line of the report lists them in that order.
