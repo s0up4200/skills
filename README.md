@@ -66,6 +66,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [native-web](skills/native-web/) | Replace custom JavaScript and UI libraries with native web platform features — 42 tips from htmlcat.net with support tiers and caveats |
 | [qbittorrent-upstream](skills/qbittorrent-upstream/) | Audit unreleased qBittorrent WebAPI and session changes and map each onto the work go-qbittorrent and qui need before the next release |
 | [challenge-request](skills/challenge-request/) | Challenge a feature request from Discord or GitHub: find the real problem, check for existing features and duplicates, and give a verdict of yes, not now, already possible, no, or need more info. Explicit invocation only |
+| [codeowners](skills/codeowners/) | Create or update a GitHub CODEOWNERS file from the commit history, counted per login, and the maintainer's decisions. Writes the file and stops before the commit. Explicit invocation only |
 
 ### From mattpocock/skills
 

@@ -61,7 +61,8 @@
         "./skills/post-review",
         "./skills/fix-review",
         "./skills/verify-review",
-        "./skills/challenge-request"
+        "./skills/challenge-request",
+        "./skills/codeowners"
       ]
     },
     {
