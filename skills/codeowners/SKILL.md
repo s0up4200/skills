@@ -91,6 +91,14 @@ gh api -X GET search/issues -f q='repo:<owner>/<repo> is:pr is:merged author:<lo
 
 The search API allows 30 requests a minute, so query only these people.
 
+**Access.** Read the permission of each person who passes the bar or nearly passes it:
+
+```bash
+gh api repos/<owner>/<repo>/collaborators/<login>/permission --jq .permission
+```
+
+GitHub requests reviews only from owners with `write`, `maintain`, or `admin`. Keep a person with less access in the draft and mark them, because the maintainer can give a strong contributor write access.
+
 ## 5. Draft
 
 Write the draft in your context. Do not write the file yet.
@@ -101,9 +109,9 @@ Write the draft in your context. Do not write the file yet.
 
 ## 6. Interview the maintainer
 
-Ask in numbered rounds, in the style of the `grilling` skill. Each item is one person or one area. It shows the evidence (commits in the window, commits in the last 6 months, line share, last date, and reviews when you counted them) and gives your recommended answer. In an update, start with the change table: one row per line of the draft and of the current file, with the action (add, change, remove, or keep), the evidence, and the decision comment that the line keeps.
+Ask in numbered rounds, in the style of the `grilling` skill. Each item is one person or one area. It shows the evidence (commits in the window, commits in the last 6 months, line share, last date, access, and reviews when you counted them) and gives your recommended answer. In an update, start with the change table: one row per line of the draft and of the current file, with the action (add, change, remove, or keep), the evidence, and the decision comment that the line keeps.
 
-Ask about every candidate co-owner, every area that has a co-owner now or would get one, and every unresolved email. The maintainer's choice wins over the data. Examples of choices from the reference run: a person owns only the package they wrote, docs keep only the maintainer, and a busy co-owner stays on all their lines. Record each choice as a decision comment.
+Ask about every candidate co-owner, every area that has a co-owner now or would get one, and every unresolved email. The maintainer's choice wins over the data. Examples of choices from the reference run: a person owns only the package they wrote, docs keep only the maintainer, and a busy co-owner stays on all their lines. For a person without write access, ask whether to give access or to leave them out. Record each choice as a decision comment.
 
 The step is done when every item has an answer and no answer opens a new item.
 
@@ -111,10 +119,7 @@ The step is done when every item has an answer and no answer opens a new item.
 
 Run each check and keep the result for the report:
 
-- **Write access** for each owner. The result must be `write`, `maintain`, or `admin`:
-  ```bash
-  gh api repos/<owner>/<repo>/collaborators/<login>/permission --jq .permission
-  ```
+- **Write access**: read the permission again for each owner in the file, with the command from step 4. The result must be `write`, `maintain`, or `admin`.
 - **Dead paths**: each pattern matches at least one file in `git ls-files`. Test a directory with `git ls-files <dir> | head -1`, and a glob with `git ls-files ':(glob)<pattern>'`.
 - **Order**: no general pattern comes after a specific pattern that it covers.
 - **Branch protection**:
