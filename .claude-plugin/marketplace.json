@@ -56,8 +56,6 @@
         "./skills/pr-conflicts",
         "./skills/branch-cleanup",
         "./skills/focus",
-        "./skills/full-review",
-        "./skills/prove-review",
         "./skills/post-review",
         "./skills/fix-review",
         "./skills/verify-review",

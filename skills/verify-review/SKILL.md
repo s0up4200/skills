@@ -11,8 +11,6 @@ An AI reviewer saw the diff. It did not run the code, read the callers, or know 
 
 Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write, then reports and waits: no commit, no push, no comment, no thread resolution. The user's reply to the report is the go-ahead for the writes in steps 3 to 5 (step 7). `--fix` gives the go-ahead at the start, so the run makes the writes for the settled findings before it reports.
 
-If a `/prove-review` report on these threads is in the conversation, its verdicts replace yours. Go on from step 3 with them.
-
 The thread script sits next to this file: `<skill base directory>/scripts/threads.sh`. The base directory is printed when the skill loads.
 
 If the `origin` remote is a Forgejo host, read `references/forgejo.md` before step 1. It replaces the `gh` reads in step 1 and the writes in steps 4 and 5.

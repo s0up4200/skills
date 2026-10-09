@@ -1,6 +1,6 @@
 ---
 name: post-review
-description: Post the last review report (/prove-review, /code-review, or /pr-review-toolkit:review-pr) on a GitHub pull request as a request-changes review, after the unslop pass and user approval. Run it only when the user names it, as /post-review [pr-number] [--dry-run]; a chained request, or the "post" answer at the end of /full-review, counts.
+description: Post the last review report (/code-review or /pr-review-toolkit:review-pr) on a GitHub pull request as a request-changes review, after the unslop pass and user approval. Run it only when the user names it, as /post-review [pr-number] [--dry-run]; a chained request counts.
 ---
 
 # Post review
@@ -13,13 +13,12 @@ The span script sits next to this file: `<skill base directory>/scripts/code-spa
 
 ## Before you start
 
-Find the review report in this conversation. Three kinds count:
+Find the review report in this conversation. Two kinds count:
 
-- A `/prove-review` report. Its findings are already proved. If one exists, use it and ignore the reports it was made from. Post its `## Standards` and `## Spec` sections only. An `## AI threads` section stays out of the review: those threads are already on the PR, and `/verify-review` answers them there.
 - A `/code-review` report, with a `## Standards` section and a `## Spec` section.
 - A `/pr-review-toolkit:review-pr` report, with findings grouped by severity. Put each finding under `## Spec` when it compares the code with the linked issue or a design document, and under `## Standards` otherwise.
 
-If there is a `/code-review` report and a `review-pr` report but no `/prove-review` report, merge them and remove duplicates. If you cannot tell which report to use, stop and ask the user. If there is no report, stop and tell the user to run a review first. Do not run the review yourself.
+If there is a `/code-review` report and a `review-pr` report, merge them and remove duplicates. If you cannot tell which report to use, stop and ask the user. If there is no report, stop and tell the user to run a review first. Do not run the review yourself.
 
 If both sections report no findings, stop. A request-changes review with nothing to change is noise. Tell the user the review was clean.
 
