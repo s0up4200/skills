@@ -21,7 +21,7 @@ Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main
 
 If the fixed point is the default branch, run `git fetch origin <branch>` and use `origin/<branch>` as the fixed point. The local default branch is often stale, and a diff against it includes changes from pull requests that are already merged.
 
-If the user names a pull request, run `gh pr view <n> --json baseRefName`, run `git fetch origin <baseRefName>`, and use `origin/<baseRefName>` as the fixed point. A stacked pull request has a base other than the default branch, and a diff against the default branch includes every change of the pull request below it.
+If the user names a pull request, check it out first, so that `HEAD` is its head: `gh pr checkout <n>` on GitHub, `fj pr checkout <n>` on Forgejo. Then read its base branch. On GitHub, `gh pr view <n> --json baseRefName` gives it. On Forgejo, the "From `<head>` into `<base>`" line of `fj pr view <n>` gives it. Run `git fetch origin <base>`, and use `origin/<base>` as the fixed point. A stacked pull request (one built on top of another open pull request) has a base other than the default branch. A diff against the default branch includes every change of the pull request below it.
 
 Capture the diff command once:
 
@@ -95,7 +95,7 @@ End with a one-line summary: total findings per axis, and the worst issue _withi
 
 A finding is a hypothesis until its citation checks out: read the rule or the spec line before changing code. When a finding proposes replacing a branch or a guard with something simpler, name the input the old branch handled and show it in a test or a trace before the replacement lands. The reviewer saw the diff, not that input, and a cleaner branch can drop the one case the old guard existed for.
 
-Before you recommend adding or keeping a CI check, read its failure history (for example `gh run list --workflow <file> --status failure`) and find what else already catches the same failure. A check that never caught a real failure, or that a later build already covers, costs time on every run and catches nothing.
+Before you recommend adding or keeping a CI check, read its failure history (for example `gh run list --workflow <file> --status failure`). Then find what else already catches the same failure. A check that never caught a real failure costs time on every run. So does a check whose failures a later build also catches.
 
 ## Why two axes
 
