@@ -113,7 +113,7 @@ The reaction is a write, so it needs `--fix` or the user's reply to the report. 
 
 ## 6. Report
 
-Account for every thread. Write for a person who has several pull requests open and reads the report once: friendly plain sentences, a short list in each section, and no table. Use the same layout every run, so each part is always in the same place. Keep the sections in this order, and leave out a section that is empty:
+Account for every thread. Write for a person who has several pull requests open and reads the report once: friendly plain sentences, a short list in each section, and no table. Describe each problem by what happens when someone uses the app: what goes wrong, when, and who notices. Leave out file names, line numbers, function names, test names, and commit hashes. If a technical word is necessary, explain it in a few words at its first use. The evidence stays in your verification and in the GitHub replies, where developers read it. Use the same layout every run, so each part is always in the same place. Keep the sections in this order, and leave out a section that is empty:
 
 ```markdown
 **owner/repo#123** · I checked 4 AI comments · I skipped 1 human comment
@@ -121,39 +121,39 @@ Account for every thread. Write for a person who has several pull requests open 
 **Status:** the fixes are in your working tree. Nothing is committed yet.
 
 **Fixed**
-- **Risk 8/10**: error logs leak the API key (`arr/common.go:77`). Both error paths now strip the query string. Test: `TestMakeArrRequest_ErrorOmitsQuerySecret`. Codex and CodeRabbit flagged the same bug.
+- **Risk 8/10**: when a request to Sonarr or Radarr failed, the error in the log showed your API key. Now the key is removed first, and a new test fails if it comes back. Codex and CodeRabbit both found this.
 
-**Already fixed:** 1 comment, by `2c95de28`.
+**Already fixed:** 1 comment, by a later commit on this PR.
 
 **The bot was wrong**
-- CodeRabbit says the URL fragment reaches the log. It doesn't, because `RedactURL` clears it first (`core/service.go:190`). Reply (needs your yes):
+- CodeRabbit says part of the web address can still reach the log. It can't, because the code removes that part before it writes the log. Reply (needs your yes). In plain words, it says the code already removes it:
   > `RedactURL` clears `Fragment` before `String()` (core/service.go:190), so the fragment never reaches the log.
 
 **Your call**
 
 ❓ **Q1** - **Should sync retry forever?** · Risk 4/10
 
-`core/sync.go:40` retries a failed sync with no limit. Codex wants a cap. The claim is true. The UI already shows the error, though, so a stuck loop costs log noise and one goroutine. It loses no data.
-- A: Stop after 3 tries, then show the error. That's about 5 lines and 1 test.
+If a sync fails, it tries again forever. Codex wants a limit. The claim is true. The app already shows the error, though, so an endless retry only fills the log and uses a little memory. It loses no data.
+- A: Stop after 3 tries, then show the error. A small change with one new test.
 - B: Leave it as it is and accept the risk.
 
 ➡️ **A.** The fix is cheap, and an endless loop is hard to spot in production.
 
 ---
 
-**Not in the patch:** `arr/sonarr.go:212` drops the error from `json.Unmarshal`. No bot flagged it.
+**Not in the patch:** if Sonarr sends back a reply that the app cannot read, the app ignores the problem and carries on with empty data. No bot found this.
 
-**Checks:** `make precommit` passes.
+**Checks:** the project's automatic checks pass.
 
-**Reply with** your answer to Q1, and yes or no to the reply. Then I commit `fix(services): redact URLs in errors`, push, resolve 3 threads, and add 👍 to 1 Codex comment.
+**Reply with** your answer to Q1, and yes or no to the reply. Then I save the fixes, send them to GitHub, close 3 comment threads, and give 1 Codex comment a 👍.
 ```
 
 - **Risk N/10** tells how bad it is if the pull request ships with the finding unfixed: 1 to 3 is cosmetic or unlikely, 4 to 6 is a real but contained problem, and 7 to 10 is security, data loss, or a crash. Give a score to each confirmed finding and each judgment call. A wrong or stale finding has no risk, so it gets no score. The report shows only the score, not this legend.
 - **Read** lists the PR body and each issue or page that you read in step 1. A PR with no closing issue says so: "the PR body (no closing issue)".
-- **Status** is one of: committed and pushed as `<sha>`, fixes in the working tree and not committed, or no changes.
-- Each finding is one list item: the claim in plain words, one file and line, and two more sentences at most. For a fix, name the change and the test. Put duplicate findings in one item and name each bot.
+- **Status** is one of: the fixes are saved and on GitHub, the fixes are on this machine and not saved yet, or no changes.
+- Each finding is one list item: the problem in plain words and two more sentences at most. For a fix, say what now happens in place of the problem, and whether a test guards it. Put duplicate findings in one item and name each bot.
 - **Your call** uses the `grilling` round format: one numbered question for each open judgment call, the options with what each costs, and your recommendation with its reason after ➡️. Ask all the questions in one round. Leave those threads unresolved.
-- Keep each question body near 100 words, because the user reads it once and then picks. Start with the verdict. Then give one concrete case, for example the two names that match by mistake, and the cause at one file and line. Name the proof in a few words, without its steps. Say what the pull request changes and what was already there. Give each option one line with its cost.
+- Keep each question body near 100 words, because the user reads it once and then picks. Start with the verdict. Then give one concrete case that a user could meet, for example the two names that match by mistake. Name the proof in a few words, without its steps. Say what the pull request changes and what was already there. Give each option one line with its cost in plain terms, such as a small change or a bigger change to the sync.
 - The last line tells the user what to reply with and lists the writes that the reply starts. When nothing is open after a `--fix` run, it says what is left, for example "wait for CI".
 
 ## 7. Act on the reply
