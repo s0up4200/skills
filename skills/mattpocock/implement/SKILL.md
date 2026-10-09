@@ -8,7 +8,9 @@ Implement the work described by the user in the spec or tickets.
 
 If the user passes a ticket reference, fetch it from the issue tracker and state its title before starting. If the reference is ambiguous, ask.
 
-If the issue has an Agent Brief comment, the latest brief is the spec. The issue body and the other comments are context only.
+If the issue has an Agent Brief comment, the latest brief is the spec, and a later `Brief amendment` comment overrides it. The issue body and the other comments are context only.
+
+When the work comes from an issue, post each answer that the user gives to a spec question, with the question, on the issue as a comment that starts with `Brief amendment`. The Spec reviewer of code-review reads only the issue, so a decision that stays in the chat comes back as a finding.
 
 Call the Skill tool with "tdd" where possible, at pre-agreed seams.
 

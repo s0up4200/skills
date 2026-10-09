@@ -1,6 +1,5 @@
 ---
 name: code-review
-effort: high
 description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
 ---
 
@@ -77,7 +76,7 @@ Issue both sub-agent calls together, in the foreground, and aggregate the report
 **Spec sub-agent prompt** should include:
 
 - The diff command and commit list.
-- The path or fetched contents of the spec.
+- The path or fetched contents of the spec. For an issue, give the body and every comment, and tell the sub-agent that a later Agent Brief or `Brief amendment` comment overrides earlier text.
 - Nothing else about the work: no reasons from the author, no plan, and no view of your own on a departure. A brief that calls a departure deliberate tells the reviewer to approve it, and the reviewer then judges the reason instead of the code against the spec.
 - The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
 

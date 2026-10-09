@@ -23,6 +23,19 @@ If the repository has no template, use this one:
 **Merge danger:** <one-way or two-way door>, <blast radius in one word>
 ```
 
+## Prose
+
+Before you show or post the body, write all of its prose with the `simple-english` skill, then apply the `unslop` skill to it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.
+
+If the Skill tool cannot start a skill, find its `SKILL.md` in the installed skills folder, read it, and apply it. The upstream `unslop` sets `disable-model-invocation`, so this is the path for it.
+
+If a skill is not installed, ask the user if they want to install it:
+
+- `simple-english`: `npx skills add aminblg/simpleenglish --skill simple-english` ([skills.sh](https://www.skills.sh/aminblg/simpleenglish/simple-english))
+- `unslop`: `npx skills add cursor/plugins --skill unslop` ([skills.sh](https://www.skills.sh/cursor/plugins/unslop))
+
+If the user says no, write the body without that skill and tell the user which pass you skipped.
+
 ## Sections
 
 Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
@@ -159,16 +172,3 @@ Use one line. Add a sentence only when the risk is not clear from the line.
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
 
 The blast radius is the potential impact or scope of the changes introduced by this PR. Consider all possibilities. Examples are layout shift, breakages for consumers, mobile responsiveness, etc.
-
-## Prose
-
-Before you show or post the body, write all of its prose with the `simple-english` skill, then apply the `unslop` skill to it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.
-
-If the Skill tool cannot start a skill, find its `SKILL.md` in the installed skills folder, read it, and apply it. The upstream `unslop` sets `disable-model-invocation`, so this is the path for it.
-
-If a skill is not installed, ask the user if they want to install it:
-
-- `simple-english`: `npx skills add aminblg/simpleenglish --skill simple-english` ([skills.sh](https://www.skills.sh/aminblg/simpleenglish/simple-english))
-- `unslop`: `npx skills add cursor/plugins --skill unslop` ([skills.sh](https://www.skills.sh/cursor/plugins/unslop))
-
-If the user says no, write the body without that skill and tell the user which pass you skipped.
