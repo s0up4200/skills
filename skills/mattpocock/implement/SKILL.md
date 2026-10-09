@@ -10,7 +10,16 @@ If the user passes a ticket reference, fetch it from the issue tracker and state
 
 If the issue has an Agent Brief comment, the latest brief is the spec, and a later `Brief amendment` comment overrides it. The issue body and the other comments are context only.
 
-When the work comes from an issue and the user answers a spec question, post a comment on the issue that starts with `Brief amendment` and quotes the question and the decision word for word. If the user answered "yes", the decision is your recommended answer. The Spec reviewer of code-review reads only the issue, so a decision that stays in the chat comes back as a finding. A spec question that you answer yourself stays a departure for the step before the commit.
+When the work comes from an issue and the user answers a spec question, post a comment on the issue that starts with `Brief amendment`. Write each decision as a short statement of what the code does in place of what the spec says, and why, so the comment reads like an edit to the spec:
+
+```
+Brief amendment
+
+- Count in `AuthLogCallback` when publickey auth succeeds, not in the accept loop. A handshake that fails during key exchange does not count.
+- A connection that passes auth but closes before the server sends the auth success now counts in `Accepts()`.
+```
+
+Write only the decisions that the user made. If the user answered "yes", the decision is your recommended answer. The Spec reviewer of code-review reads only the issue, so a decision that stays in the chat comes back as a finding. A spec question that you answer yourself stays a departure for the step before the commit.
 
 Call the Skill tool with "tdd" where possible, at pre-agreed seams.
 
