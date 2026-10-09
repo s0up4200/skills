@@ -65,14 +65,19 @@ query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){
       assignees(first:10){nodes{login}} labels(first:20){nodes{name}}
       blockedBy(first:20){nodes{number state}}
       blocking(first:20){nodes{number state}}
+      comments(last:5){nodes{author{login} createdAt body}}
       subIssues(first:50){nodes{number title state assignees(first:5){nodes{login}} labels(first:20){nodes{name}}
         blockedBy(first:10){nodes{number state}} blocking(first:20){nodes{number state}}
-        closedByPullRequestsReferences(first:5){nodes{number state isDraft reviewDecision author{login}}}}}
+        comments(last:5){nodes{author{login} createdAt body}}
+        closedByPullRequestsReferences(first:5,includeClosedPrs:true){nodes{
+          number state isDraft reviewDecision author{login} updatedAt}}}}
       closedByPullRequestsReferences(first:5,includeClosedPrs:true){nodes{
         number state isDraft reviewDecision author{login} updatedAt}}}}}}}'
 ```
 
 Sort the grandchildren like the children. A gate can be a grandchild, so count its edges too.
+
+Read the last comments on each open sub-issue. A PR with no closing keyword leaves its issue open, so the graph shows shipped work as free. Often only a comment says that the work shipped.
 
 Read the epic body too. Maintainers write things there that the graph does not hold: "needs a fresh grill", "no spec yet", "owned by X". A body note that contradicts the graph is a finding. Report it, because one of the two is stale.
 
@@ -80,11 +85,12 @@ Read the epic body too. Maintainers write things there that the graph does not h
 
 Put each open sub-issue in exactly one bucket. Check them in this order:
 
-1. **In review**: it has an open PR. Note the author, draft state, and review decision. An approved PR that is not merged is the cheapest progress on the board.
-2. **Blocked**: at least one `blockedBy` issue is open. Name the open blockers. Ignore closed ones: GitHub keeps the edge after the blocker closes.
-3. **Yours, ready**: assigned to the user, nothing open blocks it.
-4. **Others', ready**: assigned to someone else. Note when its last update is older than 14 days. A stale claim is worth a question, not a takeover.
-5. **Free**: no assignee, nothing open blocks it.
+1. **Done, still open**: a linked PR is merged, or a comment says that the work shipped or names the PRs that did it. Check each named PR with `gh pr view N --json state`, because a comment can be wrong. Report the issue as one to close. It is not work.
+2. **In review**: it has an open PR. Note the author, draft state, and review decision. An approved PR that is not merged is the cheapest progress on the board.
+3. **Blocked**: at least one `blockedBy` issue is open. Name the open blockers. Ignore closed ones: GitHub keeps the edge after the blocker closes.
+4. **Yours, ready**: assigned to the user, nothing open blocks it.
+5. **Others', ready**: assigned to someone else. Note when its last update is older than 14 days. A stale claim is worth a question, not a takeover.
+6. **Free**: no assignee, nothing open blocks it.
 
 Then mark two things across the buckets:
 
@@ -111,6 +117,7 @@ Lead with the recommendation. Then one block per epic:
 
 ```
 owner/repo#100 Example epic title: 2/9 done
+  Done:      #103 (comment names merged PRs #118 #119), close it
   In review: #104 (PR #120 by alice, approved), gates #105 #106 #107
   Yours:     #102 (1/2 sub-issues done)
   Others:    #106 bob (blocked by #104), #108 bob (blocked by #106)
@@ -128,6 +135,7 @@ Ask after the report, not before, and only when the answer changes the recommend
 - More than one epic is open: which one matters most this week?
 - The best free issue is a gate: should the user claim it? Assign it only on a yes, with `gh issue edit N --add-assignee @me`.
 - A claim by someone else is stale: should the user ask that person, or leave it?
+- An issue is done but still open: should the user close it? Close it only on a yes, with `gh issue close N --comment "Shipped in #X"`.
 
 ## No epics
 
@@ -135,7 +143,7 @@ A repo with no open epic still has work. Read its open pull requests and issues,
 
 ```bash
 gh pr list --state open --json number,title,author,isDraft,reviewDecision,mergeable,updatedAt,statusCheckRollup
-gh issue list --state open --limit 100 --json number,title,assignees,labels,updatedAt
+gh issue list --state open --limit 100 --json number,title,assignees,labels,updatedAt,comments
 ```
 
 On a Forgejo repo, use `fj`:
@@ -147,7 +155,9 @@ fj issue search --state open
 
 The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `needs-grilling`. An issue with no triage label has the role `needs-triage`.
 
-Rank, best first:
+First find the issues that are done but still open: a comment says that the work shipped or names merged PRs. Check each named PR with `gh pr view N --json state`. Report each one as an issue to close, not as work to rank.
+
+Rank the rest, best first:
 
 1. Merge: a pull request that is approved, has green checks, and has no conflicts.
 2. Review: a pull request from another contributor that has no review from the user, or has new commits since the user's last review. Next step: `/code-review`.
@@ -162,6 +172,7 @@ Give one recommendation and at most two alternatives, then one block:
 
 ```
 owner/repo: no epics
+  Done:      #99 (comment names merged PR #117), close it
   Merge:     #120 (approved, CI green)
   Review:    #118 by alice (no review, 9 days)
   Implement: #104 bug, #98
