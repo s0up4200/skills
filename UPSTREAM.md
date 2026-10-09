@@ -89,6 +89,7 @@ The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https:
 ### Local changes
 
 - `unslop`: the frontmatter drops `disable-model-invocation: true`, so that the model can load the skill by itself.
+- `unslop`: the frontmatter adds `model: sonnet`. In a test on one text, Sonnet removed the AI patterns as well as Opus, at a lower cost.
 
 ### Compare with upstream
 
