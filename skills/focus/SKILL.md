@@ -85,7 +85,7 @@ Read the epic body too. Maintainers write things there that the graph does not h
 
 Put each open sub-issue in exactly one bucket. Check them in this order:
 
-1. **Done, still open**: a linked PR is merged, or a comment says that the work shipped or names the PRs that did it. Check each named PR with `gh pr view N --json state`, because a comment can be wrong. Report the issue as one to close. It is not work.
+1. **Done, still open**: a linked PR is merged, or a comment says that the work is finished. Read the whole comment. A status update often names merged PRs and still lists open work ("Open: ...", "left to do", a date to check back). That issue is not done: sort it into the next buckets, and note the open item and its date. Check each PR that a comment names with `gh pr view N --json state`, because a comment can be wrong. Report a done issue as one to close. It is not work.
 2. **In review**: it has an open PR. Note the author, draft state, and review decision. An approved PR that is not merged is the cheapest progress on the board.
 3. **Blocked**: at least one `blockedBy` issue is open. Name the open blockers. Ignore closed ones: GitHub keeps the edge after the blocker closes.
 4. **Yours, ready**: assigned to the user, nothing open blocks it.
@@ -117,7 +117,7 @@ Lead with the recommendation. Then one block per epic:
 
 ```
 owner/repo#100 Example epic title: 2/9 done
-  Done:      #103 (comment names merged PRs #118 #119), close it
+  Done:      #103 (comment: finished in merged PRs #118 #119), close it
   In review: #104 (PR #120 by alice, approved), gates #105 #106 #107
   Yours:     #102 (1/2 sub-issues done)
   Others:    #106 bob (blocked by #104), #108 bob (blocked by #106)
@@ -155,7 +155,7 @@ fj issue search --state open
 
 The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `needs-grilling`. An issue with no triage label has the role `needs-triage`.
 
-First find the issues that are done but still open: a comment says that the work shipped or names merged PRs. Check each named PR with `gh pr view N --json state`. Report each one as an issue to close, not as work to rank.
+First find the issues that are done but still open: a comment says that the work is finished, and lists no open work. A status update that names merged PRs and lists open work is not done. Check each named PR with `gh pr view N --json state`. Report each one as an issue to close, not as work to rank.
 
 Rank the rest, best first:
 
@@ -172,7 +172,7 @@ Give one recommendation and at most two alternatives, then one block:
 
 ```
 owner/repo: no epics
-  Done:      #99 (comment names merged PR #117), close it
+  Done:      #99 (comment: finished in merged PR #117), close it
   Merge:     #120 (approved, CI green)
   Review:    #118 by alice (no review, 9 days)
   Implement: #104 bug, #98
