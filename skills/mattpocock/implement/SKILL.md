@@ -8,6 +8,8 @@ Implement the work described by the user in the spec or tickets.
 
 If the user passes a ticket reference, fetch it from the issue tracker and state its title before starting. If the reference is ambiguous, ask.
 
+Before you start, find the open children of the ticket. On a tracker without sub-issues, such as Forgejo, a child has `Part of #<n>` on the first line of its body, and the parent can list its children in a `## Tickets` task list. Search the open issues for that line and read the task list. If the ticket has open children, ask the user which child to implement. That child is the spec, and its Brief amendment goes on that child.
+
 If the issue has an Agent Brief comment, the latest brief is the spec, and a later `Brief amendment` comment overrides it. The issue body and the other comments are context only.
 
 When the work comes from an issue and the user answers a spec question, post a comment on the issue that starts with `Brief amendment`. Write each decision as a short statement of what the code does in place of what the spec says, and why, so the comment reads like an edit to the spec:
