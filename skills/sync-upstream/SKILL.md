@@ -2,7 +2,7 @@
 name: sync-upstream
 description: Sync the copied skills in s0up4200/skills with a new upstream release. Asks about each change before it applies it, lists the repos that the migration notes affect, and recommends how the release changes the user's workflow.
 disable-model-invocation: true
-argument-hint: "[mattpocock|cursor, default mattpocock]"
+argument-hint: "[mattpocock|cursor|aminblg, default mattpocock]"
 ---
 
 # Sync upstream

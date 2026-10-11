@@ -24,6 +24,7 @@ UPSTREAM.md          # Upstream commit and license of the copied skills
 skills/              # All skills live here, one directory per skill
   mattpocock/        # Skills copied from mattpocock/skills (see UPSTREAM.md)
   cursor/            # Skills copied from cursor/plugins (see UPSTREAM.md)
+  aminblg/           # Skills copied from AminBlg/SimpleEnglish (see UPSTREAM.md)
 template/
   SKILL.md           # Starter template for new skills
 ```

@@ -25,7 +25,8 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `implement` posts each spec decision that the user makes as a `Brief amendment` comment on the issue, so that the Spec reviewer of `code-review` sees the decision. The comment states each decision as an edit to the spec, not as a question and answer. A spec question that the agent answers itself stays a departure. The Spec reviewer lists each amendment that it used, so that the user can see an amendment that does not match an answer.
 - `implement` lists each departure from the spec before the commit, and asks the user about each one with AskUserQuestion.
 - `implement` finds the open children of a ticket before it starts, and asks the user which child to implement. On a tracker without sub-issues, such as Forgejo, a child has `Part of #<n>` on its first line, and the parent shows no link to it. That child is the spec and gets the Brief amendment.
-- `code-review` picks the fixed point in three cases. If the fixed point is the default branch, it fetches the branch and diffs against `<remote>/<branch>`. If the user names a pull request, it stops when the working tree has changes. Otherwise it checks the pull request out (`gh` on GitHub, `fj` on Forgejo) and diffs against `<remote>/<base>`. If the work is not committed, it diffs against `HEAD`. `<remote>` is `origin`, or the remote of the parent repository in a fork clone. The Spec sub-agent gets only the spec and the diff, not the author's reasons for a departure. For an issue, the spec is the body and every comment, and a later Agent Brief or `Brief amendment` comment overrides earlier text.
+- `code-review` picks the fixed point in three cases. If the fixed point is the default branch, it fetches the branch and diffs against `<remote>/<branch>`. If the user names a pull request, it stops when the working tree has changes. Otherwise it checks the pull request out (`gh` on GitHub, `fj` on Forgejo) and diffs against `<remote>/<base>`. If the work is not committed, it diffs against `HEAD`. `<remote>` is `origin`, or the remote of the parent repository in a fork clone. If no remote points at the parent, it adds one named `upstream`. The Spec sub-agent gets only the spec and the diff, not the author's reasons for a departure. For an issue, the spec is the body and every comment, and a later Agent Brief or `Brief amendment` comment overrides earlier text.
+- `code-review` reads the PR discussion (body, conversation comments, reviews, and inline review comments) in full, and marks each finding that a comment requested, answered, or raised before. The sub-agents do not get the discussion, because it holds the author's reasons.
 - `tdd`: a seam that the existing tests of the area already use counts as confirmed, so the agent asks only about a new seam. Upstream `implement` runs tdd "at pre-agreed seams" without a stop, and upstream `tdd` tells the agent to confirm each seam with the user first. Upstream issue: [mattpocock/skills#479](https://github.com/mattpocock/skills/issues/479). If upstream fixes it, keep the upstream text. No comment is on #479 yet. After a `/retro` measures the effect of the line, post the result on #479. If the line does not help, revert it.
 - `setup-matt-pocock-skills` treats a rerun as an upgrade. It keeps the recorded choices and custom text, and asks only about a convention that is missing or that conflicts. `ask-matt` tells the user to rerun it after a skill update.
 - `setup-matt-pocock-skills` renames an old `CONTEXT.md` or `CONTEXT-MAP.md` to the `GLOSSARY` name with `git mv`, and updates the references to it. Upstream v1.3 tells users to do this rename by hand.
@@ -110,6 +111,58 @@ The copied skills use the license of `pstack/LICENSE` in the upstream repository
 MIT License
 
 Copyright (c) 2026 Lauren Tan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## AminBlg/SimpleEnglish
+
+The skills in `skills/aminblg/` are copies of skills from [AminBlg/SimpleEnglish](https://github.com/AminBlg/SimpleEnglish).
+
+**Upstream commit:** `a6fcb4fde098b33617cc1578d151ebf58774b883` (2026-10-05, version 2.1.1)
+
+### Copied skills
+
+- `skills/simple-english` is at `skills/aminblg/simple-english`.
+
+Upstream also has hooks, an output style, a system prompt, and evals. They are not copied here.
+
+### Local changes
+
+None.
+
+### Compare with upstream
+
+```sh
+git clone https://github.com/AminBlg/SimpleEnglish.git /tmp/simple-english
+cd /tmp/simple-english
+git diff a6fcb4fd..HEAD -- skills/simple-english
+```
+
+### License
+
+The copied skills use the license of the upstream repository:
+
+```
+MIT License
+
+Copyright (c) 2026 AminBlg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
