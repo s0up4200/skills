@@ -18,13 +18,13 @@ The issue tracker should have been provided to you. If not, tell the user to run
 
 Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
 
-In the rules below, `<remote>` is `origin`. If `origin` is a fork, `<remote>` is the remote of the parent repository. A fork can have an old copy of the base branch, or no copy. The full refspec in each fetch writes the remote-tracking branch, also in a clone made with `--single-branch`.
+In the rules below, `<remote>` is `origin`. If `origin` is a fork, `<remote>` is the remote of the parent repository. If no remote points at the parent, add one named `upstream` with the parent's clone URL, as `gh repo clone` does. On GitHub, `gh api repos/<owner>/<repo> --jq .parent.clone_url` gives it for the fork `<owner>/<repo>`. The Forgejo repository API has the same `parent.clone_url` field. A fork can have an old copy of the base branch, or no copy. The full refspec in each fetch writes the remote-tracking branch, also in a clone made with `--single-branch`.
 
 If the fixed point is the default branch, run `git fetch <remote> +refs/heads/<branch>:refs/remotes/<remote>/<branch>` and use `<remote>/<branch>` as the fixed point. The local default branch is often stale, and a diff against it includes changes from pull requests that are already merged.
 
 If the user names a pull request, run `git status --short` first. If it shows changes, stop and ask the user what to do with them. A checkout carries uncommitted changes onto the pull request branch, and the diff then includes them.
 
-Check out the pull request: `gh pr checkout <n>` on GitHub, `fj pr -R <remote> checkout <n>` on Forgejo. `HEAD` is now its head. Then read its base branch. On GitHub, `gh pr view <n> --json baseRefName` gives it. On Forgejo, the "From `<head>` into `<base>`" line of `fj pr -R <remote> view <n>` gives it. Run `git fetch <remote> +refs/heads/<base>:refs/remotes/<remote>/<base>`, and use `<remote>/<base>` as the fixed point. A stacked pull request (one built on top of another open pull request) has a base other than the default branch. A diff against the default branch includes every change of the pull request below it.
+Check out the pull request: `gh pr checkout -R "$(git remote get-url <remote>)" <n>` on GitHub, `fj pr -R <remote> checkout <n>` on Forgejo. Without `-R`, `gh` can look up the number in the fork, because `gh repo set-default` can point it there. `HEAD` is now its head. Then read its base branch. On GitHub, `gh pr view -R "$(git remote get-url <remote>)" <n> --json baseRefName` gives it. On Forgejo, the "From `<head>` into `<base>`" line of `fj pr -R <remote> view <n>` gives it. Run `git fetch <remote> +refs/heads/<base>:refs/remotes/<remote>/<base>`, and use `<remote>/<base>` as the fixed point. A stacked pull request (one built on top of another open pull request) has a base other than the default branch. A diff against the default branch includes every change of the pull request below it.
 
 Capture the diff command once:
 
