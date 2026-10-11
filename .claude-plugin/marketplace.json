@@ -77,7 +77,8 @@
       "source": "./skills",
       "skills": [
         "./skills/tldr",
-        "./skills/cursor/unslop"
+        "./skills/cursor/unslop",
+        "./skills/aminblg/simple-english"
       ]
     },
     {

@@ -105,6 +105,14 @@ Copies of skills from [cursor/plugins](https://github.com/cursor/plugins). See [
 |---|---|
 | [unslop](skills/cursor/unslop/) | Cut AI tells from any writing. |
 
+### From AminBlg/SimpleEnglish
+
+Copies of skills from [AminBlg/SimpleEnglish](https://github.com/AminBlg/SimpleEnglish). See [UPSTREAM.md](UPSTREAM.md) for the upstream commit and the local changes.
+
+| Skill | Description |
+|---|---|
+| [simple-english](skills/aminblg/simple-english/) | Write or rewrite text in plain English in the spirit of ASD-STE100 Simplified Technical English. |
+
 ## Skill Structure
 
 Each skill is a self-contained directory under `skills/`:
@@ -122,4 +130,4 @@ See `template/SKILL.md` for a starter template and `CLAUDE.md` for authoring gui
 
 ## License
 
-MIT. The skills from mattpocock/skills keep their own MIT license. See [UPSTREAM.md](UPSTREAM.md).
+MIT. The copied skills keep their own MIT licenses. See [UPSTREAM.md](UPSTREAM.md).

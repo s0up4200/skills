@@ -129,3 +129,55 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## AminBlg/SimpleEnglish
+
+The skills in `skills/aminblg/` are copies of skills from [AminBlg/SimpleEnglish](https://github.com/AminBlg/SimpleEnglish).
+
+**Upstream commit:** `a6fcb4fde098b33617cc1578d151ebf58774b883` (2026-10-05, version 2.1.1)
+
+### Copied skills
+
+- `skills/simple-english` is at `skills/aminblg/simple-english`.
+
+Upstream also has hooks, an output style, a system prompt, and evals. They are not copied here.
+
+### Local changes
+
+None.
+
+### Compare with upstream
+
+```sh
+git clone https://github.com/AminBlg/SimpleEnglish.git /tmp/simple-english
+cd /tmp/simple-english
+git diff a6fcb4fd..HEAD -- skills/simple-english
+```
+
+### License
+
+The copied skills use the license of the upstream repository:
+
+```
+MIT License
+
+Copyright (c) 2026 AminBlg
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
