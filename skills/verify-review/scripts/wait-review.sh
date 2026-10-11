@@ -14,10 +14,16 @@ host=$(git remote get-url origin | sed -E 's#^[a-z+]+://([^@/]*@)?##; s#^[^@]*@#
 deadline=$(( $(date +%s) + minutes * 60 ))
 
 github_reviews() {
-  gh api --paginate "repos/$repo/pulls/$pr/reviews" | jq -rs --arg sha "$sha" 'add
+  # A Codex review with no findings posts no review. Its summary comment marks
+  # the commit as Completed instead.
+  local codex
+  codex=$(gh api --paginate "repos/$repo/issues/$pr/comments" | jq -rs --arg sha "${sha:0:7}" 'add
+    | map(select(.body|test("codex-pull-request-review-summary")))
+    | if any(.body|test("Completed\\*\\*[^|]*\\| `" + $sha)) then "chatgpt-codex-connector[bot]" else "" end')
+  gh api --paginate "repos/$repo/pulls/$pr/reviews" | jq -rs --arg sha "$sha" --arg codex "$codex" 'add
     | map(select((.user.type=="Bot") or (.user.login|test("\\[bot\\]$"))))
     | (map(.user.login) | unique) as $bots
-    | (map(select(.commit_id==$sha) | .user.login) | unique) as $done
+    | (map(select(.commit_id==$sha) | .user.login) + ([$codex] - [""]) | unique) as $done
     | "\($bots|length) \($done|length) \($done|join(","))"'
 }
 
