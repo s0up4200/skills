@@ -20,6 +20,10 @@ Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main
 
 If the fixed point is the default branch, run `git fetch origin <branch>` and use `origin/<branch>` as the fixed point. The local default branch is often stale, and a diff against it includes changes from pull requests that are already merged.
 
+If the user names a pull request, run `git status --short` first. If it shows changes, stop and ask the user what to do with them. A checkout carries uncommitted changes onto the pull request branch, and the diff then includes them.
+
+Check out the pull request: `gh pr checkout <n>` on GitHub, `fj pr checkout <n>` on Forgejo. `HEAD` is now its head. Then read its base branch. On GitHub, `gh pr view <n> --json baseRefName` gives it. On Forgejo, the "From `<head>` into `<base>`" line of `fj pr view <n>` gives it. Run `git fetch origin <base>`, and use `origin/<base>` as the fixed point. A stacked pull request (one built on top of another open pull request) has a base other than the default branch. A diff against the default branch includes every change of the pull request below it.
+
 Capture the diff command once:
 
 - If the work is committed, use `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base).
