@@ -1,7 +1,7 @@
 ---
 name: verify-review
 effort: high
-description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. After the user answers the report, or with --fix, it also commits the fixes and posts the approved refutations. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
+description: Verify the unresolved AI review threads on a pull request (CodeRabbit, Codex, Copilot, Gemini, Claude), or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. After the user answers the report, or with --fix, it also commits the fixes and posts the refutations shown in the report, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
 argument-hint: "[optional: PR number or URL] [--fix]"
 ---
 
@@ -9,9 +9,9 @@ argument-hint: "[optional: PR number or URL] [--fix]"
 
 An AI reviewer saw the diff. It did not run the code, read the callers, or know why a line is the way it is. Its findings are claims, and every claim on the pull request stays unverified until you have checked it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
-Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write, then reports and waits: no commit, no push, no comment, no thread resolution. The user's reply to the report is the go-ahead for the writes in steps 3 to 5 (step 7). `--fix` gives the go-ahead at the start, so the run makes the writes for the settled findings before it reports.
+Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write, then reports and waits: no commit, no push, no comment, no thread resolution. The user's reply to the report is the go-ahead for the writes in steps 3 to 5 (step 7). `--fix` gives the go-ahead at the start, so the run makes the writes for the settled findings before it reports. Replies are the exception: `--fix` posts none before the report, because the user has not seen their text yet.
 
-The thread script sits next to this file: `<skill base directory>/scripts/threads.sh`. The base directory is printed when the skill loads.
+The scripts sit next to this file: `<skill base directory>/scripts/threads.sh` and `scripts/wait-review.sh`. The base directory is printed when the skill loads.
 
 If the `origin` remote is a Forgejo host, read `references/forgejo.md` before step 1. It replaces the `gh` reads in step 1 and the writes in steps 4 and 5.
 
@@ -84,7 +84,7 @@ Commit with a conventional message that names what changed, not who suggested it
 
 A refutation is the one case that earns a reply, because the disagreement must be on record for the human reviewers who see the thread later. Write it in plain first person, as the maintainer's own finding, with the evidence at file and line or the command output. It names no tool: the findings on a pull request are the maintainer's, whatever surfaced them, and "verified the bot's claim" reads wrong from the maintainer. If a voice skill for the user's chat replies is available, use it for the wording.
 
-Present each reply to the user and wait for an explicit yes before posting. Every public comment goes out under the user's account, and one approval covers one reply. Post with:
+Every public comment goes out under the user's account, so the user sees its full text before it is posted. Put each reply in the report (step 6). The user's reply to the report approves every reply shown there, except one that it says no to. A reply whose text changes after the report needs a new yes. Post with:
 
 ```bash
 gh api "repos/$repo/pulls/$pr/comments/$comment_id/replies" -f body="$body"
@@ -126,7 +126,7 @@ Account for every thread. Write for a person who has several pull requests open 
 **Already fixed:** 1 comment, by a later commit on this PR.
 
 **The bot was wrong**
-- CodeRabbit says part of the web address can still reach the log. It can't, because the code removes that part before it writes the log. Reply (needs your yes). In plain words, it says the code already removes it:
+- CodeRabbit says part of the web address can still reach the log. It can't, because the code removes that part before it writes the log. Reply to post. In plain words, it says the code already removes it:
   > `RedactURL` clears `Fragment` before `String()` (core/service.go:190), so the fragment never reaches the log.
 
 **Your call**
@@ -145,7 +145,7 @@ If a sync fails, it tries again forever. Codex wants a limit. The claim is true.
 
 **Checks:** the project's automatic checks pass.
 
-**Reply with** your answer to Q1, and yes or no to the reply. Then I save the fixes, send them to GitHub, close 3 comment threads, and give 1 Codex comment a 👍.
+**Reply with** your answer to Q1, or **go** for my pick. Say no to the reply if you do not want it posted. Then I save the fixes, send them to GitHub, post the reply, close 3 comment threads, give 1 Codex comment a 👍, and wait for the next bot review.
 ```
 
 - **Risk N/10** tells how bad it is if the pull request ships with the finding unfixed: 1 to 3 is cosmetic or unlikely, 4 to 6 is a real but contained problem, and 7 to 10 is security, data loss, or a crash. Give a score to each confirmed finding and each judgment call. A wrong or stale finding has no risk, so it gets no score. The report shows only the score, not this legend.
@@ -153,9 +153,20 @@ If a sync fails, it tries again forever. Codex wants a limit. The claim is true.
 - **Status** is one of: the fixes are saved and on GitHub, the fixes are on this machine and not saved yet, or no changes.
 - Each finding is one list item: the problem in plain words and two more sentences at most. For a fix, say what now happens in place of the problem, and whether a test guards it. Put duplicate findings in one item and name each bot.
 - **Your call** uses the `grilling` round format: one numbered question for each open judgment call, the options with what each costs, and your recommendation with its reason after ➡️. Ask all the questions in one round. Leave those threads unresolved until the user answers.
+- Recommend the fix when it removes copied code, a rule that lives in two places, or behavior that only a comment explains, and the change is small or medium. This holds when the fix touches code older than the pull request: the maintainer pays for the cleanup now or later, and now is cheaper. Recommend leaving it when the fix is a large change, or when it costs more than the failure it prevents. The recommendation is advice. The fix waits for the user's answer.
 - Keep each question body near 100 words, because the user reads it once and then picks. Start with the verdict. Then give one concrete case that a user could meet, for example the two names that match by mistake. Name the proof in a few words, without its steps. Say what the pull request changes and what was already there. Give each option one line with its cost in plain terms, such as a small change or a bigger change to the sync.
 - The last line tells the user what to reply with and lists the writes that the reply starts. When nothing is open after a `--fix` run, it says what is left, for example "wait for CI".
 
 ## 7. Act on the reply
 
-The user's reply to the report is the go-ahead for the writes in steps 3 to 5, the same as `--fix`. Fix the confirmed findings and each judgment call that the user chose to fix, then commit, push, post, resolve, and rate. Resolve the thread of each judgment call that the user declines, with no reply. This applies to CodeRabbit threads too: a bot closes its own thread only after a reply, and a declined judgment never gets one. Post a reply only after a yes to that reply. An answer to a judgment question is not a yes to a reply. If the user answers only part of the round, act on the answered part and ask again about the rest. Then report again in the same layout, with the new status.
+The user's reply to the report is the go-ahead for the writes in steps 3 to 5, the same as `--fix`. **go** answers every question in this round with your recommendation and approves every reply in the report. It covers this round only. Fix the confirmed findings and each judgment call that the user chose to fix, then commit, push, post, resolve, and rate. Resolve the thread of each judgment call that the user declines, with no reply. This applies to CodeRabbit threads too: a bot closes its own thread only after a reply, and a declined judgment never gets one. Post the replies that the report showed and the user did not refuse. If the user answers only part of the round, act on the answered part and ask again about the rest. If the writes include a push, go to step 8. Otherwise report again in the same layout, with the new status.
+
+## 8. Wait for the next review
+
+Each push makes the bots review again. Wait for that review, so the user does not have to start the next run:
+
+```bash
+scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # prints each bot that reviewed the new head
+```
+
+Run it in the background where the harness supports that, because it can wait up to 20 minutes. When it prints a reviewer, start again at step 1 and send a new report. That report waits for the user's reply, the same as the first one. When the new review leaves nothing open, say so in one line and stop. When the script exits 1, no bot reviewed the new head in time. Say so and stop: the user can run `/verify-review` later.
