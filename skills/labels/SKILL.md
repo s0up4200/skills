@@ -51,7 +51,7 @@ Leave alone labels a person or a workflow owns:
 
 - Process and triage labels (`needs-triage`, `blocked`, `wontfix`, `duplicate`, `good first issue`) reflect a maintainer decision, not a property of the diff.
 - Automation labels (`dependencies`, `stale`, release-drafter and semver labels) are applied by bots. Adding them by hand fights the bot or fires the wrong release note.
-- `breaking change` and security labels change what happens downstream. Apply only when the diff plainly shows it, and say why in your report.
+- `breaking change` and security labels change what happens downstream. Apply one only when the diff plainly shows it, or, for the breaking label, when the PR body has a filled-in Breaking change section (qui CI fails such a PR without the label). Say why in your report.
 
 Never remove a label that is already there. Someone put it there deliberately, and a stale label costs far less than undoing a maintainer's triage. If one looks clearly wrong, mention it and let the user remove it.
 
