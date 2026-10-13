@@ -18,7 +18,7 @@ Accept `owner/repo`, repository, `/issues`, category, or individual URLs. Use th
 
 ## Establish proof
 
-Read each body, comments, answers, and cross-references. If the text alone does not show whether a bug is fixed and the repo has `docs/agents/issue-tracker.md`, fetch the logs of the report the way that doc says. Trace both directions through Issues, Discussions, merged PRs, commits, releases, documentation, upstream projects, tests, and current code. Start with explicit references, then search distinctive behavior, errors, and symbols.
+Read each body, comments, answers, and cross-references. Trace both directions through Issues, Discussions, merged PRs, commits, releases, documentation, upstream projects, tests, and current code. Start with explicit references, then search distinctive behavior, errors, and symbols.
 
 Map the request or reproduction to the evidence. Strong proof needs a merged artifact, release, exact current-code behavior, authoritative documentation or maintainer decision, upstream resolution, or canonical duplicate. An unsupported "fixed" claim belongs in `needs confirmation`. Similar wording is not proof.
 

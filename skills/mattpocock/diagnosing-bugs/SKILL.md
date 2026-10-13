@@ -7,8 +7,6 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
-If the bug comes from an issue or a discussion and the repo has `docs/agents/issue-tracker.md`, fetch the report the way that doc says, with each log or attachment it tells you to fetch. A reporter's log is often the captured artifact that Phase 1 needs.
-
 When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
 ## Redact
