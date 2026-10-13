@@ -11,7 +11,8 @@ A frontend change is only field-tested when a real browser rendered it against a
 
 1. `tabs_context_mcp` first, then a new tab; never reuse a tab id from another session.
 2. Confirm which build the tab runs before judging anything. The PWA service worker precaches the JS chunks, so after an image swap or a local binary swap on the same port the open tab keeps the old bundle and makes zero network requests. `curl -s <base>/ | grep -o 'assets/index-[^"]*'` names the served bundle; compare with what the tab loaded (network log, or `performance.getEntriesByType('resource')`). If they differ, unregister the worker and clear caches via the javascript tool, then hard-reload.
-3. Full-URL navigation resets the react-query cache. A repro that needs warm client state must navigate in-app: click a link, or `document.querySelector('a[href="/backups"]').click()` when a ref click does not fire.
+3. A POST, PUT, PATCH, or DELETE that you send with `fetch` from page JavaScript uses the session cookie, so it needs the header `X-Requested-With: XMLHttpRequest`. Without it qui answers 403 `Missing X-Requested-With header`.
+4. Full-URL navigation resets the react-query cache. A repro that needs warm client state must navigate in-app: click a link, or `document.querySelector('a[href="/backups"]').click()` when a ref click does not fire.
 
 ## The tools do not take over the screen
 

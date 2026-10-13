@@ -8,6 +8,7 @@ All qui calls take `X-API-Key`. Substitute the address from the host file or the
 - `POST /api/cross-seed/search/run` takes categories and tags, not hashes. Wrong tool for a single torrent.
 - Webhook check and apply (what autobrr calls): `POST /api/cross-seed/webhook/check` and `POST /api/cross-seed/webhook/apply` with the announced name and size. The check reports ready or skip per instance; a size of 0 exercises the name-only preflight.
 - Apply from search results: `POST /api/cross-seed/torrents/{instanceID}/{hash}/apply`. The added torrent lands paused; confirm in qBittorrent and delete it afterwards.
+- Candidate missing from a search: send `POST /api/torznab/search` with `{"indexer_ids":[<one id>],"cache_mode":"bypass","query":""}` plus one ID at a time: `imdb_id`, `tvdb_id`, `tmdb_id`, `tvmaze_id`, and then a title in `query`. Compare which request returns the release. Each result carries `publish_date`, `imdb_id`, and `tmdb_id`. Compare `publish_date` with the cache time before you blame the cache. Prowlarr `GET /api/v1/history` shows the IDs and the query that each indexer got. In one real case, a UNIT3D tracker matched all the IDs of a request together, so one wrong TVDb ID on the tracker hid the torrent from the cross-seed search that sends every ID.
 - Read the arr cache row: `sqlite3 -readonly qui.db "select * from arr_id_cache order by cached_at desc limit 5"`.
 
 ## Streams and lists

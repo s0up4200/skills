@@ -64,7 +64,7 @@ Record the swap in memory at once (image tag, backup file names, whether the use
 
 ## 4. Drive the behaviour
 
-Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. `references/recipes.md` lists the endpoints that field tests reach for most: per-torrent cross-seed search, webhook check and apply, SSE stream, orphan scan, backup runs, plus how to make synthetic torrents.
+Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. `references/recipes.md` lists the endpoints that field tests reach for most: per-torrent cross-seed search, a search that misses a candidate, webhook check and apply, SSE stream, orphan scan, backup runs, plus how to make synthetic torrents.
 
 Rules on a production host, where the data is real:
 
