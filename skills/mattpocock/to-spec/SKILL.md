@@ -18,7 +18,9 @@ Check with the user that these seams match their expectations.
 
 3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
 
-4. If the conversation grilled a parked `needs-grilling` issue, comment "Specced in #<spec>" on that issue and close it.
+4. If the conversation grilled an existing issue, comment "Specced in #<spec>" on that issue, close it, and remove its triage-role label. Do this whatever role the issue had.
+
+5. Give each follow-up issue that the session filed (for example "investigate X" or "track the gap Y") the triage role that the session's decisions set, such as `ready-for-agent` or `ready-for-human`. `docs/agents/triage-labels.md` maps each role to its label. When a follow-up depends on the spec, add a blocked-by edge from the follow-up to the spec with the tracker doc's **Blocking** operation.
 
 <spec-template>
 
