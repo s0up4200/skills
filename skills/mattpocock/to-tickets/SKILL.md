@@ -14,7 +14,7 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 ### 1. Gather context
 
-Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it the way `docs/agents/issue-tracker.md` says, with each log or attachment it tells you to fetch, and read its full body and comments.
 
 ### 2. Explore the codebase (optional)
 
