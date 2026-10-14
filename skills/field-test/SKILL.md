@@ -80,6 +80,10 @@ On a local rig none of this applies except the naming rule, which is about what 
 
 A frontend change is not field-tested by curl. Drive the page with the Claude in Chrome tools against a rig or the production host, confirm which bundle the tab is running (the service worker keeps the old one after a swap), read the console and network log, and screenshot from synthetic data. Narrow viewports go through DevTools device emulation that the user toggles, never a window resize. The recipe, the traps, and the observables that work in a browser are in `references/browser.md`; read it before the first browser step.
 
+## 4c. Desktop app
+
+Run a desktop app on a headless monitor, so that it stays off the user's screens. `~/github/soup/dotfiles/agents/docs/desktop.md` has the monitor recipe, how to send keys without taking focus, and how to mute the audio of the app. Read it before you start the app. Take screenshots with `grim -o BENCH`. The server log of the backend is often the best observable. For Silo, each API request line has an `operation_id`, and `client_name` shows which client sent it. Project facts, such as the build, the install, and the log query, are in `~/.config/field-test/hosts/<project>.md` (for example `relics.md`).
+
 ## 5. Observe and monitor
 
 Grep the log on the remote end. The local shell wraps `grep` as ugrep, which never flushes rare matches on a long-lived pipe, so a local filter looks alive and delivers nothing. Rotated logs are gzipped: `zgrep`.
