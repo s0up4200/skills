@@ -19,7 +19,7 @@ All qui calls take `X-API-Key`. Substitute the address from the host file or the
 
 ## Other services
 
-- Orphan scan: `POST /api/instances/{id}/orphan-scan/scan` starts one; a run in `preview_ready` counts as active, so `DELETE /api/instances/{id}/orphan-scan/runs/{runID}` before the next trigger.
+- Orphan scan: `POST /api/instances/{id}/orphan-scan/scan` starts one; a run in `preview_ready` counts as active, so `DELETE /api/instances/{id}/orphan-scan/runs/{runID}` before the next trigger. `GET .../orphan-scan/runs` returns a bare JSON array. For a scan in remote filesystem mode, use the SFTP rig in `rigs.md`.
 - Instance reconnect after a backoff: `POST /api/instances/{id}/test`.
 
 ## Synthetic torrents
