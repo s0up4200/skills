@@ -53,12 +53,6 @@ the verdict rather than approximating.
 - Client state: the react-query client is reachable by walking React fibers from `#root` for a `memoizedProps.client` with `getQueryCache`; `findAll` with a predicate lists keys, which is how a cache-collision bug was reproduced once.
 - Toasts: `[data-sonner-toast]` with `data-type`.
 
-## Screenshots for the PR
-
-Publish the captures as Evidence: run `brrbin publish --help` and follow it, then put the Evidence link in the PR body. Only the maintainers can open an Evidence, so a capture of the real library can show torrent names, tracker names, and save paths. In each capture, mask passkeys, announce URLs, and API keys.
-
-A screenshot that you attach to GitHub is public. Capture it from a rig filled with synthetic torrents. If the bug shows only on the real library, blur the name, tracker, and save-path columns before the image leaves the session. Never publish a screenshot with private tracker names, URLs, or real release names on GitHub.
-
 ## Dialog traps
 
 - Do not click anything that opens a native `confirm` or `alert`; it blocks the extension. Check for such handlers first and drive the underlying action through the API instead, or ask the user to click.

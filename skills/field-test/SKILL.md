@@ -94,6 +94,10 @@ Report the command you ran and the output you saw, quoted, for each observable. 
 
 Update the PR body's "How has this been tested?" section with the live result in one or two sentences. Update memory with what was proven and what was left.
 
+If the run made screenshots or recordings, publish them as Evidence: run `brrbin publish --help` and follow it, then put the Evidence link in that section. Only the maintainers can open an Evidence, so a capture of real data can show torrent names, tracker names, and save paths. In each capture, mask passkeys, announce URLs, and API keys.
+
+A screenshot that you attach to GitHub is public. Capture it from a rig filled with synthetic data. If the bug shows only on real data, blur the names, trackers, and save paths before the image leaves the session. Never publish a screenshot with private tracker names, URLs, or real release names on GitHub.
+
 ## 7. Clean up, and prove it
 
 Cleanup is complete when nothing from the test is left running or pinned, and you can show it.
