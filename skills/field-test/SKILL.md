@@ -29,6 +29,8 @@ Before any SSH, write down the cheapest signal that fails if the change is broke
 - A database row (`arr_id_cache.episode_map_known = 1` for the hash).
 - A count that must close arithmetically (sidebar tracker counts equal filtered totals).
 
+Also list the frontend files that the branch changed (`git diff --name-only <base>...HEAD`). Each visible change in them, such as a note, a tooltip, or a label, is a UI observable, and step 4b applies to it.
+
 Then write the negative: what does the same observable show on the old build? If you cannot name a difference, the field test cannot prove anything, so say so and stop. When the change is a performance claim, read `references/method.md` before you measure; closed-loop load and single samples fake results.
 
 Two more checks on the observable itself, both cheap and both easy to skip:
