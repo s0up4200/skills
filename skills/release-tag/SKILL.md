@@ -66,6 +66,40 @@ Show the user:
 
 Use AskUserQuestion to let them confirm or pick a different version. Offer both the minor and patch options so they can override your recommendation.
 
+### 4b. Bump the version manifest (only when the repo has one)
+
+Some repos keep the version in a manifest file, and their Release workflow rejects a tag that does not match it. Look for a manifest from this table at the repo root:
+
+| Manifest | Version field | Lockfile update |
+|---|---|---|
+| `Cargo.toml` | `version` in `[package]` or `[workspace.package]` | `cargo update --workspace --offline` |
+
+```bash
+sed -n '/^\[\(workspace\.\)\{0,1\}package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Cargo.toml | head -n 1
+```
+
+If the repo has no manifest from the table, or the command prints nothing, go to step 5. Go repos go to step 5: `go.mod` has no version, and GoReleaser takes the version from the tag. If the manifest already shows `<VERSION>`, also go to step 5.
+
+Otherwise, the tag must go on a commit that has the new version. Show the user the bump plan and get a yes before you push:
+
+1. From the release branch, create the branch `chore/release-v<VERSION>`.
+2. Set the version field to `<VERSION>`, with no `v`. Change only that line.
+3. Run the lockfile update from the table. It changes only the versions of the workspace packages and needs no network. Follow the cargo rules in the repo's `CLAUDE.md` or `AGENTS.md`, for example a `nice` prefix.
+4. Make sure that `git diff --stat` shows only the manifest and its lockfile. Commit with the message `chore(release): v<VERSION>`, push the branch, and open the PR against the release branch:
+
+   ```bash
+   gh pr create --base <release-branch> --title "chore(release): v<VERSION>" --body "Set the version to <VERSION> for the tag v<VERSION>."
+   ```
+
+5. Give the user the merge command, and do not run it yourself. Only the user decides to bypass a required review:
+
+   ```bash
+   gh pr merge <number> --squash --admin
+   ```
+
+6. Watch the PR state in the background with the watch script in step 7. If the state is `CLOSED`, or the watch times out, stop and report. Do not tag.
+7. When the state is `MERGED`, check out the release branch and pull it. Make sure that the manifest on `HEAD` shows `<VERSION>`. Step 5 tags that commit.
+
 ### 5. Create and push the tag
 
 Only after the user confirms:
