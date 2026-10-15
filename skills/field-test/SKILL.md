@@ -78,7 +78,7 @@ On a local rig none of this applies except the naming rule, which is about what 
 
 ## 4b. UI changes need the real browser
 
-A frontend change is not field-tested by curl. Drive the page with the Claude in Chrome tools against a rig or the production host, confirm which bundle the tab is running (the service worker keeps the old one after a swap), read the console and network log, and screenshot from synthetic data. Narrow viewports go through DevTools device emulation that the user toggles, never a window resize. The recipe, the traps, and the observables that work in a browser are in `references/browser.md`; read it before the first browser step.
+A frontend change is not field-tested by curl. Drive the page with the Claude in Chrome tools against a rig or the production host, confirm which bundle the tab is running (the service worker keeps the old one after a swap), read the console and network log, and screenshot from synthetic data. Each UI observable also gets a capture for a person, saved to disk during the run, because the rig is gone after step 7. Narrow viewports go through DevTools device emulation that the user toggles, never a window resize. The recipe, the traps, and the observables that work in a browser are in `references/browser.md`; read it before the first browser step.
 
 ## 4c. Desktop app
 
@@ -98,7 +98,7 @@ Report the command you ran and the output you saw, quoted, for each observable. 
 
 Update the PR body's "How has this been tested?" section with the live result in one or two sentences. Update memory with what was proven and what was left.
 
-If the run made screenshots or recordings, publish them as Evidence: run `brrbin publish --help` and follow it, then put the Evidence link in that section. Only the maintainers can open an Evidence, so a capture of real data can show torrent names, tracker names, and save paths. In each capture, mask passkeys, announce URLs, and API keys.
+A run with a UI observable is done only when you published its captures for a person as Evidence. Publish the saved captures and recordings before the teardown in step 7: run `brrbin publish --help` and follow it, then put the Evidence link in that section. If the PR does not exist yet, keep the link for the PR body. If a UI observable has no saved capture, take it now, while the rig still runs. Only the maintainers can open an Evidence, so a capture of real data can show torrent names, tracker names, and save paths. In each capture, mask passkeys, announce URLs, and API keys.
 
 A screenshot that you attach to GitHub is public. Capture it from a rig filled with synthetic data. If the bug shows only on real data, blur the names, trackers, and save paths before the image leaves the session. Never publish a screenshot with private tracker names, URLs, or real release names on GitHub.
 
@@ -106,7 +106,7 @@ A screenshot that you attach to GitHub is public. Capture it from a rig filled w
 
 Cleanup is complete when nothing from the test is left running or pinned, and you can show it.
 
-Tear down a local rig in the same turn that reads the last observable, also when the test fails or stops early. The rig is every qui binary on a spare port, every stub or mock server, every throwaway container, every scratch worktree for a baseline build, and every browser tab you opened. Unregister the service worker of each rig origin before you close its tab. Teardown is done when the rig ports are free, `docker ps` shows no rig container, and `git worktree list` shows no scratch worktree.
+Tear down a local rig in the same turn that reads the last observable, also when the test fails or stops early. When the run has captures, publish the Evidence first (step 6), then tear down in that same turn. The rig is every qui binary on a spare port, every stub or mock server, every throwaway container, every scratch worktree for a baseline build, and every browser tab you opened. Unregister the service worker of each rig origin before you close its tab. Teardown is done when the rig ports are free, `docker ps` shows no rig container, and `git worktree list` shows no scratch worktree.
 
 - Delete synthetic torrents from qBittorrent (with files if the rig created them) and any rig files on the host. On a production host, name each one before deleting it so the user can object.
 - Kill every process the test started, local and remote. Keep a ledger of process groups and listeners as you create them; a killed SSH session leaves remote zsh wrappers and tails behind. Use `pkill -xf "<exact command line>"`; `pgrep -f` without `-x` matches your own shell and kills the session.

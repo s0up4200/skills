@@ -13,6 +13,7 @@ A frontend change is only field-tested when a real browser rendered it against a
 2. Confirm which build the tab runs before judging anything. The PWA service worker precaches the JS chunks, so after an image swap or a local binary swap on the same port the open tab keeps the old bundle and makes zero network requests. `curl -s <base>/ | grep -o 'assets/index-[^"]*'` names the served bundle; compare with what the tab loaded (network log, or `performance.getEntriesByType('resource')`). If they differ, unregister the worker and clear caches via the javascript tool, then hard-reload.
 3. A POST, PUT, PATCH, or DELETE that you send with `fetch` from page JavaScript uses the session cookie, so it needs the header `X-Requested-With: XMLHttpRequest`. Without it qui answers 403 `Missing X-Requested-With header`.
 4. Full-URL navigation resets the react-query cache. A repro that needs warm client state must navigate in-app: click a link, or `document.querySelector('a[href="/backups"]').click()` when a ref click does not fire.
+5. Serve a local rig on `127.0.0.1:<port>`, not on `localhost:<port>`. Cookies ignore the port, so a `localhost` cookie from the user's own dev setup goes to the rig too, and it can block or replace a cookie that the rig sets.
 
 ## The tools do not take over the screen
 
@@ -52,6 +53,14 @@ the verdict rather than approximating.
 - Network: `read_network_requests` for the request the change was supposed to shape (query string, body, status) and for the SSE stream (`/api/stream`) staying open.
 - Client state: the react-query client is reachable by walking React fibers from `#root` for a `memoizedProps.client` with `getQueryCache`; `findAll` with a predicate lists keys, which is how a cache-collision bug was reproduced once.
 - Toasts: `[data-sonner-toast]` with `data-type`.
+
+## Captures for a person
+
+A screenshot from the `computer` tool with `scale` below 1 is a small copy for you to read. A person cannot read it, so it cannot go in an Evidence. For each UI observable, also take a capture for a person while the page shows the result:
+
+- Use the `zoom` action with `region` set to the component that changed, `scale: 1`, and `save_to_disk: true`. The region crops out the page background, which is often white.
+- Render in the app's dark theme, unless the change is for the light theme. Set the app's own theme switch, for example `class="dark"` on `<html>`, because many apps ignore the browser's color scheme.
+- Record the path of each saved file. Step 6 of the main skill publishes these files as Evidence.
 
 ## Dialog traps
 
