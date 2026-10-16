@@ -12,7 +12,7 @@ Before you start, find the open children of the ticket. On a tracker without sub
 
 If the issue has an Agent Brief comment, the latest brief is the spec, and a later `Brief amendment` comment overrides it. The issue body and the other comments are context only.
 
-The parent issue is context too. Read only the part of it that answers a question that the ticket leaves open. The parent also holds the stories of the sibling tickets, and work on those stories is scope creep in this ticket.
+Read the parent issue in full before you start, for the decisions that apply to this ticket. The user stories of the sibling tickets are context only. Build only what the spec of this ticket asks for.
 
 When the work comes from an issue and the user answers a spec question, post a comment on the issue that starts with `Brief amendment`. Write each decision as a short statement of what the code does in place of what the spec says, and why, so the comment reads like an edit to the spec:
 

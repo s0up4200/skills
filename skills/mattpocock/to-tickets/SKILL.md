@@ -37,7 +37,7 @@ Break the work into **tracer bullet** tickets.
 
 If the spec has a Domain Docs section, add each entry as an acceptance criterion on the ticket whose code it describes.
 
-Write into each ticket every decision of the source that applies to it, for example an implementation choice, a test approach, or an out-of-scope item. The agent that implements a ticket works from the ticket, and reads the parent only for a question that the ticket leaves open.
+Write into each ticket every decision of the source that applies to it, for example an implementation choice, a test approach, or an out-of-scope item. The Spec reviewer of `code-review` checks the code against the ticket, not against the parent.
 
 Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
