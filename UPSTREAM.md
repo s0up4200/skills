@@ -36,6 +36,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `codebase-design` has a new `GUARDING.md`, and its "Going deeper" list points to it. The step applies when a session settles the seam of a deep module that hides an importable dependency. A background sub-agent finds the lint rule that blocks a bypass of the module, and the agent asks the user about it. `grilling` has one line that points to this step, so `grill-with-docs` gets it too.
 - `grilling` tells the agent to read the current reference of an external API, library, or tool before it recommends a design that depends on how it behaves, also when the repo already uses it. Without the line, the agent recommended a deprecated endpoint only because the repo code already used it.
 - `to-spec` closes the grilled source issue whatever its triage role, and removes that label, when the spec covers the whole issue. When the spec covers only part, the issue stays open with the triage role that the session decided for the rest. It gives each follow-up issue that the session filed the triage role that the session decided, and adds a blocked-by edge from each follow-up that depends on the spec.
+- `codebase-design`: "Designing for testability" has an item that puts state changes in a pure reducer or a state machine when the state is several flags that can contradict each other, or when the events that are allowed depend on the current state. No upstream skill has this yet. If upstream adds similar guidance, keep the upstream text.
 
 ### Skipped upstream changes
 

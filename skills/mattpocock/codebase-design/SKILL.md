@@ -92,7 +92,19 @@ Good interfaces make testing natural:
    }
    ```
 
-3. **Small surface area.** Fewer methods = fewer tests needed. Fewer params = simpler test setup.
+3. **Put state changes in a pure reducer when the state is complex.** Use a reducer `(state, event) => state`, or a state machine, when the state is several flags that can contradict each other, or when the events that are allowed depend on the current state. The reducer is a deep module: the interface is small, and a test sends events and checks the next state, with no DOM and no mocks. A later change is one new case and one new test. A single on/off value stays a plain variable. Use the reducer of the framework (for example React `useReducer` with a discriminated union) before a state-machine library, unless the repo already uses one.
+
+   ```typescript
+   // Testable: one status, one pure transition function
+   type State = { status: "idle" } | { status: "loading" } | { status: "error"; message: string };
+   function reduce(state: State, event: Event): State {}
+
+   // Hard to test: flags that event handlers set, and that can both be true
+   const [isLoading, setIsLoading] = useState(false);
+   const [error, setError] = useState<string | null>(null);
+   ```
+
+4. **Small surface area.** Fewer methods = fewer tests needed. Fewer params = simpler test setup.
 
 ## Relationships
 
