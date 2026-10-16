@@ -41,7 +41,7 @@ Two facts behind that, worth knowing when something looks wrong:
 
 ## Mobile and narrow viewports
 
-Do not resize or float the Chrome window; the tiling WM ignores it. Ask the user to toggle
+`~/github/soup/dotfiles/agents/docs/browser.md` covers phone-width views. Ask the user to toggle
 DevTools device emulation (Ctrl+Shift+M) on the tab and wait for their "done", then continue.
 Landscape phone, folding-phone outer screen, and iOS keyboard cases need a real device; say so in
 the verdict rather than approximating.
@@ -56,11 +56,7 @@ the verdict rather than approximating.
 
 ## Captures for a person
 
-A screenshot from the `computer` tool with `scale` below 1 is a small copy for you to read. A person cannot read it, so it cannot go in an Evidence. For each UI observable, also take a capture for a person while the page shows the result:
-
-- Use the `zoom` action with `region` set to the component that changed, `scale: 1`, and `save_to_disk: true`. The region crops out the page background, which is often white.
-- Render in the app's dark theme, unless the change is for the light theme. Set the app's own theme switch, for example `class="dark"` on `<html>`, because many apps ignore the browser's color scheme.
-- Record the path of each saved file. Step 6 of the main skill publishes these files as Evidence.
+For each UI observable, take a capture for a person while the page shows the result. Follow the screenshot rules in `~/github/soup/dotfiles/agents/docs/browser.md`. Record the path of each saved file. Step 6 of the main skill publishes these files as Evidence.
 
 ## Dialog traps
 
