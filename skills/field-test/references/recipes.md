@@ -26,7 +26,7 @@ All qui calls take `X-API-Key`. Substitute the address from the host file or the
 
 Build the name by the repo rule: keep the tokens that matter, invent the title and group, and confirm the invented name still triggers the behaviour before you rely on it.
 
-- Fastest: `mkbrr create <dir> -o <file>.torrent` (Go install of `github.com/autobrr/mkbrr`), then add to qBittorrent with `savepath` and `skip_checking=true` so it seeds at once.
+- Fastest: make a file of 1 MiB, run `nice -n 19 env GOMAXPROCS=2 mkbrr create <dir> -o <file>.torrent --workers 1` (Go install of `github.com/autobrr/mkbrr`), then add to qBittorrent with `savepath` and `skip_checking=true` so it seeds at once.
 - qBittorrent 5.x can build one itself: `POST /api/v2/torrentcreator/addTask`, poll `/status`, download `/torrentFile?taskID=`. It auto-adds the result; a later `torrents/add` answers `Conflict` and can be ignored. It ignores the `trackers` parameter, so attach trackers afterwards with `POST /api/v2/torrents/addTrackers`.
 - Media files that must carry metadata: `ffmpeg -f lavfi -i testsrc -t 2 -metadata IMDB=tt... -metadata TMDB=movie/... out.mkv`.
 - Delete with files when the rig created them: `POST /api/v2/torrents/delete` with `deleteFiles=true`.

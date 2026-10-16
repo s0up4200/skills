@@ -42,6 +42,8 @@ When the claim is about how many calls qui makes to qBittorrent, count the reque
 
 Match the depth to the risk. A log line is enough for a search-shape fix. A migration or a matcher change that adds torrents needs the end-to-end path: the torrent lands in qBittorrent, paused, at the right path.
 
+A rig is code too. After two failed attempts to build one, stop. Read the cheapest observable that you can reach without the rig, and say in the report what the run did not prove.
+
 ## 2. Get the build CI made
 
 Never copy a locally built binary into the container. The image tag must describe what runs, or the next pull silently reverts it and "what is running" becomes a guess. The user allowed it once and asked not to do it again.

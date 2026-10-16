@@ -27,7 +27,9 @@ Call the Skill tool with "tdd" where possible, at pre-agreed seams.
 
 Write the Domain Docs that the spec or tickets list to `GLOSSARY.md` and `docs/adr/` on this branch, with the code. Call the Skill tool with "domain-modeling" for the formats.
 
-Run typechecking regularly, single test files regularly, and the full test suite once at the end.
+Run typechecking regularly and single test files regularly. At the end, run the test gate that your instructions define. If they define none, run the full test suite once.
+
+If the repo instructions ask for a live run, or the branch changes something that a user sees in the UI, call the Skill tool with "field-test" on a local rig. A run on the production host needs the image that CI builds after the push, so it comes after the commit. If a later change touches an observable of the live run, run that observable again.
 
 Once done, call the Skill tool with "code-review" to review the work.
 
