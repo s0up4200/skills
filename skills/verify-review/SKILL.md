@@ -86,6 +86,8 @@ Commit with a conventional message that names what changed, not who suggested it
 
 A refutation earns a reply, because the disagreement must be on record for the people who see the thread later. Write it in plain first person, as the maintainer's own finding, with the evidence at file and line or the command output. It names no tool: the findings on a pull request are the maintainer's, whatever surfaced them, and "verified the bot's claim" reads wrong from the maintainer. If a voice skill for the user's chat replies is available, use it for the wording.
 
+Each statement in a reply or a review answer about what code does is a claim, and each claim needs its own evidence from this run: a file and line, or command output. Evidence for the verdict does not cover the sentences around it. A statement about code that you take from the PR body, an issue, or an earlier comment is a claim to check at the code, the same as a finding. Before a reply goes in the report, list each claim in it next to its evidence, and cut each claim that has none. Cite code from another project at a release tag or a commit, not at a branch: a branch moves, and a local clone is often on a different ref from the one the claim is about.
+
 Every public comment goes out under the user's account, so the user sees its full text before it is posted. Put each reply in the report (step 6). The user's reply to the report approves every reply shown there, except one that it says no to. A reply whose text changes after the report needs a new yes. Post with:
 
 ```bash
