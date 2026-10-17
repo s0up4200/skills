@@ -56,7 +56,7 @@ the verdict rather than approximating.
 
 ## Captures for a person
 
-For each UI observable, take a capture for a person while the page shows the result. Follow the screenshot rules in `~/github/soup/dotfiles/agents/docs/browser.md`. Record the path of each saved file. Step 6 of the main skill publishes these files as Evidence.
+For each visual change (step 4b of the main skill defines it), take a before and an after capture for a person while the page shows the result. Follow the screenshot rules in `~/github/soup/dotfiles/agents/docs/browser.md`. Record the path of each saved file. Step 6 of the main skill publishes these files as Evidence.
 
 ## Dialog traps
 

@@ -82,7 +82,7 @@ On a local rig none of this applies except the naming rule, which is about what 
 
 ## 4b. UI changes need the real browser
 
-A frontend change is not field-tested by curl. Drive the page with the Claude in Chrome tools against a rig or the production host, confirm which bundle the tab is running (the service worker keeps the old one after a swap), read the console and network log, and screenshot from synthetic data. Each UI observable also gets a capture for a person, saved to disk during the run, because the rig is gone after step 7. Narrow viewports go through DevTools device emulation that the user toggles, never a window resize. The recipe, the traps, and the observables that work in a browser are in `references/browser.md`; read it before the first browser step.
+A frontend change is not field-tested by curl. Drive the page with the Claude in Chrome tools against a rig or the production host, confirm which bundle the tab is running (the service worker keeps the old one after a swap), read the console and network log, and screenshot from synthetic data. A **visual change** changes how the page looks: the layout, the styling, the text, or an element that appears or goes away. Each visual change also gets a before and an after capture for a person, saved to disk during the run, because the rig is gone after step 7. Take the before capture from a build of the base branch. Report a check of a value or a state, such as a field that shows a new default, in text only. Narrow viewports go through DevTools device emulation that the user toggles, never a window resize. The recipe, the traps, and the observables that work in a browser are in `references/browser.md`; read it before the first browser step.
 
 ## 4c. Desktop app
 
@@ -102,7 +102,7 @@ Report the command you ran and the output you saw, quoted, for each observable. 
 
 Update the PR body's "How has this been tested?" section with the live result in one or two sentences. Update memory with what was proven and what was left.
 
-A run with a UI observable is done only when you published its captures for a person as Evidence. Publish the saved captures and recordings before the teardown in step 7: run `brrbin publish --help` and follow it, then put the Evidence link in that section. If the PR does not exist yet, keep the link for the PR body. If a UI observable has no saved capture, take it now, while the rig still runs. Only the maintainers can open an Evidence, so a capture of real data can show torrent names, tracker names, and save paths. In each capture, mask passkeys, announce URLs, and API keys.
+A run with a visual change is done only when you published its before and after captures for a person as Evidence. Publish the saved captures and recordings before the teardown in step 7: run `brrbin publish --help` and follow it, then put the Evidence link in that section. If the PR does not exist yet, keep the link for the PR body. If a visual change has no saved capture, take it now, while the rig still runs. Only the maintainers can open an Evidence, so a capture of real data can show torrent names, tracker names, and save paths. In each capture, mask passkeys, announce URLs, and API keys.
 
 A screenshot that you attach to GitHub is public. Capture it from a rig filled with synthetic data. If the bug shows only on real data, blur the names, trackers, and save paths before the image leaves the session. Never publish a screenshot with private tracker names, URLs, or real release names on GitHub.
 
