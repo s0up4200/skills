@@ -49,6 +49,7 @@ the verdict rather than approximating.
 ## Observables that work in the browser
 
 - The element itself: `read_page` or `find` for the text, attribute, or class the change added; a screenshot for layout.
+- Disabled state: `read_page` and `find` can omit it. Read `aria-disabled` or `data-disabled` on the option with `javascript_tool`.
 - Console: `read_console_messages` with a `pattern` for the app's own log prefix or the error text. A React key warning or an uncaught error is a fail even when the page looks right.
 - Network: `read_network_requests` for the request the change was supposed to shape (query string, body, status) and for the SSE stream (`/api/stream`) staying open.
 - Client state: the react-query client is reachable by walking React fibers from `#root` for a `memoizedProps.client` with `getQueryCache`; `findAll` with a predicate lists keys, which is how a cache-collision bug was reproduced once.
