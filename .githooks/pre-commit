@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Block a commit that stages a file over 5,000 tokens (tokens = bytes / 4).
+# Enable once per clone: git config core.hooksPath .githooks
+#
+# The hook checks only the staged content of added, copied, modified, and
+# renamed files. It skips files that agents do not write:
+#   - binary files
+#   - lockfiles (the list below)
+#   - files with the linguist-generated attribute in .gitattributes
+#   - files with the "Code generated ... DO NOT EDIT." header (https://go.dev/s/generatedcode)
+set -euo pipefail
+
+max_tokens=5000
+max_bytes=$((max_tokens * 4))
+
+is_lockfile() {
+	case "${1##*/}" in
+	*.lock | package-lock.json | npm-shrinkwrap.json | pnpm-lock.yaml | bun.lockb | go.sum | \
+		go.work.sum | packages.lock.json | gradle.lockfile)
+		return 0
+		;;
+	esac
+	return 1
+}
+
+is_generated() {
+	[ "$(git check-attr --cached linguist-generated -- "$1" | sed 's/.*: //')" = true ] && return 0
+	grep -qE '^(//|#|--|/\*) Code generated .* DO NOT EDIT\.' < <(git cat-file blob ":$1" | head -n 20)
+}
+
+too_big=()
+while IFS=$'\t' read -r -d '' added _ path; do
+	[ "$added" = - ] && continue # binary
+	is_lockfile "$path" && continue
+	size=$(git cat-file -s ":$path")
+	[ "$size" -le "$max_bytes" ] && continue
+	is_generated "$path" && continue
+	too_big+=("$(((size + 3) / 4)) tokens  $path")
+done < <(git diff --cached --numstat -z --no-renames --diff-filter=ACMR)
+
+[ ${#too_big[@]} -eq 0 ] && exit 0
+
+cat >&2 <<EOF
+pre-commit: these staged files are over the limit of $max_tokens tokens ($max_bytes bytes):
+
+$(printf '  %s\n' "${too_big[@]}")
+
+Split each file before you commit. Do not delete content to fit, and do not
+use --no-verify.
+
+1. Find the seams. List the headings, classes, or top-level functions in the
+   file. Group them by the one job each group does.
+2. Move each group that can stand alone into its own file, next to the
+   original, with a name that says what the group does. Aim for files of
+   about 2,000 to 4,000 tokens, so that the next edit has room to grow.
+3. Keep the entry point small. The original file keeps only what a reader
+   needs first, plus a pointer to each new file:
+   - Markdown or SKILL.md: keep the overview and the steps. Move long
+     examples, tables, and reference material into references/<topic>.md.
+     Add one line per moved part that says when to read it, for example
+     "Read references/<topic>.md before you <task>."
+   - Code: move each cohesive group of functions or types into a new module.
+     Update the imports, or re-export from the old module, so that callers
+     do not change. Move large tests into one test file per new module.
+   - Data or config: split by top-level key or by section, and load or
+     include the parts from the original file.
+4. Fix every link and import that points at the moved content. Search the
+   repo for the old path and for each moved heading or symbol name.
+5. Stage the new files and the changed original, then commit again.
+
+If a file is a lockfile or generated code that no person or agent edits by
+hand, mark it in .gitattributes instead, for example:
+  path/to/file linguist-generated=true
+EOF
+exit 1
