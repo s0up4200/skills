@@ -78,6 +78,13 @@ expect "^  $tmp/det-merged$"
 expect "det-unique  \[detached, 1 unmerged commit"
 grep -q '^  main ' <<<"$plan" && { echo "FAIL: main listed"; fail=1; }
 
+# The same PRs as Forgejo pull objects give the same PR verdicts.
+jq '[.[] | {state: (if .state == "OPEN" then "open" else "closed" end), merged: (.state == "MERGED"), number, head: {ref: .headRefName, sha: .headRefOid}}]' \
+  "$tmp/prs.json" >"$tmp/forgejo.json"
+fplan=$(BRANCH_CLEANUP_FORGEJO_PRS="$tmp/forgejo.json" "$here/plan.sh" 7)
+grep -qE '^  squashed +merged PR #5$' <<<"$fplan" || { echo "FAIL forgejo: squashed"; fail=1; }
+grep -qE '^  pr-7 +open PR #7$' <<<"$fplan" || { echo "FAIL forgejo: pr-7"; fail=1; }
+
 script=$(sed -n 's/^Cleanup: //p' <<<"$plan")
 bash "$script" >/dev/null
 

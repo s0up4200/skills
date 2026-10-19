@@ -19,7 +19,7 @@ From anywhere inside the repo:
 
 `days` is the recent window, 7 by default. The user can write it as `14` or `14d`.
 
-The script fetches all remotes with `--prune`, reads PRs with `gh` when `origin` is on GitHub, and changes no branch or worktree. It writes two files into `<git-common-dir>/branch-cleanup/`:
+The script fetches all remotes with `--prune`, reads PRs with `gh` when `origin` is on GitHub or from the Forgejo API for any other host, and changes no branch or worktree. It writes two files into `<git-common-dir>/branch-cleanup/`:
 
 - `<stamp>.tsv`: every branch it plans to delete, with its tip SHA and the reason
 - `<stamp>-cleanup.sh`: the script the user runs
@@ -38,7 +38,7 @@ Otherwise it is deleted:
 
 - **merged into the default branch**: the tip is an ancestor of `origin/<default>`.
 - **merged PR #N**: the tip is at or behind the head of a merged PR. This catches squash merges, which `git branch --merged` misses.
-- **not on any remote, older than N days**: everything else. When some of its commits exist only on this machine, the plan flags it with `!! N commit(s) exist only here`. Commits in a PR head on GitHub count as pushed.
+- **not on any remote, older than N days**: everything else. When some of its commits exist only on this machine, the plan flags it with `!! N commit(s) exist only here`. Commits in a PR head on the forge count as pushed.
 
 Worktrees: a worktree on a deleted branch is removed. A detached worktree is removed when its HEAD is already merged or pushed. A worktree with local changes, or a locked worktree, stays, and the plan prints its `git status`. Worktree directories that no longer exist are pruned. Worktrees in other tools' directories (Codex, herdr, `/var/tmp`) are treated like any other.
 

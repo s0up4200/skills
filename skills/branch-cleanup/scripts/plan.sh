@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Usage: plan.sh [days]. Plans only; see SKILL.md for the rules and output files.
 # BRANCH_CLEANUP_PRS=<file> replaces `gh pr list` with a JSON fixture (test seam).
+# BRANCH_CLEANUP_FORGEJO_PRS=<file> replaces the Forgejo pulls API the same way.
 # The pull/N/head fetch below stays: merged fork-PR heads are often not local.
 set -eo pipefail
 
@@ -31,13 +32,36 @@ git show-ref --quiet "refs/remotes/origin/$default" && base=refs/remotes/origin/
 declare -A on_remote
 while read -r r; do on_remote[${r#*/}]=1; done < <(git for-each-ref refs/remotes --format='%(refname:lstrip=2)' | grep -v '/HEAD$')
 
-# PRs, GitHub only. Lines: state number headRefName headRefOid
+# Forgejo pull objects to PR lines.
+forgejo_rows() {
+  jq -r '.[]|"\(if .merged then "MERGED" elif .state=="open" then "OPEN" else "CLOSED" end) \(.number) \(.head.ref) \(.head.sha)"'
+}
+
+# PRs from GitHub, or from the Forgejo API for any other host. Lines: state number headRefName headRefOid
 prs=""
+origin_url=$(git remote get-url origin 2>/dev/null) || true
 if [[ -n ${BRANCH_CLEANUP_PRS:-} ]]; then
   prs=$(jq -r '.[]|"\(.state) \(.number) \(.headRefName) \(.headRefOid)"' "$BRANCH_CLEANUP_PRS")
-elif git remote get-url origin 2>/dev/null | grep -q 'github\.com' && command -v gh >/dev/null; then
+elif [[ -n ${BRANCH_CLEANUP_FORGEJO_PRS:-} ]]; then
+  prs=$(forgejo_rows <"$BRANCH_CLEANUP_FORGEJO_PRS")
+elif grep -q 'github\.com' <<<"$origin_url" && command -v gh >/dev/null; then
   prs=$(gh pr list --state all --limit 5000 --json state,number,headRefName,headRefOid \
     --jq '.[]|"\(.state) \(.number) \(.headRefName) \(.headRefOid)"') || echo "warning: gh pr list failed, PR rules skipped" >&2
+elif [[ $origin_url =~ ^(ssh://)?([^@/]+@)?([^/:]+)(:[0-9]+)?[:/](.+)$ ]]; then
+  host=${BASH_REMATCH[3]} repo_path=${BASH_REMATCH[5]%.git}
+  token=${FORGEJO_TOKEN:-}
+  for keys in "${XDG_DATA_HOME:-$HOME/.local/share}/forgejo-cli/keys.json" "$HOME/Library/Application Support/forgejo-cli.forgejo-cli/keys.json"; do
+    [[ -z $token && -r $keys ]] && token=$(jq -r --arg h "$host" '.hosts[$h].token // empty' "$keys")
+  done
+  page=1
+  while :; do
+    json=$(curl -fsS ${token:+-H "Authorization: token $token"} \
+      "https://$host/api/v1/repos/$repo_path/pulls?state=all&limit=50&page=$page") || {
+      echo "warning: no Forgejo PR list from $host, PR rules skipped" >&2; prs=""; break; }
+    [[ $(jq length <<<"$json") -gt 0 ]] || break
+    prs+=$(forgejo_rows <<<"$json")$'\n'
+    page=$((page + 1))
+  done
 fi
 
 # PR rows that belong to a branch: same head name, a pr-N / prN name, or the same tip.
@@ -92,7 +116,7 @@ while read -r b; do
   if (( $(created "$b") >= cutoff )); then keep_reason[$b]="created in the last $days days"; continue; fi
 
   del_reason[$b]="not on any remote, older than $days days"
-  # Commits in a PR head are on GitHub even when no remote branch holds them.
+  # Commits in a PR head are on the forge even when no remote branch holds them.
   unpushed=$(git rev-list --count "$tip" --not --remotes "$base" "${pr_heads[@]}")
   (( unpushed > 0 )) && del_flag[$b]="$unpushed commit(s) exist only here"
 done < <(git for-each-ref refs/heads --format='%(refname:lstrip=2)')
