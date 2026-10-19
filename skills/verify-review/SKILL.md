@@ -59,7 +59,8 @@ Answer these at the current head of the branch, with the file open:
 - Is the flagged behavior deliberate? A code comment, a user-facing document, the PR body, a linked issue or a page it links to, or a downstream verifier that makes an optimistic check self-correcting all turn a "defect" into a design decision. Fixing it inverts a tradeoff the maintainer chose on purpose.
 - Which failure mode is cheaper for the real user flow? A bot weights every branch equally. The maintainer does not.
 - Did the reviewer give a reproduction? A person often does, as a command and its output. Run it at head before you reason about it.
-- Can a runnable check settle it? A failing test, a curl against a local rig, a trace through the real input. Ten minutes on a rig beats thirty minutes of reasoning, and the rig catches the half-right finding that reasoning misses.
+
+When a finding is about runtime behavior and a test or a rig can express it, the verification ends red: the test fails at head for the reason that the reviewer gave. Reading the code shows where the fault seems to be, but a layer under it, such as a transport retry, a cache, or a framework default, can cause the same fault elsewhere. Run each fix option against the red test before it goes in the report, and keep only the options that turn it green. When no test can express the finding, say so in the verdict and name what stays unproven.
 
 The verification ends in one of four verdicts, each with the evidence that produced it, as a file and line, a test name, or a command and its output:
 
@@ -76,7 +77,7 @@ A verdict without evidence is an opinion, and the bot already supplied one of th
 
 Fix the class, not the site. Before you edit, find every sibling caller of the function the finding names. One guard in the shared function is a smaller diff than a guard in each caller, and the caller the bot did not mention is otherwise still broken.
 
-Before you remove a branch or a guard, show the input that branch handled, in a test or a trace. A simplification that reads cleaner can still drop a case the old code covered. Add a test for each fix where a test can express the finding, so the next review round does not reopen it.
+Before you remove a branch or a guard, show the input that branch handled, in a test or a trace. A simplification that reads cleaner can still drop a case the old code covered. Keep the red test from step 2 as the regression test for the fix, so the next review round does not reopen it.
 
 Keep the patch inside the findings. Verification often turns up a defect no bot named. Report it with the same evidence, and leave it out of the patch unless the user says otherwise: the pull request author scoped the change, and an unasked fix in a review pass is how scope drifts. Follow the repository's own instructions and the user's commit gate, including every review skill they require before a commit. Where CI is the test gate, push and let CI run. Otherwise run the tests you changed or added.
 
@@ -170,7 +171,7 @@ If a sync fails, it tries again forever. Codex wants a limit. The claim is true.
 - **Read** lists the PR body and each issue or page that you read in step 1. A PR with no closing issue says so: "the PR body (no closing issue)".
 - **Status** is one of: the fixes are saved and on GitHub, the fixes are on this machine and not saved yet, or no changes.
 - Each finding is one list item: the problem in plain words and two more sentences at most. For a fix, say what now happens in place of the problem, and whether a test guards it. Put duplicate findings in one item and name each bot.
-- **Your call** uses the `grilling` round format: one numbered question for each open judgment call, the options with what each costs, and your recommendation with its reason after ➡️. Ask all the questions in one round. Leave those threads unresolved until the user answers.
+- **Your call** uses the `grilling` round format: one numbered question for each open judgment call, the options with what each costs, and your recommendation with its reason after ➡️. Ask all the questions in one round. Leave those threads unresolved until the user answers. Each option that fixes the finding says whether it turned the red test from step 2 green.
 - Under each option that leaves a finding as it is, show the reply that the option posts (step 4), in the same form as a reply under **The reviewer was wrong**. The answer that picks the option then approves its reply too, so the reply needs no second round.
 - Recommend the fix when it removes copied code, a rule that lives in two places, or behavior that only a comment explains, and the change is small or medium. This holds when the fix touches code older than the pull request: the maintainer pays for the cleanup now or later, and now is cheaper. Recommend leaving it when the fix is a large change, or when it costs more than the failure it prevents. The recommendation is advice. The fix waits for the user's answer.
 - Keep each question body near 100 words, because the user reads it once and then picks. Start with the verdict. Then give one concrete case that a user could meet, for example the two names that match by mistake. Name the proof in a few words, without its steps. Say what the pull request changes and what was already there. Give each option one line with its cost in plain terms, such as a small change or a bigger change to the sync.
