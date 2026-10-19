@@ -65,7 +65,7 @@ The verification ends in one of four verdicts, each with the evidence that produ
 
 - **confirmed**: the claim holds at head and the fix is clear. Goes to step 3.
 - **wrong**: the premise fails at head, for the scenario the bot described. Goes to step 4.
-- **stale**: already addressed by a commit after the review. Resolve without a reply.
+- **stale**: already addressed by a commit after the review. Resolve without a reply, except a CodeRabbit thread (step 4).
 - **judgment**: the claim holds, or might, and what to do about it is the maintainer's call. This covers a fix that chooses between designs, a true claim whose fix costs more than the failure it prevents, and a defect that predates the pull request. Bring it to the user with the finding, a risk score, the practical tradeoff, and your recommendation (step 6). Silence is not agreement.
 
 The line between wrong and judgment matters more than any other in this skill. A true claim that is not worth fixing is a judgment. Its record is the report to the user and a reply that gives the reason (step 4). Calling it wrong puts a false statement on the record under the maintainer's name. Before you write "wrong", restate the bot's scenario in its own terms, the ordering of events and the inputs it named, and show the code handling that scenario. The most common wrong refutation argues against a neighbouring scenario: the other ordering, a different caller, a case the guard does cover. If the code handles only the neighbour, the bot was right.
@@ -80,7 +80,7 @@ Before you remove a branch or a guard, show the input that branch handled, in a 
 
 Keep the patch inside the findings. Verification often turns up a defect no bot named. Report it with the same evidence, and leave it out of the patch unless the user says otherwise: the pull request author scoped the change, and an unasked fix in a review pass is how scope drifts. Follow the repository's own instructions and the user's commit gate, including every review skill they require before a commit. Where CI is the test gate, push and let CI run. Otherwise run the tests you changed or added.
 
-Commit with a conventional message that names what changed, not who suggested it. For a thread, the commit is the whole record of a fix: write no "fixed in abc123" reply, and resolve the thread after the push. A fix for an item in a review body goes into the review answer (step 4).
+Commit with a conventional message that names what changed, not who suggested it. For a thread, the commit is the whole record of a fix: write no "fixed in abc123" reply, and resolve the thread after the push, except a CodeRabbit thread (step 4). A fix for an item in a review body goes into the review answer (step 4).
 
 ## 4. Refute the wrong findings, answer the reviews
 
@@ -99,6 +99,8 @@ Then resolve a bot's thread:
 ```bash
 gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -F id="$thread_id"
 ```
+
+CodeRabbit (author `coderabbitai`) resolves its own threads. Leave each CodeRabbit thread open after a fix, a stale verdict, a refutation, or a declined judgment call. Post the same replies as for the other bots. On a later run, skip an open CodeRabbit thread when its finding is fixed at head, or when CodeRabbit accepted your reply. Count it in the report as waiting on CodeRabbit.
 
 Leave a person's thread open after a refutation, so the reviewer can answer or resolve it. The thread is then waiting, and the next run skips it. A person's thread that the user declines as a judgment call also gets a reply with the reason, and stays open.
 
