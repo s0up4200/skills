@@ -11,6 +11,7 @@ Traps:
 - `cd dir && nohup ./qui serve ... &` makes `$!` the wrapper shell; `kill $!` leaves qui alive and the next binary logs `bind: address already in use`. Use `setsid` and kill with `pkill -f "[q]ui serve --config-dir <dir>"` (the bracket keeps the pattern from matching your own shell).
 - `qui serve` fails without a `config.toml`; run `qui generate-config --config-dir <dir>` first on a fresh dir, then `POST /api/auth/setup`, then `POST /api/instances` with `hasLocalFilesystemAccess: true`. Every POST, PUT, PATCH, or DELETE after login needs `-H 'X-Requested-With: XMLHttpRequest'`, or qui answers 403 `Missing X-Requested-With header` (`internal/api/middleware/auth.go`).
 - Comparing against the pre-fix binary: `git worktree add <dir> HEAD`, copy `internal/web/dist` in, `go build ./cmd/qui`. Grep the served bundle for a code signature to know which build a tab is running; the service worker precaches chunks across binary swaps on the same port.
+- `pnpm build` writes `web/dist`. Only `make frontend` or `make build` copies it to `internal/web/dist`, which the binary embeds. Measure chunk sizes in `web/dist`. A Vite build of an edit that changes only a comment is byte-identical, so use a real statement to make the chunk hashes change.
 
 ## Mock Torznab indexer
 
@@ -127,6 +128,8 @@ Wine (`/usr/bin/wine`, 11.17 Staging on 2026-10-07; there is no `wine64` binary)
 GOOS=windows GOARCH=amd64 go build -o qui.exe ./cmd/qui
 WINEDEBUG=-all WINEPREFIX=<scratchpad>/wineprefix wine qui.exe serve --config-dir 'Z:\<scratchpad>\cfg' ...
 ```
+
+To run the unit tests of one package under Wine, build the test binary with `GOOS=windows CGO_ENABLED=0 go test -c -o pkg.test.exe ./internal/<pkg>` and run `wine pkg.test.exe`. This finds tests that break only on Windows, for example `filepath.Join(string(filepath.Separator), ...)`, which is not an absolute path on Windows.
 
 - Give each run its own `WINEPREFIX` in the scratchpad. The first run creates it, which takes a few seconds. Delete the directory at cleanup.
 - `WINEDEBUG=-all` removes the `fixme:` noise, so the log shows only the program output.

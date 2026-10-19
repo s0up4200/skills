@@ -4,7 +4,7 @@ All qui calls take `X-API-Key`. Substitute the address from the host file or the
 
 ## Cross-seed
 
-- Per-torrent manual search: `POST /api/cross-seed/torrents/{instanceID}/{hash}/search` with an optional body `{"indexerIds":[...],"cache_mode":"bypass"}`. The response carries `decisionTrace` with per-candidate reject reasons and per-indexer outcomes, and each result's `match_reason` (snake_case in the JSON; the Go field is `MatchReason`).
+- Per-torrent manual search: `POST /api/cross-seed/torrents/{instanceID}/{hash}/search` with an optional body `{"indexerIds":[...],"cache_mode":"bypass"}`. The response carries `decisionTrace` with per-candidate reject reasons and per-indexer outcomes, and each result's `match_reason` (snake_case in the JSON; the Go field is `MatchReason`). A manual search never writes the Gazelle cooldown stamp. Only a search run writes it, and a search run has no dry run and can add matches.
 - `POST /api/cross-seed/search/run` takes categories and tags, not hashes. Wrong tool for a single torrent.
 - Webhook check and apply (what autobrr calls): `POST /api/cross-seed/webhook/check` and `POST /api/cross-seed/webhook/apply` with the announced name and size. The check reports ready or skip per instance; a size of 0 exercises the name-only preflight.
 - Apply from search results: `POST /api/cross-seed/torrents/{instanceID}/{hash}/apply`. The added torrent lands paused; confirm in qBittorrent and delete it afterwards.

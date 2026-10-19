@@ -50,6 +50,10 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 
 Upstream refers to some skills that are not copied here, for example `grill-me`, `to-questionnaire`, and `wait-what` in `ask-matt`.
 
+### Send a change upstream
+
+mattpocock/skills accepts pull requests only from collaborators, so `gh pr create` fails. Push the change to a branch of the fork [s0up4200/skills-1](https://github.com/s0up4200/skills-1), and open an issue or a discussion with a compare link to that branch. The upstream rules are: no em dashes, one changeset for each change, and a new sync of the docs page when a skill is promoted.
+
 ### Compare with upstream
 
 To see the upstream changes since the recorded commit (add `--stat` for a summary):
