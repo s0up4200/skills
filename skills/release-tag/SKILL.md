@@ -133,16 +133,17 @@ grep -lE 'docs\([a-z-]+\): add \$' .github/workflows/*.y*ml
 
 If grep finds no file, the release is finished after step 6.
 
-Wait for the runs and the PR in the background (Bash with `run_in_background`). The script judges only the latest run of each workflow, so a run that was cancelled and then re-run does not count as a failure. It gives the tag runs 20 minutes and the PR 10 more minutes. It prints one line: `PR <number>`, `FAILED <run url>`, or `TIMEOUT <phase>`:
+Wait for the runs and the PR in the background (Bash with `run_in_background`). The script judges only the latest run of each workflow on the commit that the remote tag points at. Thus a run that was cancelled and then re-run does not count as a failure, and neither does a run from before a retag. It gives the tag runs 20 minutes and the PR 10 more minutes. It prints one line: `PR <number>`, `FAILED <run url>`, or `TIMEOUT <phase>`:
 
 ```bash
 tag=v<VERSION>
+sha=$(git ls-remote origin "refs/tags/$tag^{}" | cut -f1)
 end=$((SECONDS+1200))
-until gh run list --branch "$tag" --json status --jq 'length > 0 and all(.status == "completed")' | grep -q true; do
+until gh run list --branch "$tag" --commit "$sha" --json status --jq 'length > 0 and all(.status == "completed")' | grep -q true; do
   [ $SECONDS -lt $end ] || { echo "TIMEOUT runs"; exit 2; }
   sleep 30
 done
-failed=$(gh run list --branch "$tag" --json workflowName,createdAt,conclusion,url --jq 'group_by(.workflowName) | map(max_by(.createdAt)) | .[] | select(.conclusion != "success" and .conclusion != "skipped") | .url')
+failed=$(gh run list --branch "$tag" --commit "$sha" --json workflowName,createdAt,conclusion,url --jq 'group_by(.workflowName) | map(max_by(.createdAt)) | .[] | select(.conclusion != "success" and .conclusion != "skipped") | .url')
 [ -z "$failed" ] || { echo "FAILED $failed"; exit 1; }
 end=$((SECONDS+600))
 until pr=$(gh pr list --state all --search "$tag in:title" --json number,title --jq ".[] | select(.title | endswith(\": add $tag\")) | .number") && [ -n "$pr" ]; do
@@ -152,7 +153,7 @@ done
 echo "PR $pr"
 ```
 
-If the script prints `FAILED` or `TIMEOUT`, stop and report which step broke, with the run link. Do not re-run a workflow, publish a draft, or edit the release. The user decides what to do.
+If the script prints `TIMEOUT`, stop and report the phase. If it prints `FAILED`, read [`release-failed.md`](release-failed.md) and do it. Do not re-run a workflow, publish a draft, or edit the release on your own. The user decides what to do.
 
 When the PR exists, make sure that the release is published (`isDraft` is false), and show the user:
 
