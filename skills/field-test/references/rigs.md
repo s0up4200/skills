@@ -113,6 +113,8 @@ The container is the default: it answers every endpoint the way qBittorrent does
 
 `scripts/stub-qbit.py <port> [count]` in this skill: login, capabilities, a synthetic library (2000 torrents by default), and a per-path request counter at `GET /_counts`. Every maindata poll bumps `upspeed` on each row, so stream deltas carry rows; a static library makes every delta empty and hides a handler that drops its row on an empty frame. Copy `/_counts` before and after a window and subtract for a paired request count. The stub answers only what qui asked for when it was written; an endpoint it does not know returns `[]`, so a new call path can pass here and fail on the container. A dead host such as `127.0.0.1:1` puts the instance into a 60 s backoff that survives repointing, so `POST /api/instances/{id}/test` to reconnect.
 
+To test a qBittorrent that is slow to answer, add a toggle to the stub that holds each `/api/v2/sync/maindata` answer for 75 s. That is longer than the 10 s timeout of qui for an incremental sync. Turn the toggle on only after the table shows rows. Each build needs its own healthy first sync. Before the next build connects to the same stub, turn the toggle off, reload the tab, and make sure that the maindata count in `/_counts` rises. Then turn the toggle on again. On 2026-10-19 the second build stalled until the toggle went off.
+
 Paired-binary traps (either rig):
 
 - Build the develop binary with `make backend` in the worktree, not `go build`. A build without ldflags logs in console format, so a grep for a JSON key such as `"hasHashes":true` returns 0 there and the count looks like a result. Grep for the message text, which both formats carry.
