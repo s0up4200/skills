@@ -26,6 +26,10 @@ All qui calls take `X-API-Key`. Substitute the address from the host file or the
 
 Proven 2026-09-30: a qBittorrent container, a Python mock Torznab, and qui on a spare port.
 
+- `scripts/mock-torznab.py <port> [rss file]` in this skill answers `t=caps` for movies and TV. It answers each search with the RSS file, or with an empty feed. It prints the time and the query of each search, so its log shows the order of the searches and the interval between them. Register it as a native indexer with `base_url` `http://127.0.0.1:<port>`.
+- The Dir Scan directories open at `/cross-seed?tab=directories`.
+- `POST /api/dir-scan/webhook/scan` accepts the session cookie, so a rig needs no API key for it. Send `{"path": "<folder>"}`.
+- On 2026-10-19, each movie folder with one video file searched twice, 60 s apart.
 - Give each mock item `<enclosure url=... type="application/x-bittorrent"/>`. The native client reads `item.Enclosure.URL`, not `<link>`. Without it, each download fails with "download URL is required".
 - The 7-day search cache serves a broken first response again, and no API clears it. Stop qui, then run `DELETE FROM torznab_search_cache; DELETE FROM torznab_torrent_cache;` on the rig database.
 - After a run with no match, call `POST /api/dir-scan/directories/{id}/requeue-no-match` or `reset-files` before a new scan. One run can leave a second searchee unsearched (`skippedIndexerSatisfied`). A second scan picks it up.
