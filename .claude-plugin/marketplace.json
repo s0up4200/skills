@@ -15,15 +15,6 @@
       ]
     },
     {
-      "name": "docs-skills",
-      "description": "Local documentation search skills",
-      "source": "./skills",
-      "skills": [
-        "./skills/claude-code-docs",
-        "./skills/platform-docs"
-      ]
-    },
-    {
       "name": "release-skills",
       "description": "Release tagging and announcement skills",
       "source": "./skills",
