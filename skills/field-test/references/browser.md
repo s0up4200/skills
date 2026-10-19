@@ -68,8 +68,8 @@ For each visual change (step 4b of the main skill defines it), take a before and
 - A raw `localStorage.setItem('qui-filters-<id>', ...)` is lost on reload, because the client settings sync from the server overwrite it. Use the "Clear filters" button or the client settings PUT.
 - To read the long tasks of a page mount after a full reload, observe `longtask` with `buffered: true`.
 - To test a UI that would start a real run, patch `window.fetch` in the tab. Rewrite the GET that loads the settings, answer the POST that starts the run with a fake response, and answer other writes with 418. Reload the tab afterwards to drop the patch.
-- Reload the tab before you patch a global (`fetch`, `Storage.prototype.setItem`) a second time. A second run wraps the first wrapper, recurses without end, and the call under test fails.
-- Column resize and dnd-kit drags use pointer capture, so synthetic events from `javascript_tool` do not move them. Ask the user to drag.
+- Reload the tab before you patch a global (`fetch`, `Storage.prototype.setItem`) a second time. A second run wraps the first wrapper, so each call logs twice. If the patch keeps the original in a shared global such as `window.__orig`, the second run replaces it with the first wrapper, the wrapper calls itself, and the call fails with "Maximum call stack size exceeded".
+- Column resize and the column drag of the torrent table start on `mousedown`, then listen on `document` for `mousemove` and `mouseup`. Drive them with bubbling `MouseEvent`s that carry `clientX` and `clientY`. Pointer events do nothing here, and a dnd-kit drag starts only after the mouse moves more than 8 px. Not yet proven in a browser: if the scripted drag does not move the column, ask the user to drag.
 
 ## Timing UI interactions
 

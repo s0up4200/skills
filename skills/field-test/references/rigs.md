@@ -10,8 +10,8 @@ Traps:
 
 - `cd dir && nohup ./qui serve ... &` makes `$!` the wrapper shell; `kill $!` leaves qui alive and the next binary logs `bind: address already in use`. Use `setsid` and kill with `pkill -f "[q]ui serve --config-dir <dir>"` (the bracket keeps the pattern from matching your own shell).
 - `qui serve` fails without a `config.toml`; run `qui generate-config --config-dir <dir>` first on a fresh dir, then `POST /api/auth/setup`, then `POST /api/instances` with `hasLocalFilesystemAccess: true`. Every POST, PUT, PATCH, or DELETE after login needs `-H 'X-Requested-With: XMLHttpRequest'`, or qui answers 403 `Missing X-Requested-With header` (`internal/api/middleware/auth.go`).
-- Comparing against the pre-fix binary: `git worktree add <dir> HEAD`, copy `internal/web/dist` in, `go build ./cmd/qui`. Grep the served bundle for a code signature to know which build a tab is running; the service worker precaches chunks across binary swaps on the same port.
-- `pnpm build` writes `web/dist`. Only `make frontend` or `make build` copies it to `internal/web/dist`, which the binary embeds. Measure chunk sizes in `web/dist`. A Vite build of an edit that changes only a comment is byte-identical, so use a real statement to make the chunk hashes change.
+- Comparing against the pre-fix binary: `git worktree add <dir> HEAD`, copy `web/dist` in, `go build ./cmd/qui`. Grep the served bundle for a code signature to know which build a tab is running; the service worker precaches chunks across binary swaps on the same port.
+- The binary embeds `web/dist` (`web/build.go`), so `go build ./cmd/qui` after `pnpm build` includes the new frontend. A new worktree has only `web/dist/.gitkeep`. `make frontend` also copies the bundle to `internal/web/dist`, but no code reads that copy. Measure chunk sizes in `web/dist`. A Vite build of an edit that changes only a comment is byte-identical, so use a real statement to make the chunk hashes change.
 
 ## Mock Torznab indexer
 
@@ -96,7 +96,7 @@ curl -s -b $C $U/api/instances/$ID/orphan-scan/runs/$(jq -r .id <<<"$RUN") | jq 
 pkill -f "[s]erve --config-dir $D"
 ```
 
-Build the develop binary in a worktree with `make backend`. A new worktree has no `internal/web/dist`. Copy it from the main checkout before the build, and delete the copy after the build.
+Build the develop binary in a worktree with `make backend`. A new worktree has an empty `web/dist`. Copy `web/dist` from the main checkout before the build, and delete the copy after the build.
 
 Teardown: `docker rm -f rig-qbit rig-ssh`, `git worktree remove --force` the develop worktree, and delete the rig dir. Then make sure that no rig port is still listening.
 
@@ -122,14 +122,14 @@ Paired-binary traps (either rig):
 
 ## Windows build under Wine
 
-Wine (`/usr/bin/wine`, 11.17 Staging on 2026-10-07; there is no `wine64` binary) runs a Windows Go build on this machine. Reach for it only when the diff touches Windows behaviour: code behind `runtime.GOOS == "windows"`, a `_windows.go` file or `//go:build windows` tag, or path handling with drive letters and backslashes. Any other change runs on the plain Linux rig, where the result is the same and the setup is cheaper.
+Wine (`/usr/bin/wine`, 11.20 Staging on 2026-10-19; there is no `wine64` binary) runs a Windows Go build on this machine. Reach for it only when the diff touches Windows behaviour: code behind `runtime.GOOS == "windows"`, a `_windows.go` file or `//go:build windows` tag, or path handling with drive letters and backslashes. Any other change runs on the plain Linux rig, where the result is the same and the setup is cheaper.
 
 ```bash
 GOOS=windows GOARCH=amd64 go build -o qui.exe ./cmd/qui
 WINEDEBUG=-all WINEPREFIX=<scratchpad>/wineprefix wine qui.exe serve --config-dir 'Z:\<scratchpad>\cfg' ...
 ```
 
-To run the unit tests of one package under Wine, build the test binary with `GOOS=windows CGO_ENABLED=0 go test -c -o pkg.test.exe ./internal/<pkg>` and run `wine pkg.test.exe`. This finds tests that break only on Windows, for example `filepath.Join(string(filepath.Separator), ...)`, which is not an absolute path on Windows.
+To run the unit tests of one package under Wine, build the test binary with `GOOS=windows CGO_ENABLED=0 go test -c -o pkg.test.exe ./internal/<pkg>`. Run it from the package directory, so that `testdata/` resolves: `cd internal/<pkg> && wine ../../pkg.test.exe -test.v`. The binary accepts only the `-test.*` form of the flags. This finds tests that break only on Windows, for example `filepath.Join(string(filepath.Separator), ...)`, which is not an absolute path on Windows.
 
 - Give each run its own `WINEPREFIX` in the scratchpad. The first run creates it, which takes a few seconds. Delete the directory at cleanup.
 - `WINEDEBUG=-all` removes the `fixme:` noise, so the log shows only the program output.
