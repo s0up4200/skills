@@ -56,6 +56,14 @@ git log <latest-tag>..HEAD --oneline
 
 When in doubt, default to patch.
 
+### 3b. Label work without a UI
+
+If the repo has the `no-ui-yet` label, read [`no-ui-yet.md`](no-ui-yet.md) and do it before step 4:
+
+```bash
+gh label list --search no-ui-yet --json name --jq '.[].name' | grep -qx no-ui-yet
+```
+
 ### 4. Present the plan and ask for confirmation
 
 Show the user:
