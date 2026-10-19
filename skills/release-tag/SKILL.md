@@ -123,6 +123,10 @@ Use `git push origin v<VERSION>` (pushing the specific tag) rather than `git pus
 
 Show the tag that was created and a link to the releases page if it's a GitHub repo (check with `git remote get-url origin`).
 
+The update banner of qui and autobrr reads `https://api.autobrr.com/repos/<owner>/<repo>/releases/latest`, not GitHub. That mirror learns of a release only from a GitHub `release` webhook on the repo. After the release publishes, make sure that the mirror returns the new tag. If it returns the old tag, the webhook is missing, and no user sees the update. Tell the user. The webhook secret is the user's.
+
+In autobrr/qui, a bot posts the release body to Discord once, on the `published` event. A later edit of the release does not reach Discord. Do not offer `/release-announcement` for the Discord post after the tag.
+
 ### 7. Finish the release
 
 Do this step only when a workflow opens a release-notes PR for the tag. In autobrr/qui, `release-notes.yml` copies the release body to `documentation/blog` after the Release run. In autobrr/mkbrr, `changelog.yml` writes a changelog entry. Find the workflow:

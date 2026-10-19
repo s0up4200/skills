@@ -24,6 +24,10 @@ Check with the user that these seams match their expectations.
 
 <spec-template>
 
+## Branch
+
+The first step for the implementer, before any code: update the base branch of the repo, then run `git switch -c <type>/<slug>` with a concrete name. `/implement` commits to the current branch, so without this step the work lands on the base branch.
+
 ## Problem Statement
 
 The problem that the user is facing, from the user's perspective.

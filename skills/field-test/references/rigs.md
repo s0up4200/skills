@@ -23,6 +23,15 @@ A short Python `HTTPServer` on a spare port answering `t=caps` with a caps docum
 
 `lscr.io/linuxserver/qbittorrent:latest` with the data dir bind-mounted at the same path inside the container as on the host, so paths qui reads locally match what qBittorrent reports. The temporary admin password is in `docker logs`. The container's WebUI port differs from the mapped host port, so send `-H "Host: localhost:<container port>"` with every curl request. qui cannot send that header. To let qui reach the mapped port, set both `web_ui_host_header_validation_enabled:false` and `web_ui_csrf_protection_enabled:false` with `app/setPreferences`. The first setting alone is not sufficient. To reproduce "save path not on the qui host", `docker exec` a directory the host never sees. For a fake tracker, run it inside the network of the qBittorrent container (`docker run --network container:<qbit>`), and start the qBittorrent container with `--add-host tracker-x.test:127.0.0.1`, because an edit to `/etc/hosts` inside the container is lost on restart. Also set `{"ssrf_mitigation":false}` with `app/setPreferences`, or every announce to a local address fails with "blocked by SSRF mitigation".
 
+More container gotchas:
+
+- `torrentcreator/addTask` ignores its `trackers` parameter. Add the trackers afterwards with `POST /api/v2/torrents/addTrackers`. A host under `.test` fails in seconds with `Host not found (authoritative)`, which gives a dead tracker with no network.
+- A 4 MiB recheck finishes inside the 100 ms poll of qui, and qui reports that the piece check did not start. Use a file of 1 GiB for a recheck test.
+- For a test with two pool members, run a second qBittorrent container on the same docker network that seeds the full release, and connect it with `POST /api/v2/torrents/addPeers` (this works on private torrents). Build with `format=v1`, because a hybrid torrent adds pad files and breaks the match. Set `source=` to get distinct hashes.
+- To boot qui with auth off, set `QUI__AUTH_DISABLED=true`, `QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA=true`, and `QUI__AUTH_DISABLED_ALLOWED_CIDRS=127.0.0.0/8`. With only one of the two flags, qui logs a warning and keeps auth on. Then a URL such as `/instances/1?modal=add-torrent` opens straight away.
+- `app/getDirectoryContent` with `withMetadata=true` returns base names in `name`. The plain response returns full paths.
+- The `javascript_tool` hides query strings in `performance.getEntriesByType("resource")` URLs. Read the query from the page or from the qui log.
+
 ## Remote filesystem (SFTP) rig
 
 Use this rig when the change touches remote filesystem mode. In this mode, qui reads the qBittorrent files over SFTP, not from a local path. Proven on 2026-10-14 with an orphan scan, in autobrr/qui#3175.
@@ -126,6 +135,19 @@ WINEDEBUG=-all WINEPREFIX=<scratchpad>/wineprefix wine qui.exe serve --config-di
 - Kill with `pkill -f "[q]ui.exe serve"`, then `wineserver -k` with the same `WINEPREFIX`, so no `wineserver` stays behind.
 
 Wine is not Windows. File locking, sharing modes, case-insensitive paths on a Linux file system, services, and installers behave differently. A green run under Wine proves the Windows code path compiles, starts, and does the right thing for the observable; it does not prove one of those behaviours. Report the mode as "Wine", and name what needs a real Windows host.
+
+## Windows 11 VM
+
+Use the VM when Wine is not enough, for example for self-update or file locks. The user starts it with `omarchy-windows-vm launch`. The container is `omarchy-windows`, and the compose file is `~/.config/windows/docker-compose.yml`. Its `PASSWORD` value is the Windows password. Do not print it.
+
+- Cross-build into `~/Windows/qui-test/`. Inside the VM this is `\\host.lan\Data`. The user copies the files to `C:\qui` and runs qui from there. Delete `~/Windows/qui-test` afterwards.
+- qui in the VM binds `127.0.0.1:7476`. Only the VM browser and PowerShell scripts in the VM reach it, so the user drives the UI.
+- A fake release version in `-ldflags "-X github.com/autobrr/qui/internal/buildinfo.Version=<old version>"` makes the real signed release the update target.
+- CI runs no Go tests on Windows. `GOOS=windows go test -c` builds a test exe. In PowerShell, quote the flags: `"-test.run=Name" "-test.v"`.
+- In PowerShell, use `cmd /c move /Y`, because `Move-Item` rejects `/Y`. Use `[IO.File]::ReadAllText`, because `ConvertTo-Json` hangs on a `Get-Content -Raw` string in PowerShell 5.1.
+- In Task Scheduler, "Run only when user is logged on" skips the password prompt and keeps the processes visible in `tasklist`.
+- To block writes for an error-path test, run `icacls C:\qui /deny "${env:USERNAME}:(W)"` after qui starts. Undo it with `icacls C:\qui /remove:d $env:USERNAME`.
+- On 2026-10-01 the share once served old files. If that happens again, serve the files over HTTP from a container on the docker network of the VM, and download with `$ProgressPreference='SilentlyContinue'`.
 
 ## Unresponsive qBittorrent
 

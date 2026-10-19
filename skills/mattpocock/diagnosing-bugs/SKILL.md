@@ -34,6 +34,8 @@ Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give
 9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
 10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
 
+For a bug that is slow or intermittent over a network, run a sustained load for longer than the failure window (for example back-to-back downloads of one fixed file for 90 to 150 s), and log the throughput for each interval. A single sample, a ping, or a health check says nothing about bulk throughput. Keep the client and the payload the same, and test one segment of the path at a time to find the segment that breaks. A fresh restart hides decay, so run past the failure window before you trust a pass.
+
 Build the right feedback loop, and the bug is 90% fixed.
 
 ### Tighten the loop

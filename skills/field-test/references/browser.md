@@ -26,7 +26,8 @@ is doing elsewhere.
 
 So do not move, resize, or float the Chrome window to get it out of the way. There is nothing to
 get out of the way, and the window that would move is the user's daily driver with all their
-tabs in it.
+tabs in it. The one exception is a phone-width view when the user tells you to float the window;
+`~/github/soup/dotfiles/agents/docs/browser.md` gives the commands.
 
 Two facts behind that, worth knowing when something looks wrong:
 
@@ -58,6 +59,26 @@ the verdict rather than approximating.
 ## Captures for a person
 
 For each visual change (step 4b of the main skill defines it), take a before and an after capture for a person while the page shows the result. Follow the screenshot rules in `~/github/soup/dotfiles/agents/docs/browser.md`. Record the path of each saved file. Step 6 of the main skill publishes these files as Evidence.
+
+## Page traps
+
+- Chrome refuses `document.cookie` and `cookieStore.set` on the rig origin, so a session from curl cannot move into the tab. Boot the rig with auth off (rigs.md), or ask the user to sign in on the tab. Do not type a password.
+- While DevTools device mode is on, each mouse event and screenshot through the debugger times out after 30 s. Click with `javascript_tool` instead. Radix menus open on `pointerdown`, then `pointerup` and `click`. Radix Tabs switch on `mousedown`.
+- Type into CodeMirror with `document.execCommand("insertText", false, text)` on `.cm-content`. It skips the auto-close of brackets.
+- A raw `localStorage.setItem('qui-filters-<id>', ...)` is lost on reload, because the client settings sync from the server overwrite it. Use the "Clear filters" button or the client settings PUT.
+- To read the long tasks of a page mount after a full reload, observe `longtask` with `buffered: true`.
+- To test a UI that would start a real run, patch `window.fetch` in the tab. Rewrite the GET that loads the settings, answer the POST that starts the run with a fake response, and answer other writes with 418. Reload the tab afterwards to drop the patch.
+
+## Timing UI interactions
+
+Proven 2026-10-01 for a before-and-after measurement:
+
+- Build the base in a worktree at the merge base, and run both binaries on separate ports with auth off. Compare the served `assets/index-*.js` names with what the tab loaded.
+- Use one tab, and switch between the two origins by navigation. Two tabs got different viewports, which changes render time.
+- The test tab is hidden. After about 5 minutes hidden, Chrome runs `setTimeout` at most once a minute, and rAF does not run. Yield with a `MessageChannel` message instead, and detect the render with a MutationObserver on the target element.
+- In a hidden tab, a Radix dialog never unmounts, because its exit animation never ends. Wait for `[role="dialog"][data-state="closed"]`.
+- A `javascript_tool` call times out at 45 s. Run a long loop in the background, keep the results on `window`, and poll.
+- Compare the medians of at least 5 rounds for each build, in mixed order. The median of one build moved from 86 to 106 ms between rounds. A rank test over the samples of all rounds overstates a small gap, because the samples inside one round are correlated.
 
 ## Dialog traps
 

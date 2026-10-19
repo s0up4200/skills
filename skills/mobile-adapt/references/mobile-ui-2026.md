@@ -96,6 +96,13 @@ High-signal rules and sources for mobile adaptation work. Use this file when the
 - **CSS `@layer` cascade vs iOS zoom prevention** (2026, confirmed in production): iOS Safari auto-zooms inputs with `font-size` below `16px`. The common fix (`font-size: 16px` on inputs) fails when placed inside `@layer base` because unlayered styles (including Tailwind utilities like `text-sm`) always beat layered styles in the CSS cascade — regardless of specificity. A `text-sm` utility class will override `@layer base { input { font-size: 16px } }`, restoring the zoom. Fix: place the iOS zoom-prevention rule **outside any `@layer`** so it participates in the unlayered cascade and matches or beats utility specificity.
   Source: https://developer.mozilla.org/en-US/docs/Web/CSS/@layer (cascade ordering)
 
+- **Shorthand resets a longhand from another class** (2026-04, found in production): on `class="hero container"`, `.container { padding: 0 18px }` later in the stylesheet resets `.hero { padding-top: calc(...) }` at the same specificity. When a spacing value does not apply, check every class on the element for `padding`, `margin`, or `inset` shorthand. Prefer `padding-block` and `padding-inline`.
+  Source: https://developer.mozilla.org/en-US/docs/Web/CSS/Shorthand_properties
+
+- **Radix scroll lock removes the safe-area padding of `body`** (2026-08, qui): `react-remove-scroll` adds `body[data-scroll-locked] { padding-left/top/right: 0px }` when a dialog, sheet, or menu opens. The page then moves under the camera. Radix primitives do not pass `gapMode` through. Mark the `env(safe-area-inset-*)` paddings of `body` `!important`. A layered `!important` beats an unlayered normal rule. A `fixed` element ignores the padding of `body`, so give it its own inset. An in-flow element already sits inside the body padding, so it must not add one.
+
+- **iOS holds taps near the top edge** (2026-08, iPhone PWA in landscape): Control Center and Notification Center gestures claim the top strip. A short still tap arrives late. A tap with a small drift ends in `touchcancel` and no `click`. No web API opts out (`preferredScreenEdgesDeferringSystemGestures` is UIKit only). Move critical tab rows and close buttons to the bottom on phones. A `touchcancel` with no click shows that iOS claimed the touch.
+
 Net: avoid designing critical flows around nested scroll regions and fixed bottom chrome without explicit device verification. Prefer `position: sticky` or inline flow over `position: fixed` for keyboard-adjacent UI.
 
 ## Keyboard handling on mobile web

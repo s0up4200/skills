@@ -49,7 +49,7 @@ A rig is code too. After two failed attempts to build one, stop. Read the cheape
 Never copy a locally built binary into the container. The image tag must describe what runs, or the next pull silently reverts it and "what is running" becomes a guess. The user allowed it once and asked not to do it again.
 
 - For qui, a PR from a branch in the main repo gets `ghcr.io/autobrr/qui:pr-<N>` from the Release workflow. Forks do not push images. Other projects: check the host file, and the repo's release workflow for a `type=ref,event=pr` tag rule.
-- Wait for the build: `gh pr checks <N>` or `gh run list --workflow release.yml --branch <branch> --limit 3`.
+- Wait for the build: `gh pr checks <N>`, or query the runs by commit: `gh api "repos/<owner>/<repo>/actions/runs?head_sha=<sha>" --jq '.workflow_runs[]|[.name,.status,.conclusion]|@tsv'`. `gh run list --branch` can list runs that are months old first.
 - Confirm the tag exists before touching the server: `docker manifest inspect ghcr.io/autobrr/qui:pr-<N> >/dev/null && echo built`.
 - After the swap, read `org.opencontainers.image.revision` off the running image and compare it with the PR head. PR images build from GitHub's ephemeral merge commit, so the revision is the merge commit, not the branch head; `gh pr view <N> --json mergeCommit,headRefOid` shows both.
 

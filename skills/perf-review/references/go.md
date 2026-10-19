@@ -44,6 +44,9 @@ for _, v := range hugeStructs { ... }   // copies each element
 ```
 `range` copies the element. For structs over ~100 bytes iterate by index (`&hugeStructs[i]`). Also flag large structs passed by value through call chains.
 
+### Custom MarshalJSON on a response type
+A custom `MarshalJSON` on a type inside a large response makes `encoding/json` marshal that value with an inner `json.Marshal`, then rescan every byte through `appendCompact`. On a qui list response this cost 5.8% of process CPU. Marshal the field once into a `json.RawMessage` instead. Keep the field order: a shadow-struct trick can emit the field last, and the replacement field must then be declared last too, or each response body changes.
+
 ### sync.Pool for big reusable buffers
 Per-request `make([]byte, 64<<10)` or `bytes.Buffer` churn is the textbook `sync.Pool` case. Only suggest a pool when the buffer is large and the path is genuinely hot — a pool on a cold path is complexity with no payoff.
 

@@ -13,14 +13,24 @@ All qui calls take `X-API-Key`. Substitute the address from the host file or the
 
 ## Streams and lists
 
-- Torrent list with the qBittorrent sync out of the path: `GET /api/instances/{id}/torrents?prefer=cache`. Use it when timing list code; without it qBittorrent network time swamps the delta.
-- SSE: `GET /api/stream?streams=<url-encoded JSON array of {instanceId,limit,sort,order}>`.
+- Torrent list with the qBittorrent sync out of the path: `GET /api/instances/{id}/torrents?prefer=cache`. Use it when timing list code; without it qBittorrent network time swamps the delta. It measures the cache-hit path of the counts: no sync runs in the request, so the counts cache hits on nearly every request. A claim about a counts cache miss needs a different rig. With no requests at all, the allocation profile shows the SSE tick path, and subscribers do not show in `qui.log` at the default level.
+- SSE: `GET /api/stream?streams=<url-encoded JSON array of {key,instanceId,page,limit,sort,order,filters}>`. The response JSON keys are `counts` and `preferences`.
 - Counts oracle: page the whole library out of the API (`limit` caps at 2000) and rebuild counts in Python, then compare with `counts.trackers`. Totals close only when every announce hostname of a tracker is counted; check the arithmetic before calling a mismatch a bug.
 
 ## Other services
 
 - Orphan scan: `POST /api/instances/{id}/orphan-scan/scan` starts one; a run in `preview_ready` counts as active, so `DELETE /api/instances/{id}/orphan-scan/runs/{runID}` before the next trigger. `GET .../orphan-scan/runs` returns a bare JSON array. For a scan in remote filesystem mode, use the SFTP rig in `rigs.md`.
 - Instance reconnect after a backoff: `POST /api/instances/{id}/test`.
+
+## Dir Scan rig
+
+Proven 2026-09-30: a qBittorrent container, a Python mock Torznab, and qui on a spare port.
+
+- Give each mock item `<enclosure url=... type="application/x-bittorrent"/>`. The native client reads `item.Enclosure.URL`, not `<link>`. Without it, each download fails with "download URL is required".
+- The 7-day search cache serves a broken first response again, and no API clears it. Stop qui, then run `DELETE FROM torznab_search_cache; DELETE FROM torznab_torrent_cache;` on the rig database.
+- After a run with no match, call `POST /api/dir-scan/directories/{id}/requeue-no-match` or `reset-files` before a new scan. One run can leave a second searchee unsearched (`skippedIndexerSatisfied`). A second scan picks it up.
+- Settings: `allowPartial: true`, `minPieceRatio` below the piece ratio, `startPaused: false`. A searchee is one release folder. The mock indexer can return every item for every query.
+- Build the torrents in Python with a separate piece for the extra file. Then a corrupt piece in the matched file gives a clean mismatch.
 
 ## Synthetic torrents
 

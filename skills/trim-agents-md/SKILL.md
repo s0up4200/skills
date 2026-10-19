@@ -93,6 +93,7 @@ Verify the tags yourself. A wrong tag deletes a rule that agents still need.
 3. For each `moved` tag, confirm that the text is in the new file and that a pointer reaches it.
 4. Read the write-time list of each variant against the original files. A write-time rule that the variant dropped, or moved to a nested file with no pointer from the root file, disqualifies it until the rule is back.
 5. Treat every `default` tag as a claim. Mark the ones that you doubt.
+6. For each moved rule that prevents damage, prove that agents follow its pointer. A grep that the text exists is not proof. Run two or three headless sessions (`claude -p`, `codex exec`) on small tasks that need the rule, and make sure that each transcript reads the target file before the first edit.
 
 Then report:
 
