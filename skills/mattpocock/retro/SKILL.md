@@ -22,7 +22,7 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 - **No-ops**: look for instructions in steering files that don't modify the agent's behavior. _Use when_ the steering files are large and unwieldy.
 - **Information access**: look for opportunities to increase the agent's access to information. Teeing dev server logs, readonly access to third-party services. _Use when_ a crucial piece of information was not available to the agent.
 
-4. Present these candidates to the user, in order of severity.
+4. Present these candidates to the user, in order of severity. Start each candidate's line with the **location** of its fix in bold: the repo, then the file path in that repo, for example **`my-app` · `.github/workflows/ci.yml`**. For a new file, give the path it will have. For a symlink, give the file that it points to in its source repo.
 
 ## Reference
 

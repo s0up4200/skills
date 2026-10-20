@@ -41,6 +41,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `codebase-design`: "Designing for testability" has an item that puts state changes in a pure reducer or a state machine when the state is several flags that can contradict each other, or when the events that are allowed depend on the current state. No upstream skill has this yet. If upstream adds similar guidance, keep the upstream text.
 - `to-spec`: the spec template starts with a Branch section that tells the implementer to create the feature branch, because `implement` commits to the current branch.
 - `triage`: an open design question moves a `ready-for-agent` issue back to `needs-triage`.
+- `retro`: each candidate in the report starts with the repo and the file of its fix in bold.
 - `diagnosing-bugs`: Phase 1 has a paragraph on network throughput bugs: a sustained-load loop, one path segment at a time.
 
 ### Skipped upstream changes
