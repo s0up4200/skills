@@ -30,7 +30,7 @@ A branch is kept when any of these is true, checked in this order:
 
 1. It is the default branch, `main`, `master`, `develop`, or the branch the main worktree has checked out.
 2. A branch with the same name exists on any remote.
-3. An open PR matches it: same head branch name, a `pr-N` or `prN` name, or the same tip commit. A local checkout of an open PR can hold review fixes that are not pushed yet.
+3. An open PR matches it: same head branch name, a `pr-N`, `pr/N`, or `prN` name, or the same tip commit. A local checkout of an open PR can hold review fixes that are not pushed yet.
 4. It is not merged (rules below), and its oldest reflog entry is inside the window. When the reflog has expired, the tip's commit date stands in.
 5. Its worktree has local changes or is locked. Git cannot delete a branch that is checked out.
 

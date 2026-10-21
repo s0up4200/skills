@@ -35,6 +35,8 @@ old_branch squashed; commit sq1; squashed_tip=$(git rev-parse HEAD)
 old_branch squashed-extra; commit se1; se_head=$(git rev-parse HEAD); GIT_COMMITTER_DATE=$old commit se2
 # pr-7: checkout of open fork PR #7 with a local review commit. Kept.
 old_branch pr-7; commit p7; p7_head=$(git rev-parse HEAD); commit p7-local
+# pr/8: checkout of open PR #8, rebased on the forge since, plus a local commit. Kept.
+old_branch pr/8; commit p8-local
 # wt-clean: merged branch in a clean worktree with an ignored file. Both removed.
 old_branch wt-clean; git switch -q main
 # wt-dirty: merged branch in a dirty worktree. Both kept.
@@ -55,7 +57,8 @@ cat >"$tmp/prs.json" <<EOF
 [
   {"state":"MERGED","number":5,"headRefName":"squashed","headRefOid":"$squashed_tip"},
   {"state":"MERGED","number":6,"headRefName":"squashed-extra","headRefOid":"$se_head"},
-  {"state":"OPEN","number":7,"headRefName":"fork-feature","headRefOid":"$p7_head"}
+  {"state":"OPEN","number":7,"headRefName":"fork-feature","headRefOid":"$p7_head"},
+  {"state":"OPEN","number":8,"headRefName":"other-fork-feature","headRefOid":"$(printf '%040d' 8)"}
 ]
 EOF
 
@@ -72,6 +75,7 @@ expect '^  gone-dir +merged into main$'
 expect '^  local-recent +created in the last 7 days$'
 expect '^  on-remote +on remote$'
 expect '^  pr-7 +open PR #7$'
+expect '^  pr/8 +open PR #8$'
 expect '^  wt-dirty +worktree .*/wt-dirty has local changes'
 expect "^  $tmp/wt-clean$"
 expect "^  $tmp/det-merged$"
@@ -89,7 +93,7 @@ script=$(sed -n 's/^Cleanup: //p' <<<"$plan")
 bash "$script" >/dev/null
 
 left=$(git for-each-ref refs/heads --format='%(refname:lstrip=2)' | sort | tr '\n' ' ')
-want="local-recent main on-remote pr-7 wt-dirty "
+want="local-recent main on-remote pr-7 pr/8 wt-dirty "
 [[ $left == "$want" ]] || { echo "FAIL branches left: '$left' want '$want'"; fail=1; }
 wts=$(git worktree list --porcelain | sed -n 's#^worktree '"$tmp"'/##p' | sort | tr '\n' ' ')
 [[ $wts == "det-unique repo wt-dirty " ]] || { echo "FAIL worktrees left: '$wts'"; fail=1; }

@@ -64,10 +64,10 @@ elif [[ $origin_url =~ ^(ssh://)?([^@/]+@)?([^/:]+)(:[0-9]+)?[:/](.+)$ ]]; then
   done
 fi
 
-# PR rows that belong to a branch: same head name, a pr-N / prN name, or the same tip.
+# PR rows that belong to a branch: same head name, a pr-N / pr/N / prN name, or the same tip.
 prs_for() {
   local b=$1 tip=$2 n=""
-  [[ $b =~ ^pr-?([0-9]+)(-.*)?$ ]] && n=${BASH_REMATCH[1]}
+  [[ $b =~ ^pr[-/]?([0-9]+)(-.*)?$ ]] && n=${BASH_REMATCH[1]}
   [[ -n $prs ]] || return 0
   awk -v b="$b" -v n="$n" -v t="$tip" '$3==b || $2==n || $4==t' <<<"$prs"
 }
