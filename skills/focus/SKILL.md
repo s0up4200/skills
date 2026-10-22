@@ -13,6 +13,7 @@ Requires the `gh` CLI, authenticated.
 
 ## 1. Find the scope
 
+- The user passed `prs` (`/focus prs`): find the repo as below, skip the epics, and go to "No epics". Leave the tracking issues out of the list.
 - The user named an issue: that issue is the epic.
 - The user named a repo, or the current directory is a GitHub or Forgejo repo: that repo is the whole scope. Find every open epic there. On Forgejo, read it with `fj` (see "Forgejo repos" below). When the repo has no open epic, go to "No epics" below. A repo with no open issues and no open PRs is a complete answer: report it and stop.
 - Neither: start from the user's own claims. Their open assigned issues show which repos they work in:
@@ -141,7 +142,7 @@ Ask after the report, not before, and only when the answer changes the recommend
 
 ## No epics
 
-A repo with no open epic still has work. Read its open pull requests and issues, and pick one item:
+This section runs when a repo has no open epic, or when the user passed `prs`. Read its open pull requests and issues, and pick one item:
 
 ```bash
 gh pr list --state open --json number,title,author,isDraft,reviewDecision,mergeable,createdAt,updatedAt,additions,deletions,statusCheckRollup
@@ -175,7 +176,7 @@ Ignore drafts, `wontfix`, and `needs-info` issues with no reply. The user's own 
 Give one recommendation and at most two alternatives, then one block:
 
 ```
-owner/repo: no epics
+owner/repo: no epics (or: epics skipped)
   Done:      #99 (comment: finished in merged PR #117), close it
   Merge:     #120 (approved, CI green, +12/-3)
   Review:    #118 by alice (no review, 9 days, +340/-80)
