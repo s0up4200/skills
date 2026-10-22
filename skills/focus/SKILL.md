@@ -70,9 +70,9 @@ query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){
         blockedBy(first:10){nodes{number state}} blocking(first:20){nodes{number state}}
         comments(last:5){nodes{author{login} createdAt body}}
         closedByPullRequestsReferences(first:5,includeClosedPrs:true){nodes{
-          number state isDraft reviewDecision author{login} updatedAt}}}}
+          number state isDraft reviewDecision author{login} createdAt updatedAt additions deletions}}}}
       closedByPullRequestsReferences(first:5,includeClosedPrs:true){nodes{
-        number state isDraft reviewDecision author{login} updatedAt}}}}}}}'
+        number state isDraft reviewDecision author{login} createdAt updatedAt additions deletions}}}}}}}'
 ```
 
 Sort the grandchildren like the children. A gate can be a grandchild, so count its edges too.
@@ -86,7 +86,7 @@ Read the epic body too. Maintainers write things there that the graph does not h
 Put each open sub-issue in exactly one bucket. Check them in this order:
 
 1. **Done, still open**: a linked PR is merged, or a comment says that the work is finished. Read the whole comment. A status update often names merged PRs and still lists open work ("Open: ...", "left to do", a date to check back). That issue is not done: sort it into the next buckets, and note the open item and its date. Check each PR that a comment names with `gh pr view N --json state`, because a comment can be wrong. Report a done issue as one to close. It is not work.
-2. **In review**: it has an open PR. Note the author, draft state, and review decision. An approved PR that is not merged is the cheapest progress on the board.
+2. **In review**: it has an open PR. Note the author, draft state, review decision, and size (`+additions/-deletions`). An approved PR that is not merged is the cheapest progress on the board.
 3. **Blocked**: at least one `blockedBy` issue is open. Name the open blockers. Ignore closed ones: GitHub keeps the edge after the blocker closes.
 4. **Yours, ready**: assigned to the user, nothing open blocks it.
 5. **Others', ready**: assigned to someone else. Note when its last update is older than 14 days. A stale claim is worth a question, not a takeover.
@@ -107,6 +107,8 @@ Rank what the user can do now, best first:
 4. Pick up free work, gates first, then the issues that need no spec.
 5. Spec work: grill or write the spec for a "needs spec" issue, so it becomes free.
 
+When two PRs have the same rank, put the older one first (by `createdAt`). A PR that waits for weeks costs its author more than a new one.
+
 When the user's own claim is blocked, say so and name the blocker and who holds it. Say "wait" only when nothing above applies. A blocked claim is usually a reason to help with its blocker.
 
 Give one recommendation and at most two alternatives, each with a one-line reason. The user asked where to look, not for a ranked list of fourteen issues.
@@ -118,7 +120,7 @@ Lead with the recommendation. Then one block per epic:
 ```
 owner/repo#100 Example epic title: 2/9 done
   Done:      #103 (comment: finished in merged PRs #118 #119), close it
-  In review: #104 (PR #120 by alice, approved), gates #105 #106 #107
+  In review: #104 (PR #120 by alice, approved, +210/-40), gates #105 #106 #107
   Yours:     #102 (1/2 sub-issues done)
   Others:    #106 bob (blocked by #104), #108 bob (blocked by #106)
   Free:      #110 needs spec, #111
@@ -142,7 +144,7 @@ Ask after the report, not before, and only when the answer changes the recommend
 A repo with no open epic still has work. Read its open pull requests and issues, and pick one item:
 
 ```bash
-gh pr list --state open --json number,title,author,isDraft,reviewDecision,mergeable,updatedAt,statusCheckRollup
+gh pr list --state open --json number,title,author,isDraft,reviewDecision,mergeable,createdAt,updatedAt,additions,deletions,statusCheckRollup
 gh issue list --state open --limit 100 --json number,title,assignees,labels,updatedAt,comments
 ```
 
@@ -166,6 +168,8 @@ Rank the rest, best first:
 5. `ready-for-human`: name it. The user does this work, not an agent.
 6. Grill: a `needs-grilling` issue, the maintainer's own parked idea. Next step: `/grill-with-docs`, then `/to-spec`.
 
+Inside the merge and review ranks, put the oldest PR first, as in step 4. Show the size of each PR (`+additions/-deletions`).
+
 Ignore drafts, `wontfix`, and `needs-info` issues with no reply. The user's own open pull request that waits for a review is not an item, but name it in the report.
 
 Give one recommendation and at most two alternatives, then one block:
@@ -173,8 +177,8 @@ Give one recommendation and at most two alternatives, then one block:
 ```
 owner/repo: no epics
   Done:      #99 (comment: finished in merged PR #117), close it
-  Merge:     #120 (approved, CI green)
-  Review:    #118 by alice (no review, 9 days)
+  Merge:     #120 (approved, CI green, +12/-3)
+  Review:    #118 by alice (no review, 9 days, +340/-80)
   Implement: #104 bug, #98
   Triage:    #130 (no label), #81 needs-info (reporter replied)
   Grill:     #95, #97
