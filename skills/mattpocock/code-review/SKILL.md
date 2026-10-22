@@ -24,7 +24,7 @@ If the fixed point is the default branch, run `git fetch <remote> +refs/heads/<b
 
 If the user names a pull request, run `git status --short` first. If it shows changes, stop and ask the user what to do with them. A checkout carries uncommitted changes onto the pull request branch, and the diff then includes them.
 
-Check out the pull request: `gh pr checkout -R "$(git remote get-url <remote>)" <n>` on GitHub, `fj pr -R <remote> checkout <n>` on Forgejo. Without `-R`, `gh` can look up the number in the fork, because `gh repo set-default` can point it there. `HEAD` is now its head. Then read its base branch. On GitHub, `gh pr view -R "$(git remote get-url <remote>)" <n> --json baseRefName` gives it. On Forgejo, the "From `<head>` into `<base>`" line of `fj pr -R <remote> view <n>` gives it. Run `git fetch <remote> +refs/heads/<base>:refs/remotes/<remote>/<base>`, and use `<remote>/<base>` as the fixed point. A stacked pull request (one built on top of another open pull request) has a base other than the default branch. A diff against the default branch includes every change of the pull request below it.
+Record the current branch with `git branch --show-current`, so that you can go back to it after the report. Then check out the pull request: `gh pr checkout -R "$(git remote get-url <remote>)" <n>` on GitHub, `fj pr -R <remote> checkout <n>` on Forgejo. Without `-R`, `gh` can look up the number in the fork, because `gh repo set-default` can point it there. `HEAD` is now its head. Then read its base branch. On GitHub, `gh pr view -R "$(git remote get-url <remote>)" <n> --json baseRefName` gives it. On Forgejo, the "From `<head>` into `<base>`" line of `fj pr -R <remote> view <n>` gives it. Run `git fetch <remote> +refs/heads/<base>:refs/remotes/<remote>/<base>`, and use `<remote>/<base>` as the fixed point. A stacked pull request (one built on top of another open pull request) has a base other than the default branch. A diff against the default branch includes every change of the pull request below it.
 
 Capture the diff command once:
 
@@ -48,11 +48,10 @@ Look for the originating spec, in this order:
 Then read the PR discussion, if the work has an open pull request: the PR the user named, or else the PR of the current branch. Earlier review rounds raised findings, requested changes, and answered questions there:
 
 ```bash
-pr=<number>
-{ gh pr view "$pr" --json body,comments,reviews       # PR body, conversation comments, review bodies
-  gh api --paginate "repos/{owner}/{repo}/pulls/$pr/comments"   # inline review comments and their replies
-} > <scratchpad>/pr-discussion.json
+<skill base directory>/scripts/pr-discussion.sh <number> <owner>/<repo> > <scratchpad>/pr-discussion.txt
 ```
+
+The base directory is printed when the skill loads. `<owner>/<repo>` is the repository of `<remote>`. The script writes plain text: the PR body, each conversation comment, each review body, and each inline comment with its `path:line`, id, and `in_reply_to` id. Each body is whole.
 
 Read the whole file with the Read tool, in pages if it is long. The long comments carry the decisions: a review that requests changes, and the reply that answers each request, are often the longest text on the PR. Read every body whole, because a `head`, a `cut`, or a jq slice drops exactly those. The read is done when you have read the PR body, every conversation comment, every review body, and every inline comment in full.
 
@@ -113,7 +112,11 @@ Then hold each finding against the PR discussion. Mark each finding that the dis
 
 A reply that refutes a finding does not close it. Check the reply against the code, and say if the reply is wrong. A finding that the discussion does not touch is new. List the new findings apart from the marked ones.
 
+Before a finding becomes the worst finding in the opening sentence, or a decision for the user, check at the source each severity claim that depends on a runtime default, a configuration value, or the behaviour of a caller. Read the default, the configuration, or the caller, and correct the severity if the claim is wrong. A sub-agent reads the diff, not the code around it: one sub-agent called a failed read "silent at the default log level", but DEBUG was the default log level of the app.
+
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
+
+If step 1 checked out a pull request, go back to the recorded branch after the report. If `git status --short` is empty, run `git switch <recorded-branch>`. If it shows changes, stay on the current branch, name it, and give the user the one command that goes back: `git switch <recorded-branch>`.
 
 ### 6. Act on the findings
 
