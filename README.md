@@ -93,6 +93,7 @@ Copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 | [triage](skills/mattpocock/triage/) | Move issues and external PRs through triage and write agent-ready briefs. |
 | [wayfinder](skills/mattpocock/wayfinder/) | Plan work too big for one session as a map of decision tickets. |
 | [wizard](skills/mattpocock/wizard/) | Generate an interactive bash wizard that walks a human through steps only they can perform. |
+| [grill-me](skills/mattpocock/grill-me/) | Grill the user about a plan, one question at a time. |
 | [grilling](skills/mattpocock/grilling/) | Grill the user relentlessly about a plan, decision, or idea. |
 | [handoff](skills/mattpocock/handoff/) | Compact the current conversation into a handoff document for another agent to pick up. |
 | [teach](skills/mattpocock/teach/) | Teach the user a new skill or concept, within this workspace. |
