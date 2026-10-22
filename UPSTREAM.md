@@ -47,6 +47,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `triage`: an open design question moves a `ready-for-agent` issue back to `needs-triage`.
 - `retro`: each candidate in the report starts with the repo and the file of its fix in bold.
 - `grill-me` asks one question at a time, not a round. Since 2026-07-16, upstream `grilling` asks each round in full. Its docs page gives a global `CLAUDE.md` line that goes back to one question at a time. The local `grill-me` uses that line only when the user types `/grill-me`. Thus `grilling` and the skills that run it keep the rounds.
+- `wizard` gives the user the command to run the script in their own terminal (`bash <path>`), because a Claude Code `!` command gets no keyboard input and the wizard stops at its first prompt. `template.sh` writes `${e}[Enter keeps current]` in `ask()`, so that the template passes shellcheck (SC1087).
 - `diagnosing-bugs`: Phase 1 has a paragraph on network throughput bugs: a sustained-load loop, one path segment at a time.
 
 ### Skipped upstream changes

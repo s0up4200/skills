@@ -41,4 +41,4 @@ Hold the bar the template sets: open the URL before asking for its value, use `a
 - `bash -n <script>`; run `shellcheck` if available.
 - `chmod +x <script>`.
 - Don't run it end-to-end yourself: it opens browsers and blocks on human input. Trace it statically instead: every value from step 1 is captured and lands where step 1 said, and every `set_secret` name exactly matches a `secrets.*` reference in CI.
-- Tell the user how to run it. If it's a repeatable setup path, commit it and link it from the README so the next person runs the script instead of asking an AI.
+- Tell the user how to run it: give the command for their own terminal, `bash <path>`. A Claude Code `!` command gets no keyboard input, so the wizard stops at its first prompt. If it's a repeatable setup path, commit it and link it from the README so the next person runs the script instead of asking an AI.
