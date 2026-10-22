@@ -27,6 +27,8 @@ Each round the user answers reshapes the tree: settled decisions push the fronti
 
 Finding _facts_ is your job, never the user's. When a recommendation rests on how an external API, library, or tool behaves, read its current reference before you recommend, also when the repo already uses it. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
 
+When a recommended answer changes what a live system filters, grabs, deletes, or moves, and the history of that system is at hand (logs, a database copy, an API listing), replay the proposed rule against that history before you recommend it. Give the result in the question, for example "of the last 40 grabs, this rule would have blocked 3, and all 3 were real duplicates".
+
 When a round settles the interface or seam of a code module, call the Skill tool with `codebase-design` and follow `GUARDING.md`.
 
 The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on it until the user confirms you have reached a shared understanding.
