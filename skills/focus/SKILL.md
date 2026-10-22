@@ -55,26 +55,13 @@ Forgejo has no sub-issues. A tracking issue there lists its children as a task l
 
 ## 2. Read each epic
 
-One query per epic gets the tree, the claims, the edges, and the PRs:
+One script call per epic gets the tree, the claims, the edges, the PRs, and the last comments:
 
 ```bash
-gh api graphql -F owner=OWNER -F name=REPO -F n=NUMBER -f query='
-query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){
-  issue(number:$n){title body updatedAt
-    subIssues(first:100){nodes{
-      number title state updatedAt
-      assignees(first:10){nodes{login}} labels(first:20){nodes{name}}
-      blockedBy(first:20){nodes{number state}}
-      blocking(first:20){nodes{number state}}
-      comments(last:5){nodes{author{login} createdAt body}}
-      subIssues(first:50){nodes{number title state assignees(first:5){nodes{login}} labels(first:20){nodes{name}}
-        blockedBy(first:10){nodes{number state}} blocking(first:20){nodes{number state}}
-        comments(last:5){nodes{author{login} createdAt body}}
-        closedByPullRequestsReferences(first:5,includeClosedPrs:true){nodes{
-          number state isDraft reviewDecision author{login} createdAt updatedAt additions deletions}}}}
-      closedByPullRequestsReferences(first:5,includeClosedPrs:true){nodes{
-        number state isDraft reviewDecision author{login} createdAt updatedAt additions deletions}}}}}}}'
+<skill base directory>/scripts/epic.sh OWNER/REPO NUMBER
 ```
+
+The base directory is printed when the skill loads. The script prints the epic body, cut to 6000 characters. Then it prints one line per sub-issue, with the grandchildren indented under it. A closed issue shows only its number, state, and title. An open issue also shows its last update, assignees, labels, the open `blockedBy` and `blocking` edges, and the linked PRs. Under each open issue are its last 5 comments, each cut to 400 characters. If a cut comment or body hides a fact that you need, read that issue with `gh issue view N`.
 
 Sort the grandchildren like the children. A gate can be a grandchild, so count its edges too.
 
@@ -145,9 +132,10 @@ Ask after the report, not before, and only when the answer changes the recommend
 This section runs when a repo has no open epic, or when the user passed `prs`. Read its open pull requests and issues, and pick one item:
 
 ```bash
-gh pr list --state open --json number,title,author,isDraft,reviewDecision,mergeable,createdAt,updatedAt,additions,deletions,statusCheckRollup
-gh issue list --state open --limit 100 --json number,title,assignees,labels,updatedAt,comments
+<skill base directory>/scripts/open-work.sh OWNER/REPO
 ```
+
+The script prints one line per open PR, oldest first. The line has the author, draft state, review decision, mergeable state, size, created date, the check state and date of the last commit, and the latest review by the user ("my review", or `none`). Then it prints one line per open issue, with the assignees, labels, last update, and the last comment, cut to 100 characters. "reporter replied" marks an issue whose author commented after the last maintainer comment. If a cut comment can mean that the work is done, read the issue with `gh issue view N --json comments`.
 
 On a Forgejo repo, use `fj`:
 
