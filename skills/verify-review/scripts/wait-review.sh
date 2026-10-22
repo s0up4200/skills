@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 # Wait for the AI reviewers to review a pushed commit, then print who did.
 # Usage: wait-review.sh <owner/repo> <pr-number> <head-sha> [minutes]
+# <head-sha> can be a short SHA or a ref. The script expands it to the full SHA.
 # Run it from the repository root. The host comes from the `origin` remote.
 # GitHub: wait for a bot review of <head-sha> from each bot that reviewed an earlier
-# commit. After the first one arrives, wait at most 5 more minutes for the rest.
+# commit. After the first one arrives, wait at most 2 more minutes for the rest.
 # Forgejo: wait for a forgejo-actions comment that ends with reviewed-sha <head-sha>.
 # Prints one reviewer login per line. Exits 1 when no review arrives in time
 # (default 20 minutes).
 set -euo pipefail
 export MISE_QUIET=1
 repo="${1:?owner/repo}"; pr="${2:?pr number}"; sha="${3:?head sha}"; minutes="${4:-20}"
+sha=$(git rev-parse --verify "$sha^{commit}")
 host=$(git remote get-url origin | sed -E 's#^[a-z+]+://([^@/]*@)?##; s#^[^@]*@##; s#[:/].*##')
 deadline=$(( $(date +%s) + minutes * 60 ))
 
@@ -41,7 +43,7 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
     read -r bots done who <<<"$(github_reviews)"
     if [ "$done" -gt 0 ]; then
       if [ "$done" -ge "$bots" ]; then tr , '\n' <<<"$who"; exit 0; fi
-      grace=$(( $(date +%s) + 300 ))
+      grace=$(( $(date +%s) + 120 ))
       [ "$grace" -lt "$deadline" ] && deadline=$grace
     fi
   else
