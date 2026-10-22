@@ -1,6 +1,6 @@
 ---
 name: post-review
-description: Post the last review report (/code-review or /pr-review-toolkit:review-pr) on a GitHub pull request as a request-changes review, after the unslop pass and user approval. Run it only when the user names it, as /post-review [pr-number] [--dry-run]; a chained request counts.
+description: Post the last review report (/code-review or /pr-review-toolkit:review-pr) on a GitHub pull request as a review, after the unslop pass and user approval. Run it only when the user names it, as /post-review [pr-number] [--dry-run]; a chained request counts.
 ---
 
 # Post review
@@ -20,7 +20,7 @@ Find the review report in this conversation. Two kinds count:
 
 If there is a `/code-review` report and a `review-pr` report, merge them and remove duplicates. If you cannot tell which report to use, stop and ask the user. If there is no report, stop and tell the user to run a review first. Do not run the review yourself.
 
-If both sections report no findings, stop. A request-changes review with nothing to change is noise. Tell the user the review was clean.
+If both sections report no findings, stop. A review with nothing to change is noise. Tell the user the review was clean.
 
 ## Step 1: Reshape the report
 
@@ -45,6 +45,7 @@ Keep the two axes separate. The report keeps them apart on purpose, so a standar
 While you copy the findings:
 
 - Keep every `file:line` reference, code span, fenced block, and quoted spec line. The author navigates by them.
+- Give each finding a `path:line` at the head commit of the PR. The chat report can leave them out, because the reply rules for the user drop file names and line numbers. If a finding has none, find the line in the code at the PR head and add it as a code span. Step 4 then makes sure that the prose pass keeps it.
 - If a probe test or command produced the decisive evidence, include it in a fenced block. Authors act on a repro, not on a claim.
 - Write in first person. The findings are the user's own. Remove every trace of how they were produced: no "sub-agent", "parent reviewer", "known fact", no names of other review tools. "I verified this with the test below" is the whole story.
 - Apply the repository's rules for public text. Read its `CLAUDE.md` or `AGENTS.md` before you write. Common rules: no private tracker links, no release names copied from a client.
@@ -78,10 +79,23 @@ Post only after the user answers yes in their own words. A review lands under th
 
 ## Step 6: Post
 
+Read the permission of the PR author on the repository:
+
+```bash
+author=$(gh pr view [N] --json author --jq .author.login)
+gh api "repos/{owner}/{repo}/collaborators/$author/permission" --jq .permission
+```
+
+If the permission is `write`, `maintain`, or `admin`, the author is a maintainer. Post a comment review, and leave out any thanks or greeting:
+
+```bash
+gh pr review [N] --comment --body-file post-review-body.md
+```
+
+For every other author, request changes. The review exists because the report found something:
+
 ```bash
 gh pr review [N] --request-changes --body-file post-review-body.md
 ```
-
-Always request changes. The review exists because the report found something.
 
 Report the review URL.
