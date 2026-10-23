@@ -6,7 +6,7 @@ This file records the upstream commit, the local changes, and the license of eac
 
 The skills in `skills/mattpocock/` are copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 
-**Upstream commit:** `49dd158d1076134a641b33efb035946536778336` (2026-10-09, v1.3.1 with unreleased changesets)
+**Upstream commit:** `5beb35b040e3de97e54fa9e386d7e42d15c295c2` (2026-10-19, v1.3.1 with unreleased changesets)
 
 ### Copied skills
 
@@ -68,7 +68,7 @@ To see the upstream changes since the recorded commit (add `--stat` for a summar
 ```sh
 git clone https://github.com/mattpocock/skills.git /tmp/mattpocock-skills
 cd /tmp/mattpocock-skills
-git diff 49dd158..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents
+git diff 5beb35b..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents
 ```
 
 Apply the changes that you want. Then update the upstream commit in this file.
@@ -105,7 +105,7 @@ SOFTWARE.
 
 The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https://github.com/cursor/plugins).
 
-**Upstream commit:** `1dcc2bacde73ddd284803b7af28164d0436198fc` (2026-10-12)
+**Upstream commit:** `7c493a17e4d8c7c87941f82f1c2c3b286b23e51d` (2026-10-23)
 
 ### Copied skills
 
@@ -121,7 +121,7 @@ The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https:
 ```sh
 git clone https://github.com/cursor/plugins.git /tmp/cursor-plugins
 cd /tmp/cursor-plugins
-git diff 1dcc2bac..HEAD -- pstack/skills/unslop
+git diff 7c493a17..HEAD -- pstack/skills/unslop
 ```
 
 ### License
