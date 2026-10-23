@@ -14,6 +14,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 
 - `skills/engineering/<name>`: ask-matt, code-review, codebase-design, diagnosing-bugs, domain-modeling, grill-with-docs, implement, implement-spec, improve-codebase-architecture, pr, prototype, research, retro, setup-matt-pocock-skills, tdd, to-spec, to-tickets, triage, wayfinder, wizard
 - `skills/productivity/<name>`: grill-me, grilling, handoff, teach, writing-for-agents
+- `skills/in-progress/<name>`: chief-of-staff
 
 ### Local changes
 
@@ -49,11 +50,11 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `grill-me` asks one question at a time, not a round. Since 2026-07-16, upstream `grilling` asks each round in full. Its docs page gives a global `CLAUDE.md` line that goes back to one question at a time. The local `grill-me` uses that line only when the user types `/grill-me`. Thus `grilling` and the skills that run it keep the rounds.
 - `wizard` gives the user the command to run the script in their own terminal (`bash <path>`), because a Claude Code `!` command gets no keyboard input and the wizard stops at its first prompt. `template.sh` writes `${e}[Enter keeps current]` in `ask()`, so that the template passes shellcheck (SC1087).
 - `diagnosing-bugs`: Phase 1 has a paragraph on network throughput bugs: a sustained-load loop, one path segment at a time.
+- `chief-of-staff`: the Wiki section keeps the wiki in the notes vault that the user's instructions name, and the vault's rules win where they conflict. Without the line, the agent gets two sets of rules for one folder. Upstream keeps the skill in `skills/in-progress`, so expect changes at each sync. If upstream moves it, update the path above.
 
 ### Skipped upstream changes
 
 - `setup-matt-pocock-skills/SKILL.md`: upstream tells the agent to create each missing triage label with `gh label create` or `glab label create`. The local step already creates the missing labels after the user confirms, so the upstream line is not copied.
-- `skills/in-progress/chief-of-staff`: the skill is in progress upstream. Copy it if it moves to `skills/engineering` or `skills/productivity`.
 
 Upstream refers to some skills that are not copied here, for example `to-questionnaire`, and `wait-what` in `ask-matt`.
 
@@ -68,7 +69,7 @@ To see the upstream changes since the recorded commit (add `--stat` for a summar
 ```sh
 git clone https://github.com/mattpocock/skills.git /tmp/mattpocock-skills
 cd /tmp/mattpocock-skills
-git diff 5beb35b..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents
+git diff 5beb35b..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents skills/in-progress/chief-of-staff
 ```
 
 Apply the changes that you want. Then update the upstream commit in this file.

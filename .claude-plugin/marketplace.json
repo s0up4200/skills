@@ -79,6 +79,7 @@
       "source": "./skills",
       "skills": [
         "./skills/mattpocock/ask-matt",
+        "./skills/mattpocock/chief-of-staff",
         "./skills/mattpocock/code-review",
         "./skills/mattpocock/codebase-design",
         "./skills/mattpocock/diagnosing-bugs",

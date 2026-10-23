@@ -74,6 +74,7 @@ Copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 | Skill | Description |
 |---|---|
 | [ask-matt](skills/mattpocock/ask-matt/) | Ask which skill or flow fits your situation. |
+| [chief-of-staff](skills/mattpocock/chief-of-staff/) | Pursue a long-running goal in one session by coordinating subagents, with a dated wiki as memory. In progress upstream. |
 | [code-review](skills/mattpocock/code-review/) | Review changes since a fixed point against the repo's standards and the spec. |
 | [codebase-design](skills/mattpocock/codebase-design/) | Shared vocabulary for designing deep modules. |
 | [diagnosing-bugs](skills/mattpocock/diagnosing-bugs/) | Diagnosis loop for hard bugs and performance regressions. |
