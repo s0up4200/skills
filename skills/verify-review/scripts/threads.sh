@@ -53,6 +53,6 @@ gh api --paginate "repos/$repo/pulls/$pr/reviews" | jq -s --argjson t "$out" --a
   $t + [add[] | select(.state != "DISMISSED" and .user.login != $me and (.body|length>0))
     | select(.id | IN($done[]) | not)
     | ((.user.type=="Bot") or (.user.login|test("\\[bot\\]$"))) as $ai
-    | select(($ai|not) or (.body|test("(Nitpick|Outside diff range|Duplicate) comments \\([0-9]+\\)")))
+    | select(($ai|not) or (.body|test("(Nitpick|Outside diff range|Duplicate) comments( \\(|: )[0-9]+")))
     | {kind:"review", review_id:.id, author:.user.login, ai:$ai, url:.html_url,
        submitted_at, state, commit:.commit_id, body:(.body|gsub("<!--[\\s\\S]*?-->";""))}]'
