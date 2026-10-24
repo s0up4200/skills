@@ -23,6 +23,8 @@ Use background agents so you can stay in active dialogue with the user.
 
 A subagent cannot talk to the user. Run each skill or step that asks the user in this session. Give a subagent only work that needs no answer from the user, and have it send each question back to you. When a skill mixes both, split it: the subagent does the work and returns its questions, and you ask the user.
 
+Subagents that commit in the same repo at the same time share one staging area. Have each one commit only the paths that it names (`git commit -- <paths>`), so that each commit holds only that agent's own changes.
+
 Communication to and from subagents should be sparse. Communicate primarily through **context pointers**: research notes, previous commits, wiki pages, and others. Don't duplicate information already available via pointers.
 
 ## Wiki
