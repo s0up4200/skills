@@ -1,6 +1,6 @@
 # Guarding
 
-A guard is a check, a lint rule or the compiler, that fails when other code reaches past a module to the dependency that the module hides. Without a guard, an agent can import the dependency directly and skip the module. Assumes the vocabulary in [SKILL.md](SKILL.md): **module**, **interface**, **seam**, **depth**.
+A guard is a lint rule that fails when other code reaches past a module to the dependency that the module hides. Without a guard, an agent can import the dependency directly and skip the module. Assumes the vocabulary in [SKILL.md](SKILL.md): **module**, **interface**, **seam**, **depth**.
 
 ## Trigger
 
@@ -11,10 +11,6 @@ Run the step only when both of these are true:
 
 A thin wrapper gets no guard. The rule adds friction and protects nothing.
 
-## Visibility
-
-If the hidden code lives in the same package as the module, make it private to that package: unexported in Go, or not exported in TypeScript. Then the compiler is the guard, and the step skips Lookup. Ask about it as in Question, with the code that becomes private as the configuration.
-
 ## Lookup
 
 Start a background sub-agent. Tell it to read primary sources only: the linter docs and the linter source. The sub-agent writes no file. It reports three facts:
@@ -22,6 +18,8 @@ Start a background sub-agent. Tell it to read primary sources only: the linter d
 1. The rule that the linter of the project already ships. For Go, `depguard` blocks an import path and `forbidigo` blocks calls to the wrapped API. For TypeScript, `no-restricted-imports` blocks an import path.
 2. The configuration for that rule. The `desc` or `message` text names the module to use, so that the agent that hits the failure knows where to go.
 3. The fast check that the repo already has, where the agent sees the failure while it works. Examples are a pre-commit hook, a hook in `.claude/settings.json`, or CI.
+
+Prefer the lint rule to making the hidden code private. Its message names the module at the failure, and it also covers calls inside the module's own package. An agent that meets a private name often exports it again.
 
 Continue the session while the sub-agent runs. Only the questions that need its result wait.
 
