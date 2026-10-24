@@ -23,7 +23,7 @@ Brief amendment
 - A connection that passes auth but closes before the server sends the auth success now counts in `Accepts()`.
 ```
 
-Write only the decisions that the user made. If the user answered "yes", the decision is your recommended answer. The Spec reviewer of code-review reads only the issue, so a decision that stays in the chat comes back as a finding. A spec question that you answer yourself stays a departure for the step before the commit.
+Write only the decisions that the user made, except in a coordinated run (see the end of this skill). If the user answered "yes", the decision is your recommended answer. The Spec reviewer of code-review reads only the issue, so a decision that stays in the chat comes back as a finding. A spec question that you answer yourself stays a departure for the step before the commit.
 
 Call the Skill tool with "tdd" where possible, at pre-agreed seams.
 
@@ -44,5 +44,10 @@ Before you commit, list each place where the code departs from the spec: a requi
 ```
 
 Wait for the answers, and change the code to match them. If an answer raises a new question, ask it in a new round. A spec question that you answer alone stays hidden until after the commit.
+
+A coordinated run is a run as a subagent of a coordinator, for example a chief of staff. You cannot ask the user, so this replaces the round above. Sort the departures in two kinds:
+
+- A gap in the spec, for example a term that the spec did not define or an edge case that it does not cover: decide it yourself. Pick the choice that stays inside the spec and the parent issue. If a gap needs work that the spec does not ask for, it is a requirement change, so send it to the coordinator. Post all of your gap decisions on the issue in one comment that starts with `Brief amendment (agent decision)`, in the format of a Brief amendment, then go on to the commit.
+- A requirement that the spec states and that you changed or left out: stop before the commit. Send these departures to the coordinator in the question format above, and commit after its answers.
 
 Commit your work to the current branch.
