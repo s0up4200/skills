@@ -76,7 +76,7 @@ End the report with a **Top recommendation** section: which candidate you'd tack
 
 See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
 
-Do NOT propose interfaces yet. After the report is served, ask the user which candidates to file as issues, which to reject, and whether to grill one now. In the same list, offer to stop serving the report. On a yes, run `tailscale serve --https=<https port> off` for the port of the report only, and stop the `http.server` process. Offer the teardown again in the last reply of the run while the report is still served.
+Do NOT propose interfaces yet. After the report is served, ask the user which candidates to file as issues, which to reject, and whether to grill one now. In the same list, offer to stop serving the report. On a yes, run `tailscale serve --https=<https port> off` for the port of the report only. Then stop the `http.server` by its process ID: `ss -ltnp 'sport = :<local port>'` shows it, and `kill <pid>` stops it. A `pkill -f` pattern also matches the shell that runs the command, and kills that shell. Offer the teardown again in the last reply of the run while the report is still served.
 
 ### 3. File the picked candidates
 
