@@ -18,9 +18,9 @@ Check with the user that these seams match their expectations.
 
 3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
 
-4. If the conversation grilled an existing issue, comment "Specced in #<spec>" on that issue. If the spec covers the whole issue, close it and remove its triage-role label, whatever role it had. If the spec covers only part of it, keep it open and give it the triage role that the session decided for the rest.
+4. If the conversation grilled an existing issue, comment "Specced in #<spec>" on that issue. If the issue has sub-issues, it is a map: keep it open, link the spec to it as a child the way the tracker doc's **Child ticket** operation links one, and remove its triage-role label. Otherwise, if the spec covers the whole issue, close it and remove its triage-role label, whatever role it had. If the spec covers only part of it, keep it open and give it the triage role that the session decided for the rest.
 
-5. Give each follow-up issue that the session filed (for example "investigate X" or "track the gap Y") the triage role that the session's decisions set, such as `ready-for-agent` or `ready-for-human`. `docs/agents/triage-labels.md` maps each role to its label. When a follow-up depends on the spec, add a blocked-by edge from the follow-up to the spec with the tracker doc's **Blocking** operation.
+5. Give each follow-up issue that the session filed (for example "investigate X" or "track the gap Y") the triage role that the session's decisions set, such as `ready-for-agent` or `ready-for-human`. `docs/agents/triage-labels.md` maps each role to its label. When a follow-up depends on the spec, add a blocked-by edge from the follow-up to the spec with the tracker doc's **Blocking** operation. When a follow-up is blocked by the grilled issue, move that edge to the spec.
 
 <spec-template>
 
