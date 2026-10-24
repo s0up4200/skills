@@ -108,6 +108,10 @@ If the skill involves output that should be verified, include a verification sec
 - Known platform bugs that affect verification
 - Automated checks where possible (e.g., Playwright snippets)
 
+### Report Sections
+
+If a skill writes a report, use the layout of step 6 in `skills/verify-review/SKILL.md`. The first line names the repo and the pull request or issue. The status comes next, then one short list for each section, and the last line says what the user can reply. Use the same layout on each run, and put one fact in each list item.
+
 ### Reference Files
 
 For platform-dependent skills, keep a dated reference file with:
@@ -181,6 +185,7 @@ Before committing a new or updated skill:
 - [ ] Examples are grounded in authoritative sources
 - [ ] Reference files have dated citations with URLs
 - [ ] Skill path is listed in marketplace.json
+- [ ] The skill runs with what it bundles and the tools the agent already has: no setup script, no clone of another repository, and no download at run time
 
 ## Agent skills
 

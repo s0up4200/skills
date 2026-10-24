@@ -1,6 +1,6 @@
 ---
 name: pr
-description: "Use when writing a PR body."
+description: "Use when writing a PR title or body."
 metadata:
   credits:
     skill: show-me
@@ -22,6 +22,10 @@ If the repository has no template, use this one:
 
 **Merge danger:** <one-way or two-way door>, <blast radius in one word>
 ```
+
+## Title
+
+For a fix, name the symptom that users see, not the code that changed. Make the title as wide as the fix. If the fix covers SQLite and Postgres, the title does not name only SQLite.
 
 ## Prose
 

@@ -95,17 +95,22 @@ Every public comment goes out under the user's account, so the user sees its ful
 gh api "repos/$repo/pulls/$pr/comments/$comment_id/replies" -f body="$body"
 ```
 
-Then resolve a bot's thread:
+Resolve a thread with:
 
 ```bash
 gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -F id="$thread_id"
 ```
 
-CodeRabbit (author `coderabbitai`) answers replies and resolves a thread when it accepts one, but it is often rate-limited, and then its threads stay open. Resolve a CodeRabbit thread whose finding is fixed (confirmed, stale, or a judgment call that the user chose to fix), the same as for the other bots. Leave a CodeRabbit thread open after a refutation or a declined judgment call, so that CodeRabbit can answer the reply. On a later run, resolve an open CodeRabbit thread when its finding is fixed at head or CodeRabbit accepted your reply. Count a thread that still waits for CodeRabbit's answer in the report as waiting on CodeRabbit.
+Resolve or keep each thread by this list. The report uses the same list (step 6).
 
-Leave a person's thread open after a refutation, so the reviewer can answer or resolve it. The thread is then waiting, and the next run skips it. A person's thread that the user declines as a judgment call also gets a reply with the reason, and stays open.
+- A fixed finding (confirmed, stale, or a judgment call that the user chose to fix): resolve the thread, for every reviewer.
+- A refuted finding or a declined judgment call from a bot other than CodeRabbit: reply, then resolve the thread.
+- A refuted finding or a declined judgment call from CodeRabbit (author `coderabbitai`): reply, and keep the thread open, so that CodeRabbit can answer the reply. On a later run, resolve it when the finding is fixed at head or CodeRabbit accepted your reply. Until then, count it as waiting on CodeRabbit.
+- A refuted finding or a declined judgment call from a person: reply, and keep the thread open, so that the reviewer can answer or resolve it. The thread is then waiting, and the next run skips it.
 
-A bot's thread that the user declines as a judgment call gets a short reply with the reason, and then you resolve it. Some bots learn from replies, CodeRabbit and Greptile among them, and a thread resolved with no reply looks to a later reader like a finding that nobody read. The finding was true, so give the reason that applies to this case, such as a fix that costs more than the failure, or hardware that nobody can test on. A reply that calls the check itself wrong teaches the bot to skip a real defect next time.
+CodeRabbit answers replies and resolves a thread when it accepts one, but it is often rate-limited, and then its threads stay open.
+
+A reply to a declined judgment call is short and gives the reason. Some bots learn from replies, CodeRabbit and Greptile among them, and a thread resolved with no reply looks to a later reader like a finding that nobody read. The finding was true, so give the reason that applies to this case, such as a fix that costs more than the failure, or hardware that nobody can test on. A reply that calls the check itself wrong teaches the bot to skip a real defect next time.
 
 Each review body with findings gets one review answer, a PR comment that goes through every item in the reviewer's order: fixed in which commit, refuted with the evidence, or left as it is and why. Leave out an open judgment call; the next run then lists the review again. Address a person by `@login` and link the review. End the comment with the marker line that the script looks for:
 
@@ -175,7 +180,7 @@ If a sync fails, it tries again forever. Codex wants a limit. The claim is true.
 - Under each option that leaves a finding as it is, show the reply that the option posts (step 4), in the same form as a reply under **The reviewer was wrong**. The answer that picks the option then approves its reply too, so the reply needs no second round.
 - Recommend the fix when it removes copied code, a rule that lives in two places, or behavior that only a comment explains, and the change is small or medium. This holds when the fix touches code older than the pull request: the maintainer pays for the cleanup now or later, and now is cheaper. Recommend leaving it when the fix is a large change, or when it costs more than the failure it prevents. The recommendation is advice. The fix waits for the user's answer.
 - Keep each question body near 100 words, because the user reads it once and then picks. Start with the verdict. Then give one concrete case that a user could meet, for example the two names that match by mistake. Name the proof in a few words, without its steps. Say what the pull request changes and what was already there. Give each option one line with its cost in plain terms, such as a small change or a bigger change to the sync.
-- The last line tells the user what to reply with and lists the writes that the reply starts. When nothing is open after a `--fix` run, it says what is left, for example "wait for CI".
+- The last line tells the user what to reply with and lists the writes that the reply starts. Count the threads that the writes resolve and the threads that stay open by the list in step 4. When nothing is open after a `--fix` run, it says what is left, for example "wait for CI".
 
 ## 7. Act on the reply
 

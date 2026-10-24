@@ -116,6 +116,8 @@ Before a finding becomes the worst finding in the opening sentence, or a decisio
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
 
+If the pull request is from another person, test the report before you offer `/post-review`. Start 2 or 3 fresh sub-agents in parallel. Give each one the diff command and the findings, and tell it to try to refute each finding at the code, with a file and line for each refutation. Check each refutation at the code, and drop or correct each finding whose refutation holds. A posted review goes to the author under the user's name, so a wrong finding costs more there than in a report to the user only.
+
 If step 1 checked out a pull request, go back to the recorded branch after the report. If `git status --short` is empty, run `git switch <recorded-branch>`. If it shows changes, stay on the current branch, name it, and give the user the one command that goes back: `git switch <recorded-branch>`.
 
 ### 6. Act on the findings
