@@ -1,6 +1,6 @@
 # Guarding
 
-A guard is a lint rule that fails when other code reaches past a module to the dependency that the module hides. Without a guard, an agent can import the dependency directly and skip the module. Assumes the vocabulary in [SKILL.md](SKILL.md): **module**, **interface**, **seam**, **depth**.
+A guard is a check, a lint rule or the compiler, that fails when other code reaches past a module to the dependency that the module hides. Without a guard, an agent can import the dependency directly and skip the module. Assumes the vocabulary in [SKILL.md](SKILL.md): **module**, **interface**, **seam**, **depth**.
 
 ## Trigger
 
@@ -10,6 +10,10 @@ Run the step only when both of these are true:
 2. The module hides a dependency that other code can import directly. That dependency is a third-party library, or an internal package that no lint rule guards yet.
 
 A thin wrapper gets no guard. The rule adds friction and protects nothing.
+
+## Visibility
+
+If the hidden code lives in the same package as the module, make it private to that package: unexported in Go, or not exported in TypeScript. Then the compiler is the guard, and the step skips Lookup. Ask about it as in Question, with the code that becomes private as the configuration.
 
 ## Lookup
 
