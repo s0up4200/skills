@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then file the picked ones as issues or grill one now.
 disable-model-invocation: true
 ---
 
@@ -20,11 +20,18 @@ This command is _informed_ by the project's domain model and built on a shared d
 **Scope before you scan: YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:
 
 - If the user named a direction (a module, a subsystem, a pain point), take it, and skip the inference below.
-- Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
+- Otherwise, find the codebase's hot spots: the files that change often and are large. Count the changes per file in the last six months, and read the top of the list next to the size of each file. Skip lock files and generated files.
+
+  ```sh
+  git log --since=6.months --format= --name-only | grep . | sort | uniq -c | sort -rn | head -20
+  ```
+
+  If `git rev-list --count --since=6.months HEAD` is below about 50, drop `--since` and read all of the history. If the changes are scattered with no clear hot spot, widen the net.
+- Then list the file pairs that change in the same commits: run `scripts/change-coupling.sh 6.months` from this skill's folder, in the repo root (no argument reads all of the history). A pair above about 30 % that is not a file and its own test is a sign that one concept is split across a seam, which a code reading misses when no import joins the files.
 
 Read the project's domain glossary (`GLOSSARY.md`) and any ADRs in the area you're touching first.
 
-Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
+Then spawn a sub-agent to walk the codebase. A sub-agent sees none of what you loaded, so give it the paths in scope, the hot spots and coupled pairs, the codebase-design glossary and the deletion test, the `GLOSSARY.md` terms, and the decisions of the ADRs in the area. Don't follow rigid heuristics; explore organically and note where you experience friction:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow**, with an interface nearly as complex as the implementation?
@@ -36,7 +43,9 @@ Apply the **deletion test** to anything you suspect is shallow: would deleting i
 
 ### 2. Present candidates as an HTML report
 
-Write a self-contained HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows) and tell them the absolute path.
+Before you write a card, check at the code each fact that its badge rests on: count the callers with a search, look for the tests of the module, and make sure that each listed file exists. Lower the badge or drop the card when a fact is wrong. Read `../codebase-design/DEEPENING.md` to pick the dependency category of each card.
+
+Write a single HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows) and tell them the absolute path.
 
 The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals: use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
 
@@ -57,15 +66,21 @@ End the report with a **Top recommendation** section: which candidate you'd tack
 
 See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
 
-Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
+Do NOT propose interfaces yet. After the file is written, ask the user which candidates to file as issues, which to reject, and whether to grill one now.
 
-### 3. Grilling loop
+### 3. File the picked candidates
 
-Once the user picks a candidate, call the Skill tool with "grilling" to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
+File each picked candidate as one issue in the project issue tracker (`docs/agents/issue-tracker.md`). The body carries its card: files, problem, solution, the before/after structure in words, and the recommendation strength. Apply the `needs-grilling` triage label (`docs/agents/triage-labels.md` maps the role to its label string), and the repo's refactor label when `gh label list` shows one. If the repo has no `needs-grilling` label yet, ask the user, then create it and add its row to `docs/agents/triage-labels.md`. Each issue is grilled later in a fresh session, with the tracker carrying the state.
 
-Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
+**User rejects a candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones. On a yes, write the ADR to `docs/adr/` at once, with the `domain-modeling` format. A rejection is in force when the user makes it, because no code waits for it, so it does not wait for an implementation branch.
+
+### 4. Grilling loop (when the user grills one now)
+
+Call the Skill tool with "grilling" to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
+
+Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go. Record the Domain Docs in the candidate's issue, and file the issue first if it does not exist:
 
 - **Naming a deepened module after a concept not in `GLOSSARY.md`?** Record the term as Domain Docs.
 - **Sharpening a fuzzy term during the conversation?** Record the sharpened term as Domain Docs right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.
+- **User rejects the candidate with a load-bearing reason?** Offer an ADR as in step 3.
 - **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern.
