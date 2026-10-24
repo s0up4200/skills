@@ -49,10 +49,10 @@ Write a single HTML file to the OS temp directory so nothing lands in the repo. 
 
 Serve the report on the tailnet, so the user can read it from any of their devices:
 
-1. Run `tailscale serve status`, and pick a path that no route uses, for example `/arch-review`. Leave every other route as it is.
-2. Start `python3 -m http.server <port> --bind 127.0.0.1 --directory <report folder>` in the background, on a free port. `tailscale serve` sends a file or a folder only when it runs as root, and it proxies a local port without root.
-3. Run `tailscale serve --bg --set-path /<path> http://127.0.0.1:<port>`.
-4. Read the host name from the `DNSName` field of `tailscale status --self --json`, and make sure that `curl -s https://<host>/<path>/` returns the report's `<title>`.
+1. Run `tailscale serve status`, and pick an HTTPS port that no route uses, for example 8443. Use a port and not a path: an app on `/` of the same port can take the path over in the browser, for example with a service worker, and a port is a separate origin. Leave every other route as it is.
+2. Start `python3 -m http.server <local port> --bind 127.0.0.1 --directory <report folder>` in the background, on a free local port. `tailscale serve` sends a file or a folder only when it runs as root, and it proxies a local port without root.
+3. Run `tailscale serve --bg --https=<https port> http://127.0.0.1:<local port>`.
+4. Read the host name from the `DNSName` field of `tailscale status --self --json`, and make sure that `curl -s https://<host>:<https port>/` returns the report's `<title>`.
 5. Give the user the URL and the absolute path of the file.
 
 If `tailscale` is not installed, or the host is not on a tailnet, open the file instead (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows), and tell the user why.
@@ -76,7 +76,7 @@ End the report with a **Top recommendation** section: which candidate you'd tack
 
 See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
 
-Do NOT propose interfaces yet. After the report is served, ask the user which candidates to file as issues, which to reject, and whether to grill one now. In the same list, offer to stop serving the report. On a yes, run `tailscale serve --https=443 --set-path /<path> off` and stop the `http.server` process. Do not run `tailscale serve --https=443 off`, because it removes every route on port 443, also the routes of the user. Offer the teardown again in the last reply of the run while the report is still served.
+Do NOT propose interfaces yet. After the report is served, ask the user which candidates to file as issues, which to reject, and whether to grill one now. In the same list, offer to stop serving the report. On a yes, run `tailscale serve --https=<https port> off` for the port of the report only, and stop the `http.server` process. Offer the teardown again in the last reply of the run while the report is still served.
 
 ### 3. File the picked candidates
 
