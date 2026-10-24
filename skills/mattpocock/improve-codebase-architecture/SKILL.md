@@ -45,7 +45,17 @@ Apply the **deletion test** to anything you suspect is shallow: would deleting i
 
 Before you write a card, check at the code each fact that its badge rests on: count the callers with a search, look for the tests of the module, and make sure that each listed file exists. Lower the badge or drop the card when a fact is wrong. Read `../codebase-design/DEEPENING.md` to pick the dependency category of each card.
 
-Write a single HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows) and tell them the absolute path.
+Write a single HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>/index.html` so each run gets a fresh folder.
+
+Serve the report on the tailnet, so the user can read it from any of their devices:
+
+1. Run `tailscale serve status`, and pick a path that no route uses, for example `/arch-review`. Leave every other route as it is.
+2. Start `python3 -m http.server <port> --bind 127.0.0.1 --directory <report folder>` in the background, on a free port. `tailscale serve` sends a file or a folder only when it runs as root, and it proxies a local port without root.
+3. Run `tailscale serve --bg --set-path /<path> http://127.0.0.1:<port>`.
+4. Read the host name from the `DNSName` field of `tailscale status --self --json`, and make sure that `curl -s https://<host>/<path>/` returns the report's `<title>`.
+5. Give the user the URL and the absolute path of the file.
+
+If `tailscale` is not installed, or the host is not on a tailnet, open the file instead (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows), and tell the user why.
 
 The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals: use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
 
@@ -66,7 +76,7 @@ End the report with a **Top recommendation** section: which candidate you'd tack
 
 See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
 
-Do NOT propose interfaces yet. After the file is written, ask the user which candidates to file as issues, which to reject, and whether to grill one now.
+Do NOT propose interfaces yet. After the report is served, ask the user which candidates to file as issues, which to reject, and whether to grill one now. In the same list, offer to stop serving the report. On a yes, run `tailscale serve --https=443 --set-path /<path> off` and stop the `http.server` process. Do not run `tailscale serve --https=443 off`, because it removes every route on port 443, also the routes of the user. Offer the teardown again in the last reply of the run while the report is still served.
 
 ### 3. File the picked candidates
 
