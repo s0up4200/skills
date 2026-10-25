@@ -50,7 +50,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [file-issue](skills/file-issue/) | Draft an upstream GitHub issue from the repo's template, bots, and a reproduction, and post it only after the user reads the draft |
 | [pr-conflicts](skills/pr-conflicts/) | Sweep open PRs for merge conflicts, apply the repo's conflict label, and remove it from PRs that merge cleanly again |
 | [branch-cleanup](skills/branch-cleanup/) | Find dead local branches and worktrees, including squash-merged PRs and local-only branches, and write a backed-up cleanup script for the user to run. Explicit invocation only |
-| [focus](skills/focus/) | Show the state of large chained work (epics with sub-issues and blocked-by edges) and recommend what to work on next |
+| [focus](skills/focus/) | Recommend what to work on next: teammates who wait on you first, then merges, your own claims, refactors, outside PRs, and issues. Shows one epic on request |
 | [findability](skills/findability/) | Read the last 10 Claude Code and Codex sessions in a repo, find where agents searched too long or followed stale docs, and propose navigation fixes. Requires the [`retro`](skills/mattpocock/retro/) skill |
 | [review-retro](skills/review-retro/) | Group the team's repeated PR review feedback into themes. Propose a check for each mechanical theme and a review standard for each judgement call. Requires the [`retro`](skills/mattpocock/retro/) skill |
 | [trim-agents-md](skills/trim-agents-md/) | Audit every AGENTS.md and CLAUDE.md in a repo for stale and conflicting claims, then restructure them at three levels in parallel subagents, with a reason for each removed line. The user picks one level, and it ships as one PR. Explicit invocation only |
