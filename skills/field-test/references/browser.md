@@ -38,7 +38,7 @@ const { chromium } = require('playwright');
 ```
 
 - Use a `.cjs` script with `require`. An ES module ignores `NODE_PATH` and fails with `ERR_MODULE_NOT_FOUND`.
-- Launch the system Chromium through `executablePath`. The browser builds that Playwright downloads can lag its version, and then `launch()` fails with `Executable doesn't exist`.
+- Launch the system Chromium through `executablePath`, so the run never depends on a browser that Playwright downloads.
 - Leave `recordVideo` off. It needs an ffmpeg build that Playwright downloads. For a recording, use the Claude in Chrome tools and `gif_creator`.
 - A new context starts with no service worker, no cache, and no cookies. Each run loads the bundle that the rig serves now.
 - The `dialog` handler dismisses a native `confirm` or `alert`, so the dialog traps of Chrome do not apply.
