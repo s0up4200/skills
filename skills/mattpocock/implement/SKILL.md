@@ -35,6 +35,8 @@ If the repo instructions ask for a live run, or the branch changes something tha
 
 Once done, call the Skill tool with "code-review" to review the work.
 
+If the diff adds or changes an SQL statement, or adds a loop over rows from a database or over a list that a request or a caller supplies, also call the Skill tool with "perf-review" on the diff. Act on its findings as you act on the code-review findings.
+
 Before you commit, list each place where the code departs from the spec: a requirement that you changed or left out, and each spec question that you answered yourself, for example a term that the spec did not define. Add the departures that code-review found. Ask about all the departures in one round, in the format of the `grilling` skill: number each question, give your recommended answer, and word it so "yes" accepts the recommendation.
 
 ```
