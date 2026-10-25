@@ -16,9 +16,13 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+3. Write the spec using the template below, then publish it to the project issue tracker in one of two ways:
+   - If the conversation grilled an existing issue that has no sub-issues, and the spec covers the whole issue, replace the body of that issue with the spec. Remove its triage-role label, whatever role it had. Post no comment on it. The tracker keeps the old body in the edit history.
+   - In all other cases, create a new issue.
 
-4. If the conversation grilled an existing issue, comment "Specced in #<spec>" on that issue. If the issue has sub-issues, it is a map: keep it open, link the spec to it as a child the way the tracker doc's **Child ticket** operation links one, and remove its triage-role label. Otherwise, if the spec covers the whole issue, close it and remove its triage-role label, whatever role it had. If the spec covers only part of it, keep it open and give it the triage role that the session decided for the rest.
+   Apply the `ready-for-agent` triage label - no need for additional triage.
+
+4. If the spec is a new issue and the conversation grilled an existing issue, comment "Specced in #<spec>" on that issue. If the issue has sub-issues, it is a map: keep it open, link the spec to it as a child the way the tracker doc's **Child ticket** operation links one, and remove its triage-role label. Otherwise the spec covers only part of it: keep it open and give it the triage role that the session decided for the rest. Close each other issue that the spec covers in full, with the comment "Covered by #<spec>".
 
 5. Give each follow-up issue that the session filed (for example "investigate X" or "track the gap Y") the triage role that the session's decisions set, such as `ready-for-agent` or `ready-for-human`. `docs/agents/triage-labels.md` maps each role to its label. When a follow-up depends on the spec, add a blocked-by edge from the follow-up to the spec with the tracker doc's **Blocking** operation. When a follow-up is blocked by the grilled issue, move that edge to the spec.
 
@@ -26,7 +30,7 @@ Check with the user that these seams match their expectations.
 
 ## Branch
 
-The first step for the implementer, before any code: update the base branch of the repo, then run `git switch -c <type>/<slug>` with a concrete name. `/implement` commits to the current branch, so without this step the work lands on the base branch.
+The first step for the implementer, before any code: update the base branch of the repo, then run `git switch -c <type>/<slug>` with a concrete name. `/implement` commits to the current branch, so without this step the work lands on the base branch. If the session ran on a feature branch, for example in a worktree, name that branch here and tell the implementer to rebase it on the updated base branch.
 
 ## Problem Statement
 
