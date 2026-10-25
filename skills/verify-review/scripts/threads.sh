@@ -49,9 +49,9 @@ done_ids=$(gh api --paginate "repos/$repo/issues/$pr/comments" | jq -cs --arg me
   | [.[] | select(.user.login == $me) | .body | scan("<!-- verify-review: ([0-9]+) -->")[0] | tonumber]')
 # Findings that never became threads. ponytail: a bot body counts only with CodeRabbit
 # section titles; add a pattern when another bot puts findings in its review body.
-gh api --paginate "repos/$repo/pulls/$pr/reviews" | jq -s --argjson t "$out" --argjson done "$done_ids" --arg me "$me" '
+gh api --paginate "repos/$repo/pulls/$pr/reviews" | jq -s --argjson t "$out" --argjson skip "$done_ids" --arg me "$me" '
   $t + [add[] | select(.state != "DISMISSED" and .user.login != $me and (.body|length>0))
-    | select(.id | IN($done[]) | not)
+    | select(.id | IN($skip[]) | not)
     | ((.user.type=="Bot") or (.user.login|test("\\[bot\\]$"))) as $ai
     | select(($ai|not) or (.body|test("(Nitpick|Outside diff range|Duplicate) comments( \\(|: )[0-9]+")))
     | {kind:"review", review_id:.id, author:.user.login, ai:$ai, url:.html_url,

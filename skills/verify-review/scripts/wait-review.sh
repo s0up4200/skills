@@ -40,9 +40,9 @@ forgejo_review() {
 
 while [ "$(date +%s)" -lt "$deadline" ]; do
   if [ "$host" = github.com ]; then
-    read -r bots done who <<<"$(github_reviews)"
-    if [ "$done" -gt 0 ]; then
-      if [ "$done" -ge "$bots" ]; then tr , '\n' <<<"$who"; exit 0; fi
+    read -r bots reviewed who <<<"$(github_reviews)"
+    if [ "$reviewed" -gt 0 ]; then
+      if [ "$reviewed" -ge "$bots" ]; then tr , '\n' <<<"$who"; exit 0; fi
       grace=$(( $(date +%s) + 120 ))
       [ "$grace" -lt "$deadline" ] && deadline=$grace
     fi

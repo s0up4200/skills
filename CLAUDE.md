@@ -2,7 +2,7 @@
 
 This is a personal skills repository for Claude Code and compatible AI coding tools. Skills are self-contained instruction sets that teach Claude how to perform specialized tasks.
 
-This is a content-only repo — no package.json, no build system, no tests, no dependencies. All work is editing Markdown files and JSON.
+The repo holds Markdown, JSON, and the shell scripts of some skills. It has no package.json and no dependencies. Before you commit, run `./check.sh`. CI runs it on each push.
 
 Before you create or edit a skill, run the `writing-for-agents` skill. It sets how to write the description, the body, and the reference files.
 
@@ -18,6 +18,7 @@ AGENTS.md            # Symlink → CLAUDE.md (keeps both tools in sync)
 README.md            # Installation instructions and skill index
 LICENSE              # MIT
 UPSTREAM.md          # Upstream commit and license of the copied skills
+check.sh             # Checks the skills. CI runs it from .github/workflows/check.yml
 .gitignore
 .claude-plugin/
   marketplace.json   # Plugin manifest — how Claude Code discovers installable bundles
