@@ -1,7 +1,7 @@
 ---
 name: verify-review
 effort: high
-description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Claude) and from people, or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. After the user answers the report, or with --fix, it also commits the fixes and posts the refutations shown in the report, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
+description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Greptile, Macroscope, Claude) and from people, or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. After the user answers the report, or with --fix, it also commits the fixes and posts the refutations shown in the report, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
 argument-hint: "[optional: PR number or URL] [--fix]"
 ---
 
