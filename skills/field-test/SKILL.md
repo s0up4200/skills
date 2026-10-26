@@ -46,6 +46,8 @@ Match the depth to the risk. A log line is enough for a search-shape fix. A migr
 
 Never copy a locally built binary into the container. The image tag must describe what runs, or the next pull silently reverts it and "what is running" becomes a guess.
 
+First check whether the PR is merged: `gh pr view <N> --json state,mergeCommit`. On a merged PR the image is stale and `develop` already holds the change, so neither one is the old build. Compare the merge commit with its parent on a local rig. Never run an older image against the production database, because the migrations since then are one way. Ask the user before you edit the body of a merged PR.
+
 - For qui, a PR from a branch in the main repo gets `ghcr.io/autobrr/qui:pr-<N>` from the Release workflow. Forks do not push images. Other projects: check the host file, and the repo's release workflow for a `type=ref,event=pr` tag rule.
 - Wait for the build: `gh pr checks <N>`, or query the runs by commit: `gh api "repos/<owner>/<repo>/actions/runs?head_sha=<sha>" --jq '.workflow_runs[]|[.name,.status,.conclusion]|@tsv'`. `gh run list --branch` can list runs that are months old first.
 - Confirm the tag exists before touching the server: `docker manifest inspect ghcr.io/autobrr/qui:pr-<N> >/dev/null && echo built`. The tag exists from the first build of the PR, so after a later push it can still point at the old build. Wait for the run of the new head first.
