@@ -59,7 +59,7 @@ The step is done when every remaining line of `diff -ru` is a recorded local cha
 
 ## 5. Commit and install
 
-Run the commit gate from the global `CLAUDE.md`. This repo commits straight to `main`. Then copy each changed skill folder to `~/.agents/skills/<name>` with `rsync -a --delete`, and make sure with `diff -rq` that the copies match. `~/.claude/skills` holds symlinks to `~/.agents/skills`, so one copy serves both tools.
+Run the commit gate from the global `CLAUDE.md`. This repo commits straight to `main`. The installed skills are links to this repo, so the commit installs the change.
 
 The HTTPS push can wait on a credential prompt that has no terminal. If `git push` does not finish in 30 seconds, stop it and ask the user to run `! git -C ~/github/soup/skills push`.
 
