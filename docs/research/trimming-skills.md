@@ -16,7 +16,7 @@ Each method has an evidence level:
 
 - No source measures what happens when you trim a skill. The studies measure long prompts in general. Anthropic gives limits and a deletion test, but publishes no data for them. For one skill, the only proof is an eval run of the old version against the trimmed version.
 - Studies show that more instructions and more tokens lower instruction following. Up to a point, models drop late instructions more often than early ones. This supports "shorter is safer" and "put the important part first". It gives no word target. (a)
-- After auto-compaction, Claude Code keeps only the first 5,000 tokens of a skill. By a bytes/4 estimate, `verify-review` has about 5,600 tokens, and the cut falls near line 182, inside step 6 ("Report"). In a long session, the agent can then lose steps 7 and 8. (b) for the rule, an estimate for the size.
+- After auto-compaction, Claude Code keeps only the first 5,000 tokens of a skill. The body of `verify-review` has 7,154 tokens, and the cut falls near line 140, at the start of step 6 ("Report"). In a long session, the agent can then lose the report layout and steps 7 and 8. (b) for the rule, (a) for the size.
 - Anthropic's deletion test: "Does Claude really need this explanation?" and "Would removing this cause Claude to make mistakes? If not, cut it." A rule that must hold every time moves to a hook. (b)
 - Anthropic's check: snapshot the old skill, run the same eval prompts on both versions in fresh contexts, and compare pass rate, time, and tokens. The `skill-creator` skill automates this. This repo already has 5 eval cases for `verify-review`. (b) for the method, (a) for the existing benchmark.
 - Matt Pocock's `writing-for-agents` agrees on the deletion test. It disagrees on the check. Its docs page says "There is no automated eval." (c)
@@ -149,7 +149,7 @@ Confidence: high for the counts, medium for the token estimate.
 
 Source (measured at `a65188e`):
 
-- `verify-review/SKILL.md` has 22,455 bytes. That is about 5,600 tokens at 4 bytes per token, and 5,000 to 6,400 tokens at 3.5 to 4.5 bytes per token. The 20,000th byte is at line 182, in step 6 ("Report"). Step 7 starts at line 185, and step 8 at line 189. The two reference files have 948 words.
+- `verify-review/SKILL.md` has 22,455 bytes, and 21,792 bytes after the frontmatter. `claude -p` with Opus counts 7,154 tokens for that body: the input tokens with the body as the system prompt, minus the input tokens with the one-letter system prompt "x". That is about 3 bytes per token, so a bytes/4 estimate is too low. The 5,000th token is near line 140, at the start of step 6 ("Report"). Step 7 starts at line 185, and step 8 at line 189. The two reference files have 948 words.
 - `field-test/SKILL.md` has 17,440 bytes, about 4,400 tokens. Its six reference files have 7,139 words. Two of them, `rigs.md` (2,876 words) and `browser.md` (2,049 words), are longer than the 100 lines at which Anthropic asks for a table of contents.
 - `verify-review` has `evals/evals.json` with 5 cases on public `autobrr/qui` PRs, last changed 2026-10-13. Git does not track the file, because `.gitignore` has `evals/` and `*-workspace/`. The workspace has a `skill-creator` benchmark from 2026-09-19, when the skill had 1,510 words. Iteration 2 scored 97 % ± 5 % with the skill and 51 % ± 16 % without it, with 3 runs each on evals 0 to 2.
 - `field-test` has no evals.

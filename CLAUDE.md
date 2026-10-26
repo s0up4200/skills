@@ -111,7 +111,7 @@ If the skill involves output that should be verified, include a verification sec
 
 ### Report Sections
 
-If a skill writes a report, use the layout of step 6 in `skills/verify-review/SKILL.md`. The first line names the repo and the pull request or issue. The status comes next, then one short list for each section, and the last line says what the user can reply. Use the same layout on each run, and put one fact in each list item.
+If a skill writes a report, use the layout in `skills/verify-review/references/report.md`. The first line names the repo and the pull request or issue. The status comes next, then one short list for each section, and the last line says what the user can reply. Use the same layout on each run, and put one fact in each list item.
 
 ### Reference Files
 

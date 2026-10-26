@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Checks each skill: shellcheck on its scripts, a name that matches its
-# folder, a path in the plugin manifest, and a SKILL.md under 500 lines.
+# folder, a path in the plugin manifest, a SKILL.md under 500 lines, and a
+# body under 15,000 bytes. After a compaction, Claude Code keeps only the
+# first 5,000 tokens of a skill, and 15,000 bytes is about 5,000 tokens.
 # CI runs it on each push.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -15,6 +17,10 @@ while read -r file; do
   grep -q "\"./$dir\"" .claude-plugin/marketplace.json || { echo "$dir: not in .claude-plugin/marketplace.json"; fail=1; }
   lines=$(wc -l <"$file")
   ((lines < 500)) || { echo "$file: $lines lines, keep it under 500"; fail=1; }
+  # Remove a skill from this list when its body is under the cap.
+  [[ $dir == skills/mobile-adapt || $dir == skills/field-test ]] && continue
+  bytes=$(awk 'f>=2; /^---$/ && f<2 {f++}' "$file" | wc -c)
+  ((bytes < 15000)) || { echo "$file: body has $bytes bytes, keep it under 15000"; fail=1; }
 done < <(find skills -name SKILL.md | sort)
 
 exit "$fail"
