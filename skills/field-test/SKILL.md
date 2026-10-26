@@ -8,14 +8,14 @@ description: Run a code change live and prove the behaviour it touches, either o
 
 A field test answers one question: does the change do what the PR says, on the real stack, with real data? Unit tests already proved the code paths. The live run proves the wiring nobody mocked: the image that CI built, the compose file, the database, the real qBittorrent, the real indexers, the real Sonarr.
 
-There are two very different places to run one, and the first decision is which:
+There are two places to run one, and the first decision is which:
 
-- **Local rig.** Stubs and throwaways on the laptop: a qui binary on a spare port, a mock Torznab indexer, a throwaway qBittorrent container (a stub only for large or crafted libraries). Nothing real is reachable, so you can be reckless with data, add and delete torrents freely, and crash things. Use it for crafted indexer responses, migrations against a copied database, anything that must not hit a real tracker, and anything that cannot wait for a CI image. A Windows-only change runs on the same rig under Wine. Recipes in `references/rigs.md`.
-- **The production host.** The user's live instance of the project. For qui that is a server with thousands of real torrents, a real qBittorrent, and autobrr, Prowlarr, Sonarr, and Radarr attached. It is the only place that proves the wiring nobody mocked: the CI image, the deployment, the live database, real indexer behaviour, real Sonarr answers, real announces. It is also the user's daily driver. Every action there is visible to trackers or changes data the user cares about, so the rules below are stricter on that side.
-
-Host facts live outside this skill, in `~/.config/field-test/hosts/`, one file per project: addresses, the SSH form, the deployment, data paths, the credential policy, quirks, and request-count baselines. They describe the user's private network, and this skill is public, so they stay in that folder. List the folder and read the file for the project before the first remote command. If the folder or the file is missing, or a host file says a fact is missing, ask the user and write the answer into a host file there; do not guess a path or an address.
+- **Local rig.** Stubs and throwaways on the laptop: a qui binary on a spare port, a mock Torznab indexer, a throwaway qBittorrent container (a stub only for large or crafted libraries). Nothing real is reachable, so you can add and delete torrents freely and crash things. Use it for crafted indexer responses, migrations against a copied database, anything that must not hit a real tracker, and anything that cannot wait for a CI image. A Windows-only change runs under Wine or in the Windows VM. Recipes in `references/rigs.md`.
+- **The production host.** The user's live instance of the project. For qui that is a server with thousands of real torrents, a real qBittorrent, and autobrr, Prowlarr, Sonarr, and Radarr attached. It is also the user's daily driver: every action there is visible to trackers or changes data the user cares about, so the rules below are stricter on that side.
 
 Pick the local rig whenever it can answer the question. Go to the production host when the question is about real data or real integrations, or when the PR body owes a live proof. Say which mode you are in when you report.
+
+Host facts live in `~/.config/field-test/hosts/`, one file per project: addresses, the SSH form, the deployment, data paths, the credential policy, quirks, and request-count baselines. This skill is public, so the facts of the user's private network stay in that folder. List the folder and read the file for the project before the first remote command. If the file or a fact is missing, ask the user and write the answer into a host file there; do not guess a path or an address.
 
 The whole skill rests on three habits. Pick the observable before touching anything. Change one thing at a time and know what is running. Leave the server as you found it, and be able to prove that.
 
@@ -38,15 +38,13 @@ Two more checks on the observable itself, both cheap and both easy to skip:
 - Make sure a pre-existing path cannot produce the same green. A byte-equal announce size passes the exact-size fallback with or without an episode map, so that run proves nothing about the map; a rounded size inside the tolerance does. Pin the field that only the new path sets, such as a match class or a reason prefix, not just the pass/fail bit.
 - Name the stop gate: the one observable that, if it flips the wrong way, blocks the PR rather than adding a caveat. For a matcher change that is usually the neighbour case the design rejected (the next episode must still be a mismatch). Run it as a control, and treat a wrong answer there as the headline, not one row among many.
 
-When the claim is about how many calls qui makes to qBittorrent, count the requests; do not time them. A per-hash burst at 50-wide concurrency and one bulk response take about the same wall time, so elapsed fields cannot tell the builds apart. `references/request-count.md` has the gate for when it applies (call-shape claims, changes on the sync, tracker, files, peers, or reannounce paths, go-qbittorrent bumps, saturation reports), the shipped sniffer, and the windows that matter. Do not decide from the diff; the two largest bursts found so far were invisible in any diff. A count needs a paired develop window in the same session, and a steady-state window long enough to cover one scheduled timer, not only the boot burst.
+When the claim is about how many calls qui makes to qBittorrent, or the change touches the sync, tracker, files, peers, or reannounce paths, or bumps go-qbittorrent, read `references/request-count.md`: count the requests, do not time them. It has the gate, the sniffer, and the windows to compare.
 
 Match the depth to the risk. A log line is enough for a search-shape fix. A migration or a matcher change that adds torrents needs the end-to-end path: the torrent lands in qBittorrent, paused, at the right path.
 
-A rig is code too. After two failed attempts to build one, stop. Read the cheapest observable that you can reach without the rig, and say in the report what the run did not prove.
-
 ## 2. Get the build CI made
 
-Never copy a locally built binary into the container. The image tag must describe what runs, or the next pull silently reverts it and "what is running" becomes a guess. The user allowed it once and asked not to do it again.
+Never copy a locally built binary into the container. The image tag must describe what runs, or the next pull silently reverts it and "what is running" becomes a guess.
 
 - For qui, a PR from a branch in the main repo gets `ghcr.io/autobrr/qui:pr-<N>` from the Release workflow. Forks do not push images. Other projects: check the host file, and the repo's release workflow for a `type=ref,event=pr` tag rule.
 - Wait for the build: `gh pr checks <N>`, or query the runs by commit: `gh api "repos/<owner>/<repo>/actions/runs?head_sha=<sha>" --jq '.workflow_runs[]|[.name,.status,.conclusion]|@tsv'`. `gh run list --branch` can list runs that are months old first.
@@ -64,11 +62,11 @@ Order matters:
 3. Repoint `image:` to `ghcr.io/autobrr/qui:pr-<N>`, then `docker compose pull qui && docker compose up -d qui`.
 4. Verify: container up, revision label matches, first log lines show the expected version, the UI answers on its usual address.
 
-Record the swap in memory at once (image tag, backup file names, whether the user wants it kept). The user restarts the stack on their own schedule and a forgotten pin has caused a "revert scare" before.
+Record the swap in memory at once (image tag, backup file names, whether the user wants it kept). The user restarts the stack on their own schedule, and a forgotten pin looks like a revert.
 
 ## 4. Drive the behaviour
 
-Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. `references/recipes.md` lists the endpoints that field tests reach for most: per-torrent cross-seed search, a search that misses a candidate, webhook check and apply, SSE stream, orphan scan, backup runs, plus how to make synthetic torrents.
+Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. `references/recipes.md` lists the endpoints that field tests use most (cross-seed search, webhook check and apply, SSE, orphan scan, backups) and how to make synthetic torrents.
 
 Rules on a production host, where the data is real:
 
@@ -82,17 +80,19 @@ On a local rig none of this applies except the naming rule, which is about what 
 
 ## 4b. UI changes need the real browser
 
-A frontend change is not field-tested by curl. On a local rig, drive the page with a headless Playwright script, so that the run stays out of the user's Chrome. On the production host, use the Claude in Chrome tools, because the sign-in to the host lives in the user's Chrome. Confirm which bundle the page runs (the service worker keeps the old one after a swap), read the console and network log, and screenshot from synthetic data. A **visual change** changes how the page looks: the layout, the styling, the text, or an element that appears or goes away. Each visual change also gets a before and an after capture for a person, saved to disk during the run, because the rig is gone after step 7. Take the before capture from a build of the base branch. Report a check of a value or a state, such as a field that shows a new default, in text only. For a narrow viewport, a Playwright script sets the viewport. In Chrome, the user toggles DevTools device emulation, and you never resize the window. The recipe, the traps, and the observables that work in a browser are in `references/browser.md`; read it before the first browser step.
+A frontend change is not field-tested by curl. Drive the page in a browser: headless Playwright on a local rig, the Claude in Chrome tools on the production host. Read `references/browser.md` before the first browser step. It has the browser for each mode, phone widths, the service-worker trap, and the observables.
+
+A **visual change** changes how the page looks: the layout, the styling, the text, or an element that appears or goes away. Each visual change gets a before capture from a build of the base branch and an after capture, saved to disk during the run, because the rig is gone after step 7. Report a check of a value or a state, such as a field that shows a new default, in text only.
 
 ## 4c. Desktop app
 
-Run a desktop app on a headless monitor, so that it stays off the user's screens. `~/github/soup/dotfiles/agents/docs/desktop.md` has the monitor recipe, how to send keys without taking focus, and how to mute the audio of the app. Read it before you start the app. Take screenshots with `grim -o BENCH`. The server log of the backend is often the best observable. For Silo, each API request line has an `operation_id`, and `client_name` shows which client sent it. Project facts, such as the build, the install, and the log query, are in `~/.config/field-test/hosts/<project>.md` (for example `relics.md`).
+Before you start a desktop app, read `references/desktop-app.md`. It keeps the app off the user's screens and its audio muted.
 
 ## 5. Observe and monitor
 
 Grep the log on the remote end. The local shell wraps `grep` as ugrep, which never flushes rare matches on a long-lived pipe, so a local filter looks alive and delivers nothing. Rotated logs are gzipped: `zgrep`.
 
-For anything longer than a single request, arm a monitor and prove it delivers before you report "watching": send a sentinel through the full chain and wait for it to arrive. `references/monitoring.md` has the working recipe (keepalives, reconnect loop, foreground tail, sentinel, cleanup of orphaned remote tails). Three monitors in a row were once reported as watching while silently dead; the user found out by reading the log by hand.
+For anything longer than a single request, arm a monitor and prove it delivers before you report "watching": send a sentinel through the full chain and wait for it to arrive. `references/monitoring.md` has the working recipe (keepalives, reconnect loop, foreground tail, sentinel, cleanup of orphaned remote tails).
 
 Cross-check the monitor against one known-present pattern whenever you report status. Silence is not evidence.
 
@@ -100,17 +100,19 @@ Cross-check the monitor against one known-present pattern whenever you report st
 
 Report the command you ran and the output you saw, quoted, for each observable. Then say plainly what the run did not exercise: a path that needs a natural announce, a size collision that never happened, an indexer that was rate limited. A partial field test reported as partial is useful. A partial field test reported as green is a future incident.
 
+The same message carries the cleanup evidence from step 7: the end checks and their output. A verdict without it is not finished.
+
 Update the PR body's "How has this been tested?" section with the live result in one or two sentences. Update memory with what was proven and what was left.
 
-A run with a visual change is done only when you published its before and after captures for a person as Evidence. Publish the saved captures and recordings before the teardown in step 7: run `brrbin publish --help` and follow it, then put the Evidence link in that section. brrbin publishes only for an open PR. If the PR does not exist yet, keep the captures and recordings in the scratchpad, and publish them after the PR opens. If a visual change has no saved capture, take it now, while the rig still runs. Only the maintainers can open an Evidence, so a capture of real data can show torrent names, tracker names, and save paths. In each capture, mask passkeys, announce URLs, and API keys.
+A run with a visual change is done only when its before and after captures are published as Evidence. If a capture is missing, take it now, while the rig still runs. Publish the captures and recordings before the teardown in step 7: run `brrbin publish --help` and follow it, then put the Evidence link in that section. brrbin publishes only for an open PR; until the PR opens, keep the files in the scratchpad. Only the maintainers can open an Evidence, so a capture can show torrent names, tracker names, and save paths. Mask passkeys, announce URLs, and API keys.
 
-A screenshot that you attach to GitHub is public. Capture it from a rig filled with synthetic data. If the bug shows only on real data, blur the names, trackers, and save paths before the image leaves the session. Never publish a screenshot with private tracker names, URLs, or real release names on GitHub.
+A screenshot that you attach to GitHub is public. Capture it from a rig with synthetic data. If the bug shows only on real data, blur the names, trackers, and save paths before the image leaves the session.
 
 ## 7. Clean up, and prove it
 
 Cleanup is complete when nothing from the test is left running or pinned, and you can show it.
 
-Tear down a local rig in the same turn that reads the last observable, also when the test fails or stops early. When the run has captures and the PR is open, publish the Evidence first (step 6), then tear down in that same turn. The rig is every qui binary on a spare port, every stub or mock server, every throwaway container, every scratch worktree for a baseline build, every Playwright browser, and every Chrome tab you opened. For a desktop app (step 4c), the rig is also the app window, its window rule, and its null sink. Clean them up as step 4 of `desktop.md` says. In Chrome, unregister the service worker of each rig origin before you close its tab. Teardown is done when the rig ports are free, `docker ps` shows no rig container, and `git worktree list` shows no scratch worktree. For a desktop app, teardown is also done when `hyprctl clients -j` shows no window with the class of the app, the rule check in `desktop.md` passes, and `pactl list short modules` does not list `agent-mute`.
+Tear down a local rig in the same turn that reads the last observable, also when the test fails or stops early. When the run has captures and the PR is open, publish the Evidence first (step 6). The rig is every qui binary on a spare port, every stub or mock server, every throwaway container, every scratch worktree for a baseline build, and every browser, tab, or app window you opened; `references/browser.md` and `references/desktop-app.md` have their cleanup. Teardown is done when the rig ports are free, `docker ps` shows no rig container, and `git worktree list` shows no scratch worktree.
 
 - Delete synthetic torrents from qBittorrent (with files if the rig created them) and any rig files on the host. On a production host, name each one before deleting it so the user can object.
 - Kill every process the test started, local and remote. Keep a ledger of process groups and listeners as you create them; a killed SSH session leaves remote zsh wrappers and tails behind. Use `pkill -xf "<exact command line>"`; `pgrep -f` without `-x` matches your own shell and kills the session.
@@ -118,5 +120,3 @@ Tear down a local rig in the same turn that reads the last observable, also when
 - Leave DB snapshots in place; note their names and sizes so the user can delete them after the merge.
 - Tell the user the temporary API key can be revoked.
 - Watch the log for one polling interval after cleanup and confirm it stays quiet.
-
-Report the cleanup evidence in the same message as the verdict.
