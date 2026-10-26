@@ -23,7 +23,7 @@ Brief amendment
 - A connection that passes auth but closes before the server sends the auth success now counts in `Accepts()`.
 ```
 
-Write only the decisions that the user made, except in a coordinated run (see the end of this skill). If the user answered "yes", the decision is your recommended answer. The Spec reviewer of code-review reads only the issue, so a decision that stays in the chat comes back as a finding. A spec question that you answer yourself stays a departure for the step before the commit.
+The Spec reviewer of code-review reads only the issue, so a decision that stays in the chat comes back as a finding.
 
 Call the Skill tool with "tdd" where possible, at pre-agreed seams.
 
@@ -37,19 +37,6 @@ Once done, call the Skill tool with "code-review" to review the work.
 
 If the diff adds or changes an SQL statement, or adds a loop over rows from a database or over a list that a request or a caller supplies, also call the Skill tool with "perf-review" on the diff. Act on its findings as you act on the code-review findings.
 
-Before you commit, list each place where the code departs from the spec: a requirement that you changed or left out, and each spec question that you answered yourself, for example a term that the spec did not define. Add the departures that code-review found. Ask about all the departures in one round, in the format of the `grilling` skill: number each question, give your recommended answer, and word it so "yes" accepts the recommendation.
-
-```
-❓ **Q1** - **<departure title>**: <what the spec says, what the code does, and the choices>
-
-➡️ <your recommended answer>
-```
-
-Wait for the answers, and change the code to match them. If an answer raises a new question, ask it in a new round. A spec question that you answer alone stays hidden until after the commit.
-
-A coordinated run is a run as a subagent of a coordinator, for example a chief of staff. You cannot ask the user, so this replaces the round above. Sort the departures in two kinds:
-
-- A gap in the spec, for example a term that the spec did not define or an edge case that it does not cover: decide it yourself. Pick the choice that stays inside the spec and the parent issue. If a gap needs work that the spec does not ask for, it is a requirement change, so send it to the coordinator. Post all of your gap decisions on the issue in one comment that starts with `Brief amendment (agent decision)`, in the format of a Brief amendment, then go on to the commit.
-- A requirement that the spec states and that you changed or left out: stop before the commit. Send these departures to the coordinator in the question format above, and commit after its answers.
+Before you commit, list each place where the code departs from the spec: a requirement that you changed or left out, and each spec question that you answered yourself, for example a term that the spec did not define. Add the departures that code-review found. When the work comes from an issue, post them on the issue in one comment that starts with `Brief amendment (agent decision)`, in the format of a Brief amendment. Otherwise, list them in your final reply.
 
 Commit your work to the current branch.
