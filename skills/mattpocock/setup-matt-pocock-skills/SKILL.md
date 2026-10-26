@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Configure or upgrade the per-repo configuration that the engineering skills assume:
 
-- **Issue tracker**: where issues live (GitHub by default; local markdown is also supported out of the box)
+- **Issue tracker**: where issues live (GitHub, GitLab, Forgejo, or local Markdown)
 - **Triage labels**: the strings used for the six canonical triage roles
 - **Domain docs**: where `GLOSSARY.md` and ADRs live, and the consumer rules for reading them
 
@@ -20,7 +20,7 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 
 Look at the current repo to understand its starting state. Read whatever exists; don't assume:
 
-- `git remote -v` and `.git/config`: is this a GitHub repo? Which one?
+- `git remote -v` and `.git/config`: which host and repository does this clone use? Read any recorded tracker choice.
 - `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section in either?
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root. A `CONTEXT.md` or `CONTEXT-MAP.md` there is the same file under its old name: the skills read only the `GLOSSARY` names.
 - `docs/adr/` and any `src/*/docs/adr/` directories
@@ -41,14 +41,15 @@ Lead each section with the recommended answer so the user can accept it in a wor
 
 > Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tickets`, `triage`, and `to-spec` read from and write to it. They need to know whether to call `gh issue create`, write a markdown file under `.scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
-Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. Otherwise (or if the user prefers), offer:
+Default posture: these skills were designed for GitHub. If a `git remote` points at GitHub, propose that. If a `git remote` points at GitLab (`gitlab.com` or a self-hosted host), propose GitLab. If the existing tracker document identifies Forgejo, keep that choice. An unfamiliar remote host alone does not identify its forge. Otherwise (or if the user prefers), offer:
 
 - **GitHub**: issues live in the repo's GitHub Issues (uses the `gh` CLI)
 - **GitLab**: issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
+- **Forgejo**: issues live in the repo's Forgejo issues (uses the `fj` CLI)
 - **Local markdown**: issues live as files under `.scratch/<feature>/` in this repo (good for solo projects or repos without a remote)
 - **Other** (Jira, Linear, etc.): ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
 
-Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off**. Leave it off and don't raise it: a user who wants external PRs in the triage queue can flip the flag in the file later.
+Record the choice in `docs/agents/issue-tracker.md`. The GitHub, GitLab, and Forgejo templates carry a "PRs as a request surface" flag, defaulted **off**. Leave it off and don't raise it: a user who wants external PRs in the triage queue can flip the flag in the file later.
 
 **Section B: Triage label vocabulary.** Skip this section entirely if the `triage` skill isn't installed (exploration told you), since an uninstalled skill needs no labels.
 
@@ -58,7 +59,7 @@ If it is installed, ask exactly one question:
 
 The defaults are the six canonical roles, each label string equal to its name: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `needs-grilling`. On **yes**, write them as-is. Only if the user says no, usually because their tracker already uses other names (e.g. `bug:triage` for `needs-triage`), collect the overrides so `triage` applies existing labels instead of creating duplicates.
 
-The skills apply these labels but never create them. Compare the final label strings with `gh label list`, and list each missing label in the step 3 draft. When the user confirms, create each one with `gh label create`.
+The other skills apply existing labels. This setup creates missing labels after confirmation. Read the existing labels with the selected tracker's commands: `gh label` for GitHub, `glab label` for GitLab, or the Forgejo template's **Label setup** operation. List each missing label in the step 3 draft. When the user confirms, create only those labels with the same tracker. Local Markdown stores roles as text and needs no label creation.
 
 **Section C: Domain docs.** Default to **single-context** (one `GLOSSARY.md` + `docs/adr/` at the repo root). This fits almost every repo; write it without asking.
 
@@ -111,6 +112,7 @@ Then write the docs files using the seed templates in this skill folder as a sta
 
 - [issue-tracker-github.md](./issue-tracker-github.md): GitHub issue tracker
 - [issue-tracker-gitlab.md](./issue-tracker-gitlab.md): GitLab issue tracker
+- [issue-tracker-forgejo.md](./issue-tracker-forgejo.md): Forgejo issue tracker
 - [issue-tracker-local.md](./issue-tracker-local.md): local-markdown issue tracker
 - [triage-labels.md](./triage-labels.md): label mapping (only if `triage` is installed)
 - [domain.md](./domain.md): domain doc consumer rules + layout
