@@ -17,33 +17,75 @@ Sections marked "Chrome" below apply only to the Claude in Chrome tools.
 
 ## Playwright on a local rig
 
-Write one script per question in the scratchpad, run it, and read what it prints and saves. Proven 2026-10-25 with Playwright 1.64.1 and the Arch `chromium` package:
+Use a script for each before and after pair, each timing run, and each step that needs Node. Use `playwright cli` (below) to explore a page when you do not yet know the selector or the flow. `docs/research/browser-automation-alternatives.md` in the skills repo compares the other tools and gives the sources.
+
+Write one script per question in the scratchpad, run it, and read what it prints and saves. Proven 2026-10-27 with Playwright 1.64.1 and the Arch `chromium` package:
 
 ```bash
-CHROMIUM="$(command -v chromium)" NODE_PATH="$(dirname "$(readlink -f "$(command -v playwright)")")/.." node check.cjs
+PW="$(dirname "$(readlink -f "$(command -v playwright)")")/../playwright" node check.mjs
 ```
 
 ```js
-const { chromium } = require('playwright');
-(async () => {
-  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM });
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' });
-  const page = await ctx.newPage();
-  page.on('console', m => console.log('console', m.type(), m.text()));
-  page.on('dialog', d => { console.log('dialog', d.message()); d.dismiss(); });
-  await page.goto('http://127.0.0.1:<port>/');
-  // drive the page, print the observable, save the captures
-  await browser.close();
-})();
+const { chromium } = await import(process.env.PW + '/index.mjs');
+const browser = await chromium.launch({ executablePath: '/usr/bin/chromium' });
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' });
+const page = await ctx.newPage();
+page.on('console', m => console.log('console', m.type(), m.text()));
+page.on('dialog', d => { console.log('dialog', d.message()); d.dismiss(); });
+await page.goto('http://127.0.0.1:<port>/');
+// drive the page, print the observable, save the captures
+await browser.close();
 ```
 
-- Use a `.cjs` script with `require`. An ES module ignores `NODE_PATH` and fails with `ERR_MODULE_NOT_FOUND`.
+- `PW` is the absolute path of the global Playwright package, so the script needs no `node_modules` and no `NODE_PATH`. A `.cjs` script loads it with `require(process.env.PW)`.
 - Launch the system Chromium through `executablePath`, so the run never depends on a browser that Playwright downloads.
-- Leave `recordVideo` off. It needs an ffmpeg build that Playwright downloads. For a recording, use the Claude in Chrome tools and `gif_creator`.
 - A new context starts with no service worker, no cache, and no cookies. Each run loads the bundle that the rig serves now.
 - The `dialog` handler dismisses a native `confirm` or `alert`, so the dialog traps of Chrome do not apply.
-- `page.route()` answers a request with a fake response. Use it in place of a patch of `window.fetch`.
+- `page.route()` answers a request with a fake response. Use it in place of a patch of `window.fetch`. Add `serviceWorkers: 'block'` to the context, unless the service worker is under test: a route does not see a request that the service worker answers.
 - To look at a capture, read the saved PNG with the Read tool.
+
+### Recordings
+
+Record with Chrome's own screen recorder through a CDP session. It writes an mp4 and needs no ffmpeg from Playwright. Leave `recordVideo` and `page.screencast.start({ path })` off: they look for an ffmpeg build that Playwright downloads, and the run fails with `Executable doesn't exist at .../ffmpeg-<rev>/ffmpeg-linux`.
+
+```js
+const cdp = await page.context().newCDPSession(page);
+await cdp.send('Page.startScreenRecording', { frameRate: 25 });
+// drive the page
+const { stream } = await cdp.send('Page.stopScreenRecording');
+const chunks = [];
+for (;;) {
+  const r = await cdp.send('IO.read', { handle: stream });
+  chunks.push(Buffer.from(r.data, r.base64Encoded ? 'base64' : 'utf8'));
+  if (r.eof) break;
+}
+await cdp.send('IO.close', { handle: stream });
+(await import('node:fs')).writeFileSync('run.mp4', Buffer.concat(chunks));
+```
+
+For a GIF, run `ffmpeg -y -i run.mp4 -vf fps=10,scale=480:-1 run.gif` with the system ffmpeg. `Page.startScreenRecording` is experimental in the protocol. If a Chromium update removes it and the command fails, say so and record with `gif_creator` on a Chrome tab.
+
+### `playwright cli` for exploration
+
+Playwright 1.64.1 bundles a CLI that keeps a headless browser open between commands and prints a few hundred bytes per step. Run it from the scratchpad, because it writes snapshots and logs to `.playwright-cli/` in the working directory:
+
+```bash
+export PLAYWRIGHT_MCP_EXECUTABLE_PATH=/usr/bin/chromium
+playwright cli -s=rig open http://127.0.0.1:<port>/ --config=cli.config.json
+playwright cli -s=rig snapshot          # accessibility tree with refs such as e12
+playwright cli -s=rig click e12
+playwright cli -s=rig console
+playwright cli -s=rig requests
+playwright cli -s=rig route '**/api/x*' --body='{"fake":true}'
+playwright cli -s=rig dialog-dismiss
+playwright cli -s=rig --raw eval 'document.title'
+playwright cli close-all
+```
+
+- Without `PLAYWRIGHT_MCP_EXECUTABLE_PATH`, the CLI runs `google-chrome-stable` headless. Both use a temporary profile, not the user's.
+- The config file sets the context: `{ "browser": { "contextOptions": { "viewport": { "width": 390, "height": 844 }, "isMobile": true, "hasTouch": true, "colorScheme": "dark", "serviceWorkers": "block" } } }`.
+- `screenshot` has no clip. For a fixed clip, use `run-code "async page => { await page.screenshot({ path: '<abs path>', clip: { x: 0, y: 0, width: 800, height: 400 } }) }"`. `run-code` has no `require` and no `process`.
+- `playwright cli --help` lists the other commands (`fill`, `press`, `tracing-start`, `video-start`).
 
 ## Start every Chrome session the same way
 
@@ -134,4 +176,4 @@ Proven 2026-10-01 for a before-and-after measurement:
 
 ## Cleanup
 
-Make sure that each Playwright script reached `browser.close()`, and that `pgrep -f '[p]laywright_chromiumdev_profile'` finds no browser that it left. The brackets keep the pattern from matching your own shell. In Chrome, close the tabs you opened and unregister a service worker you registered on a local rig. In both, and delete synthetic torrents through the API rather than through the UI's delete dialog (see the dialog trap).
+Make sure that each Playwright script reached `browser.close()`, that `playwright cli list` shows `(no browsers)`, and that `pgrep -f '[p]laywright_chromiumdev_profile'` finds no browser that either one left. The brackets keep the pattern from matching your own shell. In Chrome, close the tabs you opened and unregister a service worker you registered on a local rig. In both, and delete synthetic torrents through the API rather than through the UI's delete dialog (see the dialog trap).
