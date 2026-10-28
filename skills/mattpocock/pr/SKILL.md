@@ -11,7 +11,7 @@ metadata:
 
 Use the PR template of the repository. Look for it in `.github/pull_request_template.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/PULL_REQUEST_TEMPLATE/`, `docs/`, or the repository root. Fill in every section that the template asks for, and tick only the checklist items that are true.
 
-The default body is one sentence that says what the PR does and why: "adds X to get Y", "fixes Z when W". Add the parts below only when the diff alone would confuse a reviewer. Put each part in the template section that fits it.
+The default body is one sentence that says what the PR does and why: "adds X to get Y", "fixes Z when W". Add Summary and Evidence only when the diff alone would confuse a reviewer. Every body gets the Merge danger line. Put each part in the template section that fits it.
 
 If the repository has no template, use this one:
 
@@ -182,7 +182,7 @@ Screenshots are the best evidence when the change is visual and the environment 
 
 ### Merge danger
 
-Use one line. Add a sentence only when the risk is not clear from the line.
+Use one line. Add a sentence only when the risk is not clear from the line. If the template has no section for risk, put the line at the end of the section that describes the change.
 
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
 
