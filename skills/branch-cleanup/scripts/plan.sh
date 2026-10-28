@@ -2,6 +2,7 @@
 # Usage: plan.sh [days]. Plans only; see SKILL.md for the rules and output files.
 # BRANCH_CLEANUP_PRS=<file> replaces `gh pr list` with a JSON fixture (test seam).
 # BRANCH_CLEANUP_FORGEJO_PRS=<file> replaces the Forgejo pulls API the same way.
+# BRANCH_CLEANUP_HERDR=<file> replaces `herdr api snapshot` the same way.
 # The pull/N/head fetch below stays: merged fork-PR heads are often not local.
 set -eo pipefail
 
@@ -121,25 +122,38 @@ while read -r b; do
   (( unpushed > 0 )) && del_flag[$b]="$unpushed commit(s) exist only here"
 done < <(git for-each-ref refs/heads --format='%(refname:lstrip=2)')
 
+# Directories of the open Herdr panes. An agent can work in a clean worktree.
+herdr_snap=""
+if [[ -n ${BRANCH_CLEANUP_HERDR:-} ]]; then
+  herdr_snap=$(cat "$BRANCH_CLEANUP_HERDR")
+elif command -v herdr >/dev/null; then
+  herdr_snap=$(herdr api snapshot 2>/dev/null) || echo "warning: no Herdr snapshot, open panes not checked" >&2
+fi
+herdr_cwds=$(jq -r '.result.snapshot.panes[]? | .cwd, .foreground_cwd | select(.)' <<<"$herdr_snap")
+# in_herdr tells if a Herdr pane is open in the directory $1 or below it.
+in_herdr() { awk -v p="$1" '$0 == p || index($0, p "/") == 1 {f = 1} END {exit !f}' <<<"$herdr_cwds"; }
+
 # Worktrees. A dirty worktree keeps its branch: git cannot delete a checked-out branch.
 wt_remove=() wt_keep=()
 while IFS=$'\t' read -r path head branch locked; do
   [[ $path == "$main_wt" ]] && continue
   [[ -d $path ]] || continue  # missing dirs go to `git worktree prune`
   dirty=$(git -C "$path" status --porcelain 2>/dev/null | head -5)
+  live=""
+  in_herdr "$path" && live="Herdr pane open "
   if [[ -n $branch ]]; then
     [[ -n ${del_reason[$branch]:-} ]] || continue
-    if [[ -n $locked || -n $dirty ]]; then
-      keep_reason[$branch]="worktree $path has local changes or is locked"
+    if [[ -n $locked || -n $dirty || -n $live ]]; then
+      keep_reason[$branch]="worktree $path has local changes, is locked, or has a Herdr pane open"
       unset 'del_reason[$branch]' 'del_flag[$branch]'
-      wt_keep+=("$path  [$branch] ${locked:+locked }${dirty:+$'\n'$(sed 's/^/      /' <<<"$dirty")}")
+      wt_keep+=("$path  [$branch] ${live}${locked:+locked }${dirty:+$'\n'$(sed 's/^/      /' <<<"$dirty")}")
     else
       wt_remove+=("$path")
     fi
   else
     left=$(git rev-list --count "$head" --not --remotes "$base" "${merged_tips[@]}")
-    if [[ -n $locked || -n $dirty || $left -gt 0 ]]; then
-      wt_keep+=("$path  [detached, $left unmerged commit(s)] ${locked:+locked }${dirty:+$'\n'$(sed 's/^/      /' <<<"$dirty")}")
+    if [[ -n $locked || -n $dirty || -n $live || $left -gt 0 ]]; then
+      wt_keep+=("$path  [detached, $left unmerged commit(s)] ${live}${locked:+locked }${dirty:+$'\n'$(sed 's/^/      /' <<<"$dirty")}")
     else
       wt_remove+=("$path")
     fi

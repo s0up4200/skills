@@ -41,12 +41,20 @@ old_branch pr/8; commit p8-local
 old_branch wt-clean; git switch -q main
 # wt-dirty: merged branch in a dirty worktree. Both kept.
 old_branch wt-dirty; git switch -q main
+# wt-live: merged branch in a clean worktree with a Herdr pane open below it. Both kept.
+old_branch wt-live; git switch -q main
 # The main worktree's branch is protected even when local only.
 git switch -q main
 git worktree add -q "$tmp/wt-clean" wt-clean
 printf 'node_modules/\n' >>.git/info/exclude
 mkdir "$tmp/wt-clean/node_modules"; touch "$tmp/wt-clean/node_modules/x"
 git worktree add -q "$tmp/wt-dirty" wt-dirty; echo x >"$tmp/wt-dirty/new-file"
+git worktree add -q "$tmp/wt-live" wt-live; mkdir "$tmp/wt-live/sub"
+# A pane in wt-clean-x is not in wt-clean.
+cat >"$tmp/herdr.json" <<EOF
+{"result":{"snapshot":{"panes":[{"cwd":"$tmp/repo","foreground_cwd":"$tmp/wt-live/sub"},{"cwd":"$tmp/wt-clean-x"}]}}}
+EOF
+export BRANCH_CLEANUP_HERDR=$tmp/herdr.json
 # Detached worktree on a merged commit: removed. Detached with a unique commit: kept.
 git worktree add -q --detach "$tmp/det-merged" main
 git worktree add -q --detach "$tmp/det-unique" main; (cd "$tmp/det-unique" && commit du1)
@@ -77,6 +85,8 @@ expect '^  on-remote +on remote$'
 expect '^  pr-7 +open PR #7$'
 expect '^  pr/8 +open PR #8$'
 expect '^  wt-dirty +worktree .*/wt-dirty has local changes'
+expect '^  wt-live +worktree .*/wt-live has local changes, is locked, or has a Herdr pane open$'
+expect "wt-live  \\[wt-live\\] Herdr pane open"
 expect "^  $tmp/wt-clean$"
 expect "^  $tmp/det-merged$"
 expect "det-unique  \[detached, 1 unmerged commit"
@@ -93,10 +103,10 @@ script=$(sed -n 's/^Cleanup: //p' <<<"$plan")
 bash "$script" >/dev/null
 
 left=$(git for-each-ref refs/heads --format='%(refname:lstrip=2)' | sort | tr '\n' ' ')
-want="local-recent main on-remote pr-7 pr/8 wt-dirty "
+want="local-recent main on-remote pr-7 pr/8 wt-dirty wt-live "
 [[ $left == "$want" ]] || { echo "FAIL branches left: '$left' want '$want'"; fail=1; }
 wts=$(git worktree list --porcelain | sed -n 's#^worktree '"$tmp"'/##p' | sort | tr '\n' ' ')
-[[ $wts == "det-unique repo wt-dirty " ]] || { echo "FAIL worktrees left: '$wts'"; fail=1; }
+[[ $wts == "det-unique repo wt-dirty wt-live " ]] || { echo "FAIL worktrees left: '$wts'"; fail=1; }
 backup=$(sed -n 's/^Backup: *//p' <<<"$plan")
 grep -q "^squashed	$squashed_tip	merged PR #5$" "$backup" || { echo "FAIL backup row"; fail=1; }
 

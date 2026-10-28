@@ -32,7 +32,7 @@ A branch is kept when any of these is true, checked in this order:
 2. A branch with the same name exists on any remote.
 3. An open PR matches it: same head branch name, a `pr-N`, `pr/N`, or `prN` name, or the same tip commit. A local checkout of an open PR can hold review fixes that are not pushed yet.
 4. It is not merged (rules below), and its oldest reflog entry is inside the window. When the reflog has expired, the tip's commit date stands in.
-5. Its worktree has local changes or is locked. Git cannot delete a branch that is checked out.
+5. Its worktree has local changes, is locked, or has a Herdr pane open in it. Git cannot delete a branch that is checked out, and an agent can work in a clean worktree.
 
 Otherwise it is deleted:
 
@@ -40,7 +40,7 @@ Otherwise it is deleted:
 - **merged PR #N**: the tip is at or behind the head of a merged PR. This catches squash merges, which `git branch --merged` misses.
 - **not on any remote, older than N days**: everything else. When some of its commits exist only on this machine, the plan flags it with `!! N commit(s) exist only here`. Commits in a PR head on the forge count as pushed.
 
-Worktrees: a worktree on a deleted branch is removed. A detached worktree is removed when its HEAD is already merged or pushed. A worktree with local changes, or a locked worktree, stays, and the plan prints its `git status`. Worktree directories that no longer exist are pruned. Worktrees in other tools' directories (Codex, herdr, `/var/tmp`) are treated like any other.
+Worktrees: a worktree on a deleted branch is removed. A detached worktree is removed when its HEAD is already merged or pushed. A worktree with local changes, a locked worktree, or a worktree with a Herdr pane open in it or below it stays, and the plan prints its `git status`. The plan reads the panes from `herdr api snapshot`. If Herdr is installed but gives no snapshot, the plan warns and does not check the panes. Worktree directories that no longer exist are pruned. Worktrees in other tools' directories (Codex, herdr, `/var/tmp`) are treated like any other.
 
 ## 3. Show the plan
 
