@@ -118,4 +118,4 @@ Link each number. Leave empty lines out. The `Epics` line shows progress only. F
 Ask after the report, not before, and only when the answer changes the recommendation:
 
 - The best free issue is a gate: should the user claim it? Assign it only on a yes, with `gh issue edit N --add-assignee @me`.
-- An issue is done but still open: should the user close it? Close it only on a yes, with `gh issue close N --comment "Shipped in #X"`.
+- An issue is done but still open: should the user close it? Close it only on a yes, with `gh issue comment N --body "Shipped in #X"` and then `gh issue close N`, because `gh issue close --comment` on an already-closed issue drops the comment and still exits 0.

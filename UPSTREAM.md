@@ -6,7 +6,7 @@ This file records the upstream commit, the local changes, and the license of eac
 
 The skills in `skills/mattpocock/` are copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 
-**Upstream commit:** `5beb35b040e3de97e54fa9e386d7e42d15c295c2` (2026-10-19, v1.3.1 with unreleased changesets)
+**Upstream commit:** `59db609eb1e18aaf59b63284d0e52255aff0c63c` (2026-10-27, v1.3.1 with unreleased changesets)
 
 ### Copied skills
 
@@ -41,7 +41,8 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `tdd` has a "Real sleeps" anti-pattern. It comes from the test rules in autobrr/qui#3520.
 - `setup-matt-pocock-skills` includes a Forgejo tracker template. It records membership in a `## Sub-issues` task list and blockers as native dependencies, with `fj` commands. Label setup uses the selected tracker. `to-tickets` delegates child linking to the tracker document and permits only the required parent membership update. GitHub keeps its existing template and fallback.
 - `setup-matt-pocock-skills` treats a rerun as an upgrade. It keeps the recorded choices and custom text, and asks only about a convention that is missing or that conflicts. `ask-matt` tells the user to rerun it after a skill update.
-- `setup-matt-pocock-skills` renames an old `CONTEXT.md` or `CONTEXT-MAP.md` to the `GLOSSARY` name with `git mv`, and updates the references to it. Upstream v1.3 tells users to do this rename by hand.
+- `setup-matt-pocock-skills` renames an old `CONTEXT.md` or `CONTEXT-MAP.md` to the `GLOSSARY` name with `git mv`, and updates the references to it in `docs/agents/`, `AGENTS.md`, and `CLAUDE.md`. Upstream only offers the rename in its explore step, and updates `docs/agents/domain.md` only.
+- `setup-matt-pocock-skills`: the check for a reachable repo also covers a Forgejo tracker, with `fj repo view`. Upstream has no Forgejo tracker.
 - A sixth triage role, `needs-grilling`, marks the maintainer's own idea that is parked until a `/grill-with-docs` session. `setup-matt-pocock-skills` adds it to `triage-labels.md` and creates each mapped label that the repo does not have. `ask-matt` tells the agent to file an own idea with this label, and to create the label in a repo that was set up before this change. `to-spec` writes the spec into the grilled issue, or closes the grilled issue after it publishes the spec as a new issue.
 - `codebase-design` has a new `GUARDING.md`, and its "Going deeper" list points to it. The step applies when a session settles the seam of a deep module that hides an importable dependency. A background sub-agent finds the lint rule that blocks a bypass of the module, and the agent asks the user about it. `grilling` has one line that sends the agent to read `GUARDING.md` by its path, so `grill-with-docs` gets it too. When the line pointed only to `codebase-design`, an agent loaded that skill but did not open `GUARDING.md`, and a spec shipped with no guard. `GUARDING.md` prefers a lint rule to making the hidden code private, because the rule's message names the module, it covers calls inside the module's own package, and an agent often exports a private name again.
 - `grilling` tells the agent to read the current reference of an external API, library, or tool before it recommends a design that depends on how it behaves, also when the repo already uses it. Without the line, the agent recommended a deprecated endpoint only because the repo code already used it.
@@ -77,7 +78,7 @@ To see the upstream changes since the recorded commit (add `--stat` for a summar
 ```sh
 git clone https://github.com/mattpocock/skills.git /tmp/mattpocock-skills
 cd /tmp/mattpocock-skills
-git diff 5beb35b..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents skills/in-progress/chief-of-staff
+git diff 59db609..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents skills/in-progress/chief-of-staff
 ```
 
 Apply the changes that you want. Then update the upstream commit in this file.
