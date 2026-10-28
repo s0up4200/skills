@@ -112,6 +112,8 @@ Then hold each finding against the PR discussion. Mark each finding that the dis
 
 A reply that refutes a finding does not close it. Check the reply against the code, and say if the reply is wrong. A finding that the discussion does not touch is new. List the new findings apart from the marked ones.
 
+Then list, under `## Questions for you`, each question that the PR body or a comment asks the reviewer and that no reply answers: an OK on a cost, or a choice between two options. Link the comment. Neither axis answers these questions, because both axes check the code.
+
 Before a finding becomes the worst finding in the opening sentence, or a decision for the user, check at the source each severity claim that depends on a runtime default, a configuration value, or the behaviour of a caller. Read the default, the configuration, or the caller, and correct the severity if the claim is wrong. A sub-agent reads the diff, not the code around it: one sub-agent called a failed read "silent at the default log level", but DEBUG was the default log level of the app.
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
