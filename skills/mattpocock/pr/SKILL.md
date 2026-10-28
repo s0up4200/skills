@@ -36,7 +36,7 @@ gh issue view <child> --json parent --jq .parent.number
 gh issue view <parent> --json subIssues --jq '.subIssues.nodes[]|"#\(.number) \(.state)"'
 ```
 
-If the PR closes every sub-issue that is still open, add `Closes #<parent>` too, so the parent closes when the PR merges. On Forgejo, read the parent's `## Sub-issues` task list.
+If the PR closes every sub-issue that is still open, add `Closes #<parent>` too, so the parent closes when the PR merges. Skip a parent with the `wayfinder:map` label, because wayfinder decides when a map is done. On Forgejo, read the parent's `## Sub-issues` task list.
 
 ## Prose
 
