@@ -37,7 +37,7 @@ The base directory is printed when the skill loads. The script prints one line p
 
 - `team` or `outside` on a PR. A team member is an author with the association OWNER, MEMBER, or COLLABORATOR. Each other author is an outside contributor.
 - `review requested: me` on a PR, and `new commits since my review`.
-- `asks me` on an issue: a comment after the user's last comment mentions the user.
+- `asks me` on an issue: a comment after the user's last comment mentions the user. A team comment after the user's last comment that proposes a plan or asks to take the issue waits on the user too, with no mention. Read each `last:` line for it.
 - `blocking` and `blockedBy` on an issue, with only the open edges. An issue that blocks two or more open issues is a gate. Finishing a gate frees the most work.
 - `epic N/M done` on a tracking issue, and `epic #N` on its sub-issues.
 
@@ -79,7 +79,7 @@ A tracking issue with `epic M/M done` is done too: every sub-issue is closed. Re
 
 Ignore drafts, `wontfix` issues, and `needs-info` issues with no reply from the reporter. Rank the rest, best first:
 
-1. Unblock a teammate. A team PR that asks for the user's review, or that has no review from the user, or that has new commits since the user's last review. An issue with `asks me` from a team member. The user's issue or PR that blocks an issue that a teammate claimed. Next step for a PR: `/code-review`.
+1. Unblock a teammate. A team PR that asks for the user's review, or that has no review from the user, or that has new commits since the user's last review. An issue with `asks me` from a team member. The user's issue or PR that blocks an issue that a teammate claimed. Next step for a PR: `/code-review`. Next step for an issue: `/grilling` on it, then one reply with the answers.
 2. Merge: a PR that is approved, has green checks, and has no conflicts.
 3. The user's own work: the user's PR with requested changes, then the user's ready claims, gates first.
 4. Refactor: an open issue with a refactor label that is free or claimed by the user, and that nothing open blocks. Put first a refactor that is a gate or that touches a hot spot. When no refactor issue touches the top hot spot, name that file as a candidate for `/codebase-design`.
