@@ -27,6 +27,17 @@ If the repository has no template, use this one:
 
 For a fix, name the symptom that users see, not the code that changed. Make the title as wide as the fix. If the fix covers SQLite and Postgres, the title does not name only SQLite.
 
+## Parent issue
+
+When the PR closes a sub-issue, read its parent and the siblings:
+
+```bash
+gh issue view <child> --json parent --jq .parent.number
+gh issue view <parent> --json subIssues --jq '.subIssues.nodes[]|"#\(.number) \(.state)"'
+```
+
+If the PR closes every sub-issue that is still open, add `Closes #<parent>` too, so the parent closes when the PR merges. On Forgejo, read the parent's `## Sub-issues` task list.
+
 ## Prose
 
 Before you show or post the body, write all of its prose with the `simple-english` skill, then apply the `unslop` skill to it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.

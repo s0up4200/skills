@@ -73,6 +73,8 @@ A file with many fixes is a hot spot. Leave out lock files, changelogs, and gene
 
 First find the issues that are done but still open: a comment says that the work is finished, and lists no open work. A PR with no closing keyword leaves its issue open. A status update that names merged PRs and also lists open work ("Open: ...", "left to do") is not done. Check each PR that a comment names with `gh pr view N --json state`, because a comment can be wrong. Report each done issue as one to close, not as work to rank.
 
+A tracking issue with `epic M/M done` is done too: every sub-issue is closed. Report it as one to close, unless its body lists work that has no ticket yet.
+
 ## 4. Rank
 
 Ignore drafts, `wontfix` issues, and `needs-info` issues with no reply from the reporter. Rank the rest, best first:

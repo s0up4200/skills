@@ -54,6 +54,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `triage`: an open design question moves a `ready-for-agent` issue back to `needs-triage`.
 - `retro`: each candidate in the report starts with the repo and the file of its fix in bold.
 - `grilling` starts each question with a short scenario with concrete values, and says what the user sees under each option. Without the line, a round asked about field names such as `groupId`, and the user could not answer it.
+- `pr` has a Parent issue section: when the PR closes the last open sub-issues of a parent, the body closes the parent too. Without it, a spec split into tickets stayed open after its last ticket merged.
 - `pr` has a Title section: a fix names the symptom that users see, as wide as the fix. The description names the title too. A title named only SQLite for a fix that covered both databases.
 - `grill-me` asks one question at a time, not a round. Since 2026-07-16, upstream `grilling` asks each round in full. Its docs page gives a global `CLAUDE.md` line that goes back to one question at a time. The local `grill-me` uses that line only when the user types `/grill-me`. Thus `grilling` and the skills that run it keep the rounds.
 - `wizard` gives the user the command to run the script in their own terminal (`bash <path>`), because a Claude Code `!` command gets no keyboard input and the wizard stops at its first prompt. `template.sh` writes `${e}[Enter keeps current]` in `ask()`, so that the template passes shellcheck (SC1087).

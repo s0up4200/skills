@@ -22,6 +22,8 @@ Read the epic body too. Maintainers write things there that the graph does not h
 
 ## 2. Sort every open sub-issue
 
+When no sub-issue is open, the epic is done. Report it as one to close, unless its body lists work that has no ticket yet.
+
 Put each open sub-issue in exactly one bucket. Check them in this order:
 
 1. **Done, still open**: a linked PR is merged, or a comment says that the work is finished. Read the whole comment. A status update often names merged PRs and still lists open work ("Open: ...", "left to do", a date to check back). That issue is not done: sort it into the next buckets, and note the open item and its date. Check each PR that a comment names with `gh pr view N --json state`, because a comment can be wrong. Report a done issue as one to close. It is not work.
