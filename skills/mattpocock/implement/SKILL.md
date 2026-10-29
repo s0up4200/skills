@@ -40,3 +40,5 @@ If the diff adds or changes an SQL statement, or adds a loop over rows from a da
 Before you commit, list each place where the code departs from the spec: a requirement that you changed or left out, and each spec question that you answered yourself, for example a term that the spec did not define. Add the departures that code-review found. When the work comes from an issue, post them on the issue in one comment that starts with `Brief amendment (agent decision)`, in the format of a Brief amendment. Otherwise, list them in your final reply.
 
 Commit your work to the current branch.
+
+When the commit is the last step of the user's message, and the session has the tool `mcp__compact__after_turn`, call it, so that the next step, for example `/pr`, starts from a short summary. Give it a `focus` that keeps what the pull request body needs: the issue, the branch, the departures that are not on the issue, and the result of each check that CI cannot see, such as a live run.
