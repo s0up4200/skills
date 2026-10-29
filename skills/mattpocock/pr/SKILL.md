@@ -187,3 +187,7 @@ Use one line. Add a sentence only when the risk is not clear from the line. If t
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
 
 The blast radius is the potential impact or scope of the changes introduced by this PR. Consider all possibilities. Examples are layout shift, breakages for consumers, mobile responsiveness, etc.
+
+## After the PR opens
+
+When you opened the pull request in this turn because the user asked for it, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. It compacts the conversation after your last reply.
