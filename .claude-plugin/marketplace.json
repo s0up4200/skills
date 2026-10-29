@@ -33,7 +33,8 @@
         "./skills/trim-agents-md",
         "./skills/sync-upstream",
         "./skills/perf-review",
-        "./skills/go-proverbs"
+        "./skills/go-proverbs",
+        "./skills/fix-one-thing"
       ]
     },
     {

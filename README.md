@@ -66,6 +66,7 @@ cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [field-test](skills/field-test/) | Run a code change live on a local test setup or on the production server, prove the change with one chosen result, count the requests that qui sends to qBittorrent, and clean up. The host facts stay in a private folder outside the repo |
 | [challenge-request](skills/challenge-request/) | Challenge a feature request from Discord or GitHub: find the real problem, check for existing features and duplicates, and give a verdict of yes, not now, already possible, no, or need more info. Explicit invocation only |
 | [codeowners](skills/codeowners/) | Create or update a GitHub CODEOWNERS file from the commit history, counted per login, and the maintainer's decisions. Writes the file and stops before the commit. Explicit invocation only |
+| [fix-one-thing](skills/fix-one-thing/) | Find one violation of the repo's coding standards, fix it with a small diff that keeps behavior, and open one PR. Runs by hand or on a schedule, where the PR opens as a draft. Explicit invocation only |
 
 ### From mattpocock/skills
 
