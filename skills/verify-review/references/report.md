@@ -16,6 +16,9 @@ Write for a person who has several pull requests open and reads the report once:
 - CodeRabbit says part of the web address can still reach the log. It can't, because the code removes that part before it writes the log. I posted this reply. In plain words, it says the code already removes it:
   > `RedactURL` clears `Fragment` before `String()` (core/service.go:190), so the fragment never reaches the log.
 
+**I decided**
+- **Risk 1/10**: Codex wants the two copies of the retry message in one place. I merged them. No user sees a change.
+
 **Your call**
 
 ❓ **Q1** - **Should sync retry forever?** · Risk 4/10
@@ -41,6 +44,7 @@ If a sync fails, it tries again forever. Codex wants a limit. The claim is true.
 - **Read**: a PR with no closing issue says "the PR body (no closing issue)".
 - **Status** is one of: the fixes are saved and on GitHub, the fixes are on this machine and not saved yet, or no changes.
 - Each finding is one list item of three sentences at most. For a fix, say whether a test guards it. Put duplicate findings in one item and name each bot.
+- **I decided** lists each small judgment call (step 2 of `SKILL.md`) in one item: the finding, your pick, and the reply that you posted, in the same form as under **The reviewer was wrong**. The user can reverse one by name. Then do the other option, and post a reply that corrects the first one.
 - **Your call** asks one question for each open judgment call, in the `grilling` round format, all in one round. Leave those threads unresolved until the user answers. Each option that fixes the finding says whether it turned the red test from step 2 green.
 - Under each option that leaves a finding as it is, show the reply that the option posts (step 4), in the same form as a reply under **The reviewer was wrong**. The answer that picks the option then approves its reply too, so the reply needs no second round.
 - Recommend the fix when it removes copied code, a rule that lives in two places, or behavior that only a comment explains, and the change is small or medium. This holds when the fix touches code older than the pull request: the maintainer pays for the cleanup now or later, and now is cheaper. Recommend leaving it when the fix is a large change, or when it costs more than the failure it prevents.

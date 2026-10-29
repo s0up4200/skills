@@ -1,7 +1,7 @@
 ---
 name: verify-review
 effort: high
-description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Greptile, Macroscope, Claude) and from people, or the Claude review comments on a Forgejo pull request, then commit the fixes, post the refutations, and report. It waits for the user only on judgment calls and on replies to people, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr]; a chained request such as "then /verify-review" counts.
+description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Greptile, Macroscope, Claude) and from people, or the Claude review comments on a Forgejo pull request, then commit the fixes, post the refutations, and report. It waits for the user only on judgment calls that change the spec or the app, or that are not small, and on replies to people, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr]; a chained request such as "then /verify-review" counts.
 argument-hint: "[optional: PR number or URL]"
 ---
 
@@ -9,7 +9,7 @@ argument-hint: "[optional: PR number or URL]"
 
 A reviewer saw the diff, not the running code, the callers, or the reason for a line. Each finding is a claim, and it stays unverified until you check it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
-Arguments: `/verify-review [pr]`. With no PR, use the pull request named in the conversation, or the one for the current branch. The run makes the writes in steps 3 to 5 for each settled finding (confirmed, wrong, or stale) before it reports: commit, push, reply, resolve, and rate. Two things wait for the user (step 7): a judgment call, and a reply or review answer to a person. The user named the skill, and that request approves each reply to a bot. The report shows the full text of each reply.
+Arguments: `/verify-review [pr]`. With no PR, use the pull request named in the conversation, or the one for the current branch. The run makes the writes in steps 3 to 5 for each settled finding (confirmed, wrong, or stale) before it reports. Two things wait for the user (step 7): a judgment call that is not small (step 2), and a reply or review answer to a person. The user named the skill, and that request approves each reply to a bot. The report shows the full text of each reply.
 
 The scripts sit next to this file: `<skill base directory>/scripts/threads.sh` and `scripts/wait-review.sh`.
 
@@ -69,6 +69,8 @@ The verification ends in one of four verdicts, each with the evidence that produ
 - **stale**: already addressed by a commit after the review. Resolve without a reply.
 - **judgment**: the claim holds, or might, and what to do about it is the maintainer's call. This covers a fix that chooses between designs, a true claim whose fix costs more than the failure it prevents, and a defect that predates the pull request. Bring it to the user with the finding, a risk score, the practical tradeoff, and your recommendation (step 6). Silence is not agreement.
 
+A judgment call is **small** when its risk is 3/10 or lower, you have a clear pick, and the pick is a small change that leaves each outcome of the spec (the closing issue, else the PR body) and each behavior a user sees as it is, such as merging repeated lines. Settle it with your pick, as a confirmed finding (step 3) or with a reply (step 4), and list it under **I decided** in the report.
+
 The line between wrong and judgment matters more than any other in this skill. A true claim that is not worth fixing is a judgment. Calling it wrong puts a false statement on the record under the maintainer's name. Before you write "wrong", restate the bot's scenario in its own terms, the ordering of events and the inputs it named, and show the code handling that scenario. The most common wrong refutation argues against a neighbouring scenario: the other ordering, a different caller, a case the guard does cover. If the code handles only the neighbour, the bot was right.
 
 ## 3. Fix the confirmed findings
@@ -99,12 +101,12 @@ Resolve a thread with:
 gh api graphql -f query='mutation($id:ID!){resolveReviewThread(input:{threadId:$id}){thread{isResolved}}}' -F id="$thread_id"
 ```
 
-Resolve or keep each thread by this list. The report uses the same list (step 6).
+Resolve or keep each thread by this list.
 
-- A fixed finding (confirmed, stale, or a judgment call that the user chose to fix): resolve the thread, for every reviewer.
-- A refuted finding or a declined judgment call from a bot other than CodeRabbit: reply, then resolve the thread.
-- A refuted finding or a declined judgment call from CodeRabbit (author `coderabbitai`): reply, and keep the thread open, so that CodeRabbit can answer the reply. On a later run, resolve it when the finding is fixed at head or CodeRabbit accepted your reply. Until then, count it as waiting on CodeRabbit.
-- A refuted finding or a declined judgment call from a person: reply, and keep the thread open. The thread is then waiting, and the next run skips it.
+- A fixed finding (confirmed, stale, or a judgment call settled with a fix): resolve the thread, for every reviewer.
+- A declined finding (wrong, or a judgment call settled without a fix) from a bot other than CodeRabbit: reply, then resolve the thread.
+- A declined finding from CodeRabbit (author `coderabbitai`): reply, and keep the thread open, so that CodeRabbit can answer the reply. On a later run, resolve it when the finding is fixed at head or CodeRabbit accepted your reply. Until then, count it as waiting on CodeRabbit.
+- A declined finding from a person: reply, and keep the thread open. The thread is then waiting, and the next run skips it.
 
 A reply to a declined judgment call is short and gives the reason. Some bots learn from replies, and a thread resolved with no reply looks like a finding that nobody read. The finding was true, so give the reason that applies to this case, such as a fix that costs more than the failure, or hardware that nobody can test on. A reply that calls the check itself wrong teaches the bot to skip a real defect next time.
 
@@ -120,8 +122,8 @@ The answer cites commit SHAs, so post it after the push.
 
 Codex ends each comment with "Useful? React with 👍 / 👎." Add one reaction to the first comment of each Codex thread:
 
-- 👍 for a finding that led to a fix: **confirmed**, or a **judgment** that the user chose to fix.
-- 👎 for a finding that did not: **wrong**, or a **judgment** that the user declined.
+- 👍 for a finding that led to a fix: **confirmed**, or a **judgment** settled with a fix.
+- 👎 for a finding that did not: **wrong**, or a **judgment** settled without a fix.
 - For a **stale** finding, rate the claim at the commit that the bot reviewed.
 - Add no reaction to an open judgment call.
 
@@ -139,7 +141,7 @@ Account for every finding. Read `references/report.md`, and write the report in 
 
 When the report has no open judgment call and no reply to a person, nothing waits for the user. Go to step 8 if the writes included a push, and stop otherwise.
 
-The user's answer settles the judgment calls, and it approves each reply to a person that it does not say no to. **go** answers every question in this round with your recommendation and approves every reply to a person. It covers this round only. A reply whose text changes after the report needs a new yes. Fix each judgment call that the user chose to fix, then commit, push, post, resolve, and rate. For each judgment call that the user declines, post its reply, and resolve or keep the thread by the list in step 4. If the user answers only part of the round, act on the answered part and ask again about the rest. If the writes include a push, go to step 8. Otherwise report again in the same layout, with the new status.
+The user's answer settles the judgment calls, and it approves each reply to a person that it does not say no to. **go** answers every question in this round with your recommendation and approves every reply to a person. It covers this round only. A reply whose text changes after the report needs a new yes. Then make the writes of steps 3 to 5 for each judgment call that it settles. If the user answers only part of the round, act on the answered part and ask again about the rest. If the writes include a push, go to step 8. Otherwise report again in the same layout, with the new status.
 
 ## 8. Wait for the next review
 
@@ -155,6 +157,6 @@ Each push makes the bots review again. Wait for that review, so the user does no
 scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # prints each bot that reviewed the new head
 ```
 
-Run it in the background where the harness supports that, because it can wait up to 20 minutes. Start it right after the push, also while a judgment call waits for the user. If the run pushed to more than one pull request, start one wait for each pull request, not one combined wait. When it prints a reviewer, start again at step 1 and send a new report. When the new review leaves nothing open, say so in one line and stop.
+Run it in the background where the harness supports that, because it can wait up to 20 minutes. Start it right after the push, also while a judgment call waits for the user. After pushes to more than one pull request, start one wait for each. When it prints a reviewer, start again at step 1 and send a new report. When the new review leaves nothing open, say so in one line and stop.
 
-When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. It compacts the conversation after your last reply. A run that still waits on the user or on a review keeps its context. When the script exits 1, no bot reviewed the new head in time. Say so and stop: the user can run `/verify-review` later. When no bot has reviewed this pull request, skip the wait and stop after the writes.
+When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When the script exits 1, no bot reviewed the new head in time. Say so and stop: the user can run `/verify-review` later. When no bot has reviewed this pull request, skip the wait and stop after the writes.

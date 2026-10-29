@@ -27,8 +27,8 @@ Do them as in SKILL.md, but commit and do not push yet. Leave out "Resolve the t
 
 Write one PR comment that lists every finding you collected, one line each:
 
-- `Fixed in <sha> (#<comment id>)` for a confirmed finding, or for a judgment that the user chose to fix.
-- `Accepted: <reason> (#<comment id>)` for a judgment that the user declined.
+- `Fixed in <sha> (#<comment id>)` for a confirmed finding, or for a judgment call settled with a fix.
+- `Accepted: <reason> (#<comment id>)` for a judgment call settled without a fix.
 - `Refuted: <evidence at file:line or command output> (#<comment id>)` for a wrong finding.
 - `Stale: fixed by <sha> (#<comment id>)` for a stale finding.
 
