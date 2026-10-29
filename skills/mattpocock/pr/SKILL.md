@@ -190,6 +190,4 @@ The blast radius is the potential impact or scope of the changes introduced by t
 
 ## After the PR opens
 
-When you opened the pull request in this turn because the user asked for it, wait for the first bot review. Start `scripts/wait-review.sh` from the folder of the `verify-review` skill in the background, with the repo, the pull request, and the head SHA. When it prints a reviewer, run the `verify-review` skill on the pull request. When it exits 1, no bot reviewed in 20 minutes: say so in one line, and stop.
-
-Then, when the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request, what is left, and the running wait. It compacts the conversation after your last reply, while the wait runs.
+When you opened the pull request in this turn because the user asked for it, run the `verify-review` skill on it next. It waits for the first bot review, and it compacts the session when it stops.

@@ -1,7 +1,7 @@
 ---
 name: verify-review
 effort: high
-description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Greptile, Macroscope, Claude) and from people, or the Claude review comments on a Forgejo pull request, then commit the fixes, post the refutations, and report. It waits for the user only on judgment calls that change the spec or the app, or that are not small, and on replies to people, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr], or when the pr skill starts it after the first bot review of a new pull request; a chained request such as "then /verify-review" counts.
+description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Greptile, Macroscope, Claude) and from people, or the Claude review comments on a Forgejo pull request, then commit the fixes, post the refutations, and report. It waits for the user only on judgment calls that change the spec or the app, or that are not small, and on replies to people, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr], or when the pr skill starts it after it opens a pull request; a chained request such as "then /verify-review" counts.
 argument-hint: "[optional: PR number or URL]"
 ---
 
@@ -9,7 +9,9 @@ argument-hint: "[optional: PR number or URL]"
 
 A reviewer saw the diff, not the running code, the callers, or the reason for a line. Each finding is a claim, and it stays unverified until you check it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
-Arguments: `/verify-review [pr]`. With no PR, use the pull request named in the conversation, or the one for the current branch. The run makes the writes in steps 3 to 5 for each settled finding (confirmed, wrong, or stale) before it reports. Two things wait for the user (step 7): a judgment call that is not small (step 2), and a reply or review answer to a person. The request for the skill or for the pull request approves each reply to a bot. The report shows the full text of each reply.
+Arguments: `/verify-review [pr]`. With no PR, use the pull request named in the conversation, or the one for the current branch. The run makes the writes in steps 3 to 5 for each settled finding (confirmed, wrong, or stale) before it reports. Two things wait for the user (step 7): a judgment call that is not small (step 2), and a reply or review answer to a person. The request for the skill or for the pull request approves each reply to a bot.
+
+When the pr skill starts the run and no bot has reviewed the pull request yet, run the wait of step 8 first.
 
 The scripts sit next to this file: `<skill base directory>/scripts/threads.sh` and `scripts/wait-review.sh`.
 
@@ -159,4 +161,4 @@ scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # prints each
 
 Run it in the background where the harness supports that, because it can wait up to 20 minutes. Start it right after the push, also while a judgment call waits for the user. After pushes to more than one pull request, start one wait for each. When it prints a reviewer, start again at step 1 and send a new report. When the new review leaves nothing open, say so in one line and stop.
 
-When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When the script exits 1, no bot reviewed the new head in time. Say so and stop: the user can run `/verify-review` later. When no bot has reviewed this pull request, skip the wait and stop after the writes.
+When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When the script exits 1, no bot reviewed the new head in time. Say so and stop. When no bot has reviewed this pull request, skip the wait and stop after the writes.
