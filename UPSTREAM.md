@@ -6,7 +6,7 @@ This file records the upstream commit, the local changes, and the license of eac
 
 The skills in `skills/mattpocock/` are copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 
-**Upstream commit:** `59db609eb1e18aaf59b63284d0e52255aff0c63c` (2026-10-27, v1.3.1 with unreleased changesets)
+**Upstream commit:** `d1478fcb140db0b93c0c8df17bcfd311844749d0` (2026-10-29, v1.3.2)
 
 ### Copied skills
 
@@ -81,7 +81,7 @@ To see the upstream changes since the recorded commit (add `--stat` for a summar
 ```sh
 git clone https://github.com/mattpocock/skills.git /tmp/mattpocock-skills
 cd /tmp/mattpocock-skills
-git diff 59db609..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents skills/in-progress/chief-of-staff
+git diff d1478fc..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents skills/in-progress/chief-of-staff
 ```
 
 Apply the changes that you want. Then update the upstream commit in this file.

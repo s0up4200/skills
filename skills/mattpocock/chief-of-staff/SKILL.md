@@ -19,7 +19,7 @@ Harness-permitting, you will suggest recurring schedules which can help in achie
 
 All work should be done in subagents. Protect your context window.
 
-Use background agents so you can stay in active dialogue with the user.
+Use background agents so you can stay in active dialogue with the user. Start every subagent with a fresh context window.
 
 A subagent cannot talk to the user. Run each skill or step that asks the user in this session. Give a subagent only work that needs no answer from the user, and have it send each question back to you. When a skill mixes both, split it: the subagent does the work and returns its questions, and you ask the user.
 

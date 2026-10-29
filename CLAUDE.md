@@ -101,6 +101,10 @@ for mobile audits, small-screen layout fixes, or form/table/chart adaptation.
 - **Keep it general.** Skills run across many projects. Write principles the model can apply with judgment, not rigid rules overfitted to one codebase.
 - **Avoid heavy-handed MUSTs.** If you're writing ALWAYS or NEVER in all caps, reframe as reasoning. Claude is smart — explain the tradeoff and it will make the right call.
 
+### Subagents
+
+If a skill starts a subagent, the skill tells the agent to start it with a fresh context window. Some harnesses, for example Codex, fork the parent conversation by default. A fork gets the full context of the parent, and the subagent must see only its brief.
+
 ### Verification Sections
 
 If the skill involves output that should be verified, include a verification section with:

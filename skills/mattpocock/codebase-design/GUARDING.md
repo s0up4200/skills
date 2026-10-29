@@ -13,7 +13,7 @@ A thin wrapper gets no guard. The rule adds friction and protects nothing.
 
 ## Lookup
 
-Start a background sub-agent. Tell it to read primary sources only: the linter docs and the linter source. The sub-agent writes no file. It reports three facts:
+Start a background sub-agent with a fresh context window. Tell it to read primary sources only: the linter docs and the linter source. The sub-agent writes no file. It reports three facts:
 
 1. The rule that the linter of the project already ships. For Go, `depguard` blocks an import path and `forbidigo` blocks calls to the wrapped API. For TypeScript, `no-restricted-imports` blocks an import path.
 2. The configuration for that rule. The `desc` or `message` text names the module to use, so that the agent that hits the failure knows where to go.

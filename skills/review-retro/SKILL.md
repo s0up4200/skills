@@ -31,7 +31,7 @@ Done when the chunk files exist and the user accepts the team.
 
 ## 2. Find themes in subagents
 
-The corpus is too large for one context: 812 kept items in a 1,600-PR repo came to 750 KB. Send one subagent per chunk, all in one turn, on Opus. Theme work is judgement over long text, so a smaller model misses the repeats.
+The corpus is too large for one context: 812 kept items in a 1,600-PR repo came to 750 KB. Send one subagent per chunk, all in one turn, on Opus, each with a fresh context window. Theme work is judgement over long text, so a smaller model misses the repeats.
 
 Prompt for each subagent (fill in the brackets):
 

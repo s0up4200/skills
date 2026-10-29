@@ -40,7 +40,7 @@ Done when you have a list of kept sessions with the user's first prompt for each
 
 ## 2. Analyse each session in a subagent
 
-The digests are large (up to about 150 KB each), so the analysis runs in subagents. Give each subagent about 150 KB of digests: one large session alone, or several small ones together. Run all subagents in one turn. Use the session's model; do not choose a smaller one, because this work is judgement over long text.
+The digests are large (up to about 150 KB each), so the analysis runs in subagents. Give each subagent about 150 KB of digests: one large session alone, or several small ones together. Run all subagents in one turn, each with a fresh context window. Use the session's model; do not choose a smaller one, because this work is judgement over long text.
 
 The script's last line names the repo's **memory**: the Claude auto-memory directory, or `none`. Agents read memory as if it were docs, but Codex, subagents, and other checkouts do not see it.
 

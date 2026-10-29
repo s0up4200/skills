@@ -31,7 +31,7 @@ This command is _informed_ by the project's domain model and built on a shared d
 
 Read the project's domain glossary (`GLOSSARY.md`) and any ADRs in the area you're touching first.
 
-Then spawn a sub-agent to walk the codebase. A sub-agent sees none of what you loaded, so give it the paths in scope, the hot spots and coupled pairs, the codebase-design glossary and the deletion test, the `GLOSSARY.md` terms, and the decisions of the ADRs in the area. Don't follow rigid heuristics; explore organically and note where you experience friction:
+Then spawn a sub-agent with a fresh context window to walk the codebase. A sub-agent sees none of what you loaded, so give it the paths in scope, the hot spots and coupled pairs, the codebase-design glossary and the deletion test, the `GLOSSARY.md` terms, and the decisions of the ADRs in the area. Don't follow rigid heuristics; explore organically and note where you experience friction:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow**, with an interface nearly as complex as the implementation?

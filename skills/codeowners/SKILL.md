@@ -71,7 +71,7 @@ git log origin/<base> --no-merges --since=<window> --numstat --format='@%aE' -- 
   | sort -rn | head -20
 ```
 
-Do this in the main session when the repo has 8 areas or fewer and 1500 commits or fewer in the window. Above either limit, dispatch one Explore agent per area, all in parallel. Give each agent the repo path, `origin/<base>`, the window, its paths, and the email-to-login map from step 3. Tell it not to fetch, check out, or change the repo. Each agent returns one table with the columns path, login, commits, lines, and last date.
+Do this in the main session when the repo has 8 areas or fewer and 1500 commits or fewer in the window. Above either limit, dispatch one Explore agent per area, all in parallel, each with a fresh context window. Give each agent the repo path, `origin/<base>`, the window, its paths, and the email-to-login map from step 3. Tell it not to fetch, check out, or change the repo. Each agent returns one table with the columns path, login, commits, lines, and last date.
 
 **Count again.** For each person who passes the bar, or nearly passes it, run the count again in the main session, for that path and every email of that login:
 

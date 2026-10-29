@@ -31,7 +31,7 @@ Done when every fact above is written down.
 
 ## 2. Audit the claims
 
-Stale lines are facts, not a level, so every variant fixes the same ones. Audit once, before the variants. When the set is larger than about 40 KB, split it over subagents by file.
+Stale lines are facts, not a level, so every variant fixes the same ones. Audit once, before the variants. When the set is larger than about 40 KB, split it over subagents by file, each with a fresh context window.
 
 1. List every **checkable claim** in the set: a path, a command, a `make` target, a script name, a flag, an environment variable, a config key, a version, a type or function name, and every statement of how the code behaves.
 2. Check each claim against the base SHA. Run the command with `--help` or a dry run, open the path, grep for the name, read the code for a behaviour claim.
@@ -45,7 +45,7 @@ Done when every checkable claim is marked true, stale, or conflict.
 
 ## 3. Three variants in parallel
 
-Make three detached worktrees at the base SHA: `git -C <repo> worktree add --detach <path>/<level> <sha>`. Do not use `isolation: "worktree"`, because it copies the session's repo at its current HEAD, not the target repo at the base. Send three subagents in one turn, one per worktree, on Opus. Give each one the same prompt with a different level:
+Make three detached worktrees at the base SHA: `git -C <repo> worktree add --detach <path>/<level> <sha>`. Do not use `isolation: "worktree"`, because it copies the session's repo at its current HEAD, not the target repo at the base. Send three subagents in one turn, one per worktree, on Opus, each with a fresh context window. Give each one the same prompt with a different level:
 
 - **prune:** apply the audit fixes, and delete no-ops. Move nothing.
 - **disclose:** prune, then move review-only rules to the standards home, move area rules from the root file to the nested file of that area, and move procedures that only one kind of task needs into a doc behind a pointer.
