@@ -37,7 +37,7 @@ Once done, call the Skill tool with "code-review" to review the work.
 
 If the diff adds or changes an SQL statement, or adds a loop over rows from a database or over a list that a request or a caller supplies, also call the Skill tool with "perf-review" on the diff. Act on its findings as you act on the code-review findings.
 
-Before you commit, list each place where the code departs from the spec: a requirement that you changed or left out, and each spec question that you answered yourself, for example a term that the spec did not define. Add the departures that code-review found. When the work comes from an issue, post them on the issue in one comment that starts with `Brief amendment (agent decision)`, in the format of a Brief amendment. Otherwise, list them in your final reply.
+Before you commit, list each place where the code departs from the spec: a requirement that you changed or left out, and each spec question that you answered yourself, for example a term that the spec did not define. Add the departures that code-review found. When the work comes from an issue, post them on the issue in one comment that starts with `Brief amendment (agent decision)`, in the format of a Brief amendment, and commit without a wait: the user checks the departures on the issue. Otherwise, list them in your final reply.
 
 Commit your work to the current branch.
 
