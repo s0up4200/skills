@@ -1,15 +1,15 @@
 ---
 name: verify-review
 effort: high
-description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Greptile, Macroscope, Claude) and from people, or the Claude review comments on a Forgejo pull request, then report which findings to fix and which to refute. After the user answers the report, or with --fix, it also commits the fixes and posts the refutations shown in the report, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr] [--fix]; a chained request such as "then /verify-review" counts.
-argument-hint: "[optional: PR number or URL] [--fix]"
+description: Verify the open review findings on a pull request, from bots (CodeRabbit, Codex, Copilot, Gemini, Greptile, Macroscope, Claude) and from people, or the Claude review comments on a Forgejo pull request, then commit the fixes, post the refutations, and report. It waits for the user only on judgment calls, then waits for the next bot review and runs again. Run it only when the user names it, as /verify-review [pr]; a chained request such as "then /verify-review" counts.
+argument-hint: "[optional: PR number or URL]"
 ---
 
 # Verify review
 
 A reviewer saw the diff, not the running code, the callers, or the reason for a line. Each finding is a claim, and it stays unverified until you check it at the code. The two failure modes are symmetric and both cost the maintainer: a wrong finding applied breaks working code, and a right finding dismissed ships a bug under the maintainer's name.
 
-Arguments: `/verify-review [pr] [--fix]`. With no PR, use the pull request named in the conversation, or the one for the current branch. By default, the run does everything up to the first write, then reports and waits: no commit, no push, no comment, no thread resolution. The user's reply to the report is the go-ahead for the writes in steps 3 to 5 (step 7). `--fix` gives the go-ahead at the start, so the run makes the writes for the settled findings before it reports. Replies are the exception: `--fix` posts none before the report, because the user has not seen their text yet.
+Arguments: `/verify-review [pr]`. With no PR, use the pull request named in the conversation, or the one for the current branch. The run makes the writes in steps 3 to 5 for each settled finding (confirmed, wrong, or stale) before it reports: commit, push, reply, resolve, and rate. Only a judgment call waits for the user (step 7). The user named the skill, and that request approves each reply that the run posts. The report shows the full text of each one.
 
 The scripts sit next to this file: `<skill base directory>/scripts/threads.sh` and `scripts/wait-review.sh`.
 
@@ -87,7 +87,7 @@ A refutation gets a reply, so that the disagreement is on record. Write it in pl
 
 Each statement in a reply or a review answer about what code does is a claim, and each claim needs its own evidence from this run: a file and line from `grep -n`, or command output. Evidence for the verdict does not cover the sentences around it. A statement about code that you take from the PR body, an issue, or an earlier comment is a claim to check at the code, the same as a finding. Before a reply goes in the report, list each claim in it next to its evidence, and cut each claim that has none. Cite code from another project at a release tag or a commit, not at a branch: a branch moves, and a local clone is often on a different ref from the one the claim is about.
 
-Every public comment goes out under the user's account, so the user sees its full text before it is posted. Put each reply in the report (step 6). The user's reply to the report approves every reply shown there, except one that it says no to. A reply whose text changes after the report needs a new yes. Post with:
+Every public comment goes out under the user's account. Post each reply, and put its full text in the report (step 6), so the user sees what went out. The reply for a judgment call waits with its finding: it sits under its option in the report, and the user's answer approves it. Post with:
 
 ```bash
 gh api "repos/$repo/pulls/$pr/comments/$comment_id/replies" -f body="$body"
@@ -108,13 +108,13 @@ Resolve or keep each thread by this list. The report uses the same list (step 6)
 
 A reply to a declined judgment call is short and gives the reason. Some bots learn from replies, and a thread resolved with no reply looks like a finding that nobody read. The finding was true, so give the reason that applies to this case, such as a fix that costs more than the failure, or hardware that nobody can test on. A reply that calls the check itself wrong teaches the bot to skip a real defect next time.
 
-Each review body with findings gets one review answer, a PR comment that goes through every item in the reviewer's order: fixed in which commit, refuted with the evidence, or left as it is and why. Leave out an open judgment call; the next run then lists the review again. Address a person by `@login` and link the review. End the comment with the marker line that the script looks for:
+Each review body with findings gets one review answer, a PR comment that goes through every item in the reviewer's order: fixed in which commit, refuted with the evidence, or left as it is and why. When an item is an open judgment call, hold the whole answer until the user answers it, so one comment covers every item. Address a person by `@login` and link the review. End the comment with the marker line that the script looks for:
 
 ```bash
 gh api "repos/$repo/issues/$pr/comments" -f body="$body"   # last line: <!-- verify-review: $review_id -->
 ```
 
-The answer cites commit SHAs, so post it after the push. It goes in the report like every reply, with `<sha>` where the commit does not exist yet.
+The answer cites commit SHAs, so post it after the push.
 
 ## 5. Rate the Codex findings
 
@@ -129,15 +129,17 @@ Codex ends each comment with "Useful? React with 👍 / 👎." Add one reaction 
 gh api "repos/$repo/pulls/comments/$comment_id/reactions" -f content=+1   # or -1
 ```
 
-The reaction is a write, so it needs `--fix` or the user's reply to the report. It is not a comment, so it needs no approval for each post. Rate only Codex comments (author `chatgpt-codex-connector`).
+Rate only Codex comments (author `chatgpt-codex-connector`).
 
 ## 6. Report
 
 Account for every finding. Read `references/report.md`, and write the report in its layout and by its rules.
 
-## 7. Act on the reply
+## 7. Act on the answer
 
-The user's reply to the report is the go-ahead for the writes in steps 3 to 5, the same as `--fix`. **go** answers every question in this round with your recommendation and approves every reply in the report. It covers this round only. Fix the confirmed findings and each judgment call that the user chose to fix, then commit, push, post, resolve, and rate. For each judgment call that the user declines, post its reply, and resolve or keep the thread by the list in step 4. If the user answers only part of the round, act on the answered part and ask again about the rest. If the writes include a push, go to step 8. Otherwise report again in the same layout, with the new status.
+When the report has no open judgment call, nothing waits for the user. Go to step 8 if the writes included a push, and stop otherwise.
+
+The user's answer settles the judgment calls. **go** answers every question in this round with your recommendation. It covers this round only. Fix each judgment call that the user chose to fix, then commit, push, post, resolve, and rate. For each judgment call that the user declines, post its reply, and resolve or keep the thread by the list in step 4. If the user answers only part of the round, act on the answered part and ask again about the rest. If the writes include a push, go to step 8. Otherwise report again in the same layout, with the new status.
 
 ## 8. Wait for the next review
 
@@ -153,4 +155,4 @@ Each push makes the bots review again. Wait for that review, so the user does no
 scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # prints each bot that reviewed the new head
 ```
 
-Run it in the background where the harness supports that, because it can wait up to 20 minutes. If the run pushed to more than one pull request, start one wait for each pull request, not one combined wait. When it prints a reviewer, start again at step 1 and send a new report. That report waits for the user's reply, the same as the first one. When the new review leaves nothing open, say so in one line and stop. When the script exits 1, no bot reviewed the new head in time. Say so and stop: the user can run `/verify-review` later. When no bot has reviewed this pull request, skip the wait and stop after the writes.
+Run it in the background where the harness supports that, because it can wait up to 20 minutes. Start it right after the push, also while a judgment call waits for the user. If the run pushed to more than one pull request, start one wait for each pull request, not one combined wait. When it prints a reviewer, start again at step 1 and send a new report. When the new review leaves nothing open, say so in one line and stop. When the script exits 1, no bot reviewed the new head in time. Say so and stop: the user can run `/verify-review` later. When no bot has reviewed this pull request, skip the wait and stop after the writes.
