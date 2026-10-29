@@ -31,7 +31,7 @@ Write the Domain Docs that the spec or tickets list to `GLOSSARY.md` and `docs/a
 
 Run typechecking regularly and single test files regularly. At the end, run the test gate that your instructions define. If they define none, run the full test suite once.
 
-If the repo instructions ask for a live run, or the branch changes something that a user sees in the UI, call the Skill tool with "field-test" on a local rig. A run on the production host needs the image that CI builds after the push, so it comes after the commit. If a later change touches an observable of the live run, run that observable again.
+If the repo instructions ask for a live run, or the branch changes something that a user sees in the UI, call the Skill tool with "field-test" on a local rig. A run on the production host needs the image that CI builds after the push, so it comes after the commit. If a later change touches an observable of the live run, run that observable again. For a visual change, the live run is done when it saved a before and an after capture to disk, and your final reply lists the path of each one. `/pr` publishes these captures as Evidence. Without them, it builds both versions again to take them.
 
 Once done, call the Skill tool with "code-review" to review the work.
 
@@ -41,4 +41,4 @@ Before you commit, list each place where the code departs from the spec: a requi
 
 Commit your work to the current branch.
 
-When the commit is the last step of the user's message, and the session has the tool `mcp__compact__after_turn`, call it, so that the next step, for example `/pr`, starts from a short summary. Give it a `focus` that keeps what the pull request body needs: the issue, the branch, the departures that are not on the issue, and the result of each check that CI cannot see, such as a live run.
+When the commit is the last step of the user's message, and the session has the tool `mcp__compact__after_turn`, call it, so that the next step, for example `/pr`, starts from a short summary. Give it a `focus` that keeps what the pull request body needs: the issue, the branch, the departures that are not on the issue, the result of each check that CI cannot see, such as a live run, and the path of each capture.
