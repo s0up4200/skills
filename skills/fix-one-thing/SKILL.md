@@ -60,7 +60,7 @@ Use the `pr` skill for the title and the body if it is installed. Else write a s
 - Says why the change is safe: the tests that ran, and the reason why the behavior stays the same.
 - Ends with the line `Found by fix-one-thing.`, so that step 2 of a later run finds it.
 
-If a person runs the skill, show the diff and the pull request text, and wait for approval before the push. On a schedule, the user approved the draft pull requests when they set up the schedule. Push, and open the pull request as a draft (`gh pr create --draft`), so that it waits for a review.
+A run of the skill is the request for its pull request: a person approves it when they run the skill, and the user approved the scheduled runs when they set up the schedule. Push without a wait, and open the pull request. On a schedule, open it as a draft (`gh pr create --draft`), so that it waits for a review.
 
 If the agent instructions say to commit straight to the default branch, a scheduled run keeps the commit on a local `refactor/<slug>` branch and stops. Nothing reaches the default branch until a person reads the diff.
 
