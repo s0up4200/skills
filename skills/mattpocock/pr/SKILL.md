@@ -190,4 +190,4 @@ The blast radius is the potential impact or scope of the changes introduced by t
 
 ## After the PR opens
 
-When you opened the pull request in this turn because the user asked for it, run the `verify-review` skill on it next. It waits for the first bot review, and it compacts the session when it stops.
+When you opened the pull request in this turn, run the `verify-review` skill on it next. It waits for the first bot review, and it compacts the session when it stops.
