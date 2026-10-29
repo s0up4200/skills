@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Checks each skill: shellcheck on its scripts, a name that matches its
 # folder, a path in the plugin manifest, a SKILL.md under 500 lines, and a
-# body under 15,000 bytes. After a compaction, Claude Code keeps only the
-# first 5,000 tokens of a skill, and 15,000 bytes is about 5,000 tokens.
+# body under 15,000 bytes, and other Markdown files under 20,000 bytes.
+# After a compaction, Claude Code keeps only the first 5,000 tokens of a
+# skill, and 15,000 bytes is about 5,000 tokens. A reference file has no
+# compaction cap, but over 20,000 bytes (about 5,000 tokens) it costs more
+# context than the one entry that the agent needs. Split it by section.
 # CI runs it on each push.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -22,5 +25,11 @@ while read -r file; do
   bytes=$(awk 'f>=2; /^---$/ && f<2 {f++}' "$file" | wc -c)
   ((bytes < 15000)) || { echo "$file: body has $bytes bytes, keep it under 15000"; fail=1; }
 done < <(find skills -name SKILL.md | sort)
+
+# The *-workspace folders hold local eval output that git ignores.
+while read -r file; do
+  bytes=$(wc -c <"$file")
+  ((bytes < 20000)) || { echo "$file: $bytes bytes, split it under 20000"; fail=1; }
+done < <(find skills -name '*.md' ! -name SKILL.md ! -path '*-workspace/*' | sort)
 
 exit "$fail"

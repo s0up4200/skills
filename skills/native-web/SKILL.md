@@ -14,7 +14,7 @@ Based on the tips collected at [htmlcat.net](https://htmlcat.net/) (captured 202
 ## Workflow
 
 1. Match the problem against the lookup table below.
-2. Read the full entry in `references/htmlcat-tips-2026.md` — it has the code, the caveats, and the MDN link.
+2. Read the full entry. It has the code, the caveats, and the MDN link. The table rows from `<dialog>` to `@function` are in `references/htmlcat-ui-layout-2026.md`. The rows from dark mode to the Custom Highlight API are in `references/htmlcat-theming-motion-js-2026.md`.
 3. Check the support tier. "Widely available" and Baseline ≤2023: use directly. Baseline 2024+: fine as progressive enhancement. "Limited support" or "Experimental": needs a tested fallback or `@supports` guard — never a bare production default. Labels are from 2026-08-22 — re-check MDN or caniuse for anything below "Widely available".
 
 ## Lookup table
