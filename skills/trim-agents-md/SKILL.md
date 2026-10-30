@@ -68,7 +68,7 @@ Every line you delete or move gets exactly one tag:
 - moved: <new path>
 A line with no tag that you can prove stays where it is.
 
-Write-time rules: a rule that prevents damage while code is written (data loss, real network calls in tests, editing migrations, secrets, destructive commands), or that works against a default of the agent tool (for example the co-author trailer that some tools add to each commit), must stay readable at write time. An agent can commit or run a command without the task that a pointer names, so a pointer does not protect such a rule. Keep it in a steering file, move it to the nested file beside the code it governs with a pointer from the root file, or propose a check that enforces it. Never delete it, and never move it to a file that only review reads.
+Write-time rules: a rule that prevents damage while code is written (data loss, real network calls in tests, editing migrations, secrets, destructive commands), or that works against a default of the agent tool (for example the co-author trailer that some tools add to each commit), must stay readable at write time. Keep a rule against a tool default in the root file, because an agent commits without doing the task that a pointer names. Keep it in a steering file, move it to the nested file beside the code it governs with a pointer from the root file, or propose a check that enforces it. Never delete it, and never move it to a file that only review reads.
 
 The `## Code Review Rules` section of each AGENTS.md stays there under that heading, because the Codex GitHub review reads only that section. An area-only review rule moves to the `## Code Review Rules` section of the nested file.
 
