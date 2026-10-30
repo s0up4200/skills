@@ -34,7 +34,7 @@ Write one PR comment that lists every finding you collected, one line each:
 
 Leave an open judgment call out of the reply. The next run then reports it again.
 
-Post the reply with `fj pr comment <n> --body-file <file>`, and put its full text in the report. For each open judgment call, show its `Fixed` line and its `Accepted` line under the question, so the user's answer approves the line that it picks. After the answer, post one more owner reply with those lines, then push.
+Start the reply with the note from step 4 of `SKILL.md`, with your `fj` login. Post the reply with `fj pr comment <n> --body-file <file>`, and put its full text in the report. For each open judgment call, show its `Fixed` line and its `Accepted` line under the question, so the user's answer approves the line that it picks. After the answer, post one more owner reply with those lines, then push.
 
 Then push. Until the push, the SHAs in the reply exist only in the local repository. Push those commits unchanged. An amend or a rebase between the reply and the push makes new SHAs, and then the reply cites commits that the PR does not have. If the push fails, fix the cause and push the same commits.
 
