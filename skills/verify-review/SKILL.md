@@ -40,7 +40,7 @@ scripts/threads.sh owner/repo "$pr"    # unresolved threads, then review bodies 
 
 Each object has a `kind`: `thread` or `review`, and `ai` tells a bot from a person. A **waiting** thread ends with your reply, so the next move is the reviewer's: skip it, and count it in the report.
 
-Some findings never become threads. A person often writes the whole review in its body, as a numbered or bulleted list, and CodeRabbit puts "Nitpick", "Outside diff range", and "Duplicate" items there. Each item in a review body is one finding; keep the reviewer's own label for it, such as "must fix" or "non-blocking". A review body has no thread to resolve, so its record is the **review answer**, one PR comment (step 4). The script leaves out each review that already has your review answer, so the answer is also how the next run knows the review is done. A person's review body with no finding in it (an approval that says "LGTM") gets no answer; count it in the report.
+Some findings never become threads. A person often writes the whole review in its body, as a list, and CodeRabbit puts "Nitpick", "Outside diff range", and "Duplicate" items there. Each item in a review body is one finding; keep the reviewer's own label for it, such as "must fix" or "non-blocking". A review body has no thread to resolve, so its record is the **review answer**, one PR comment (step 4). The script skips each review that has your review answer, so the next run knows that the review is done. A review body with no finding (an "LGTM" approval) gets no answer; count it in the report.
 
 When the user names a plain PR comment, verify its claim the same way and give it a verdict. Post a reply or edit the PR body only after the user approves that exact write.
 
@@ -158,17 +158,17 @@ A person does not review again on a push. After you post a review answer to a pe
 gh api "repos/$repo/pulls/$pr/requested_reviewers" -f "reviewers[]=$login"
 ```
 
-Each push makes the bots review again. Wait for that review, so the user does not have to start the next run:
+Each push makes the bots review again, except Greptile, which reviews again only when the user starts it. The wait skips Greptile, and **Done** says so. Wait for the other reviews, so the user does not have to start the next run:
 
 ```bash
 scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # one line per event
 ```
 
-Run it in the background, because it can wait up to 20 minutes. Start it right after the push, also while a judgment call waits for the user. After pushes to more than one pull request, start one wait for each. It reports each event once. Act on each line:
+Run it in the background, because it can wait up to 20 minutes. Start it right after the push, also while a judgment call waits for the user. After pushes to more than one pull request, start one wait for each. Act on each line:
 
 - `review <login>`: start again at step 1 and send a new report. If nothing is open after it, say so in one line and stop.
 - `comment <login> <url>`: start again at step 1. If no bot reviewed the head yet, start the wait again after the run.
 - `check-failed <name> <url>`: read `gh run view <run id> --log-failed`. Fix a failure that the change causes as a confirmed finding (step 3). Report any other failure, and wait again.
-- `conflict <sha>`: report it and stop. A rebase rewrites the branch, so the user decides.
+- `conflict <sha>`: report it and stop. The user decides on a rebase.
 
-When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When the script exits 1, nothing happened on the new head in time. Say so and stop. When no bot has reviewed this pull request, skip the wait and stop after the writes.
+When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. If the script exits 1, say that nothing happened on the new head in time, and stop. When no bot other than Greptile has reviewed this pull request, skip the wait and stop after the writes.

@@ -5,7 +5,8 @@
 # Run it from the repository root. The host comes from the `origin` remote.
 # GitHub events:
 #   review <login>             a bot reviewed <head-sha>. The script waits for a review
-#                              from each bot that reviewed an earlier commit, and for
+#                              from each bot that reviewed an earlier commit (except
+#                              Greptile, which reviews again only on request), and for
 #                              each bot review check on <head-sha> to finish. After
 #                              that, if a bot has not reviewed yet, it waits at most 2
 #                              more minutes for it.
@@ -57,7 +58,7 @@ github_reviews() {
   jq -r --arg sha "$sha" --arg codex "$codex" --argjson starts "$starts" '
     map(select((.user.type=="Bot") or (.user.login|test("\\[bot\\]$"))))
     | map(select(.body!="" or (.id as $id | $starts | index($id))))
-    | (map(.user.login) + ([$codex] - [""]) | unique) as $bots
+    | (map(.user.login | select(test("greptile")|not)) + ([$codex] - [""]) | unique) as $bots
     | (map(select(.commit_id==$sha) | .user.login) + ([$codex] - [""]) | unique) as $done
     | "\($bots|length) \($done|length) \($done|join(","))"' "$tmp/reviews.json"
 }
