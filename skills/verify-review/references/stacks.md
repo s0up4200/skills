@@ -18,11 +18,13 @@ Name the stack on the first line of the report, for example `**owner/repo#3026**
 
 A finding is stale only when a commit on this pull request's branch resolved it. A pull request in a stack can still merge alone, and then it ships what its own branch holds. When the fix exists only in a pull request higher up, the verdict is **judgment**: "fixed in #N; move the fix down to this pull request?"
 
-## Step 3: fix at the lowest branch
+## Step 3: fix this branch, hand off a lower one
 
-Commit the fix on the lowest branch whose diff introduced the code, even when the thread is on a pull request higher up. A fix on the upper branch leaves the lower pull request with the defect.
+Each pull request in a stack can have its own session in its own worktree, which runs this skill on that pull request. A commit on the branch of another pull request competes with that session.
 
-After the commit, carry it up the stack:
+Find the lowest branch whose diff introduced the code. When it is this pull request's branch, commit the fix here. When it is a lower branch, the verdict is **judgment**, and it waits for the user even when it is small: name the lower pull request and the fix, so the user can give it to the session that owns that pull request. A fix on this branch only would leave the lower pull request with the defect. Keep the thread open. After the fix reaches this branch by a rebase, a later run finds it stale.
+
+After a commit on this branch, carry it up the stack:
 
 ```bash
 gh stack rebase
