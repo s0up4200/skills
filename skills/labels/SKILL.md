@@ -41,6 +41,8 @@ Paths carry most of the signal: `docs/` means documentation, `.github/workflows/
 
 For an issue, the body is all there is. A stack trace or "this used to work" means a bug; "it would be nice if" means a feature request.
 
+For a PR, copy the `no-ui-yet` label from each issue it closes (`gh pr view <N> --json closingIssuesReferences --jq '.closingIssuesReferences[].number'`). `to-tickets` puts that label on each ticket that users cannot reach yet. Without the label, the release notes show a feature that users cannot reach.
+
 ## 4. Choose labels
 
 Aim for the smallest set that helps someone filtering the issue tracker. Most PRs land on one type label plus one area label. More than about four on one item is usually a sign of guessing.
