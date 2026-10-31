@@ -87,6 +87,13 @@ playwright cli close-all
 - `screenshot` has no clip. For a fixed clip, use `run-code "async page => { await page.screenshot({ path: '<abs path>', clip: { x: 0, y: 0, width: 800, height: 400 } }) }"`. `run-code` has no `require` and no `process`.
 - `playwright cli --help` lists the other commands (`fill`, `press`, `tracing-start`, `video-start`).
 
+### A browser extension (MV3)
+
+1. Copy the build (`.output/chrome-mv3`), and add the stub origin to `host_permissions` in the copy, so no permission prompt shows.
+2. Load it: `chromium.launchPersistentContext(profile, { headless: true, args: ['--disable-extensions-except=<copy>', '--load-extension=<copy>'] })`. The extension id is in the host part of `ctx.serviceWorkers()[0].url()`.
+3. Start a menu click in the service worker: `sw.evaluate(() => chrome.contextMenus.onClicked.dispatch(info, tab))`. To read menus and notices, wrap `chrome.contextMenus.create` and `chrome.notifications.create` in the worker first.
+4. Set the viewport to the size of the extension window that you capture, so the capture needs no crop.
+
 ## Start every Chrome session the same way
 
 Load the Claude in Chrome tools with one ToolSearch call before the first browser step (`tabs_context_mcp`, `navigate`, `computer`, `read_page`, `tabs_create_mcp`, `tabs_close_mcp`, plus `read_console_messages`, `read_network_requests`, `javascript_tool`, `gif_creator` as the task needs). Steps 3 to 5 also apply to a Playwright script.
