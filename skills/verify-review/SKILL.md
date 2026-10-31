@@ -158,7 +158,7 @@ A person does not review again on a push. After you post a review answer to a pe
 gh api "repos/$repo/pulls/$pr/requested_reviewers" -f "reviewers[]=$login"
 ```
 
-Each push makes the bots review again, except Greptile, which reviews again only when the user starts it. The wait skips Greptile, and **Done** says so. Wait for the other reviews, so the user does not have to start the next run:
+Each push makes the bots review again, and Greptile if the repo sets it to. The wait counts Greptile after it reviews a second commit. Until then, **Done** says it skips Greptile. Wait, so the next run starts by itself:
 
 ```bash
 scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # one line per event
@@ -171,4 +171,4 @@ Run it in the background, because it can wait up to 20 minutes. Start it right a
 - `check-failed <name> <url>`: read `gh run view <run id> --log-failed`. Fix a failure that the change causes as a confirmed finding (step 3). Report any other failure, and wait again.
 - `conflict <sha>`: report it and stop. The user decides on a rebase.
 
-When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. If the script exits 1, say that nothing happened on the new head in time, and stop. When no bot other than Greptile has reviewed this pull request, skip the wait and stop after the writes.
+When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. If the script exits 1, say that nothing happened on the new head in time, and stop. When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.

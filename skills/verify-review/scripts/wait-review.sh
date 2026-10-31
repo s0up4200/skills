@@ -5,11 +5,12 @@
 # Run it from the repository root. The host comes from the `origin` remote.
 # GitHub events:
 #   review <login>             a bot reviewed <head-sha>. The script waits for a review
-#                              from each bot that reviewed an earlier commit (except
-#                              Greptile, which reviews again only on request), and for
+#                              from each bot that reviewed an earlier commit, and for
 #                              each bot review check on <head-sha> to finish. After
 #                              that, if a bot has not reviewed yet, it waits at most 2
-#                              more minutes for it.
+#                              more minutes for it. Greptile counts only after it
+#                              reviewed two commits, because a repo can set it to
+#                              review only when the pull request opens.
 #   check-failed <name> <url>  a check that is not a bot review failed on <head-sha>
 #   conflict <head-sha>        the branch conflicts with its base branch
 #   comment <login> <url>      a person other than you commented or reviewed after the
@@ -58,7 +59,8 @@ github_reviews() {
   jq -r --arg sha "$sha" --arg codex "$codex" --argjson starts "$starts" '
     map(select((.user.type=="Bot") or (.user.login|test("\\[bot\\]$"))))
     | map(select(.body!="" or (.id as $id | $starts | index($id))))
-    | (map(.user.login | select(test("greptile")|not)) + ([$codex] - [""]) | unique) as $bots
+    | (map(select(.user.login|test("greptile")) | .commit_id) | unique | length > 1) as $greptile
+    | (map(.user.login | select($greptile or (test("greptile")|not))) + ([$codex] - [""]) | unique) as $bots
     | (map(select(.commit_id==$sha) | .user.login) + ([$codex] - [""]) | unique) as $done
     | "\($bots|length) \($done|length) \($done|join(","))"' "$tmp/reviews.json"
 }
