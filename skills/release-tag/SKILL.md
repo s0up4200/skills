@@ -81,6 +81,7 @@ Some repos keep the version in a manifest file, and their Release workflow rejec
 | Manifest | Version field | Lockfile update |
 |---|---|---|
 | `Cargo.toml` | `version` in `[package]` or `[workspace.package]` | `cargo update --workspace --offline` |
+| `package.json` | `version` | none |
 
 ```bash
 sed -n '/^\[\(workspace\.\)\{0,1\}package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Cargo.toml | head -n 1
@@ -88,7 +89,7 @@ sed -n '/^\[\(workspace\.\)\{0,1\}package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Ca
 
 If the repo has no manifest from the table, or the command prints nothing, go to step 5. Go repos go to step 5: `go.mod` has no version, and GoReleaser takes the version from the tag. If the manifest already shows `<VERSION>`, also go to step 5.
 
-Otherwise, the tag must go on a commit that has the new version. Show the user the bump plan and get a yes before you push:
+Otherwise, the tag must go on a commit that has the new version. If the repo has a release doc, its bump steps (for example a CHANGELOG date) go in the same commit. Show the user the bump plan and get a yes before you push:
 
 1. From the release branch, create the branch `chore/release-v<VERSION>`.
 2. Set the version field to `<VERSION>`, with no `v`. Change only that line.
