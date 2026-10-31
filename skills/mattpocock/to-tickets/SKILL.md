@@ -43,6 +43,13 @@ Give each ticket its **blocking edges**: the other tickets that must complete be
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
 
+**Hidden UI** applies when the repo has the `no-ui-yet` label (`gh label list --search no-ui-yet`) and the feature has two or more tickets with UI. In such a repo, users run the branch that each ticket merges into, and they must not see a feature before its last ticket:
+
+- Hide the UI of each ticket behind one switch, for example an environment variable, so that a developer sees it and users do not. Hide every way in: the navigation link, the route, the setting, and each new field in a view that users already have.
+- Give each of these tickets the acceptance criterion "The PR has the `no-ui-yet` label." The release notes leave a PR with this label out of the Highlights.
+- Add a last **unlock** ticket, blocked by every other ticket. It removes the switch. Its PR has no `no-ui-yet` label, and its body describes the whole feature, because the earlier PRs got no Highlight.
+- A migration and a new API endpoint reach users before the unlock. Give each table its final shape in the ticket that makes it, so that users get no second migration for it.
+
 ### 4. Quiz the user
 
 Present the proposed breakdown as a numbered list. For each ticket, show:

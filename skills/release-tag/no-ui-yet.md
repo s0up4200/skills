@@ -26,4 +26,4 @@ gh pr edit <n> --add-label no-ui-yet
 - A mixed PR stays unlabeled. A mixed PR has a remote part and also a part that users can reach.
 - The PR that adds the SSH setup screen stays unlabeled. That work is #2917, and it can come as several PRs. Its body must describe the whole remote feature, because the earlier remote PRs got no Highlight.
 - If the body of a PR that gets the label has a real Breaking change section, also add the `BREAKING CHANGE` label. The workflow keeps a labeled PR only for that label or for a `!` in the commit subject.
-- After the release with the SSH setup screen is out, tell the user to delete the label with `gh label delete no-ui-yet`. Step 3b then stops.
+- After the release with the SSH setup screen is out, tell the user to remove the remote check from this file. Keep the label, because `to-tickets` puts it on the tickets of each feature with a hidden UI.
