@@ -174,6 +174,7 @@ Proven 2026-10-01 for a before-and-after measurement:
 - Compare the medians of at least 5 rounds for each build, in mixed order. The median of one build moved from 86 to 106 ms between rounds. A rank test over the samples of all rounds overstates a small gap, because the samples inside one round are correlated.
 - A probe changes what it measures. A rAF loop that pushes a sample each frame, or a `MutationObserver` with `subtree: true` on `document.body`, costs real time. One run reported 53 ms long tasks every 2 s that came from the probes. Confirm a number on a clean reload with only a passive `PerformanceObserver`.
 - `longtask` reports only tasks over 50 ms, so work near that line appears and disappears. Time the work itself.
+- A "stop" during a scroll can be the end of the loaded rows, not a slow frame. Scroll with no pause longer than the scroll-end delay of the app (150 ms in TanStack Virtual), and log each sample where `el.scrollTop >= el.scrollHeight - el.clientHeight - 2`.
 - Render work grows with the rows that change, so the activity of the instance changes the result. Record the transfer rate beside each measurement.
 
 ## Dialog traps
