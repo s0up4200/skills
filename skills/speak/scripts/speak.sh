@@ -72,7 +72,7 @@ if [[ -z $key ]]; then
   exit 1
 fi
 api=${SPEAK_API:-https://api.elevenlabs.io} # tests point this at a local fake
-voice=${SPEAK_VOICE:-yj30vwTGJxSHezdAGsv9}
+voice=${SPEAK_VOICE:-6WwXjDDEMyNmFG95zycZ} # Eldrin, a Library voice
 model=${SPEAK_MODEL:-eleven_v4_turbo}
 
 # ponytail: regex Markdown strip; it also drops '_' in snake_case. Use pandoc -t plain if it reads badly.
