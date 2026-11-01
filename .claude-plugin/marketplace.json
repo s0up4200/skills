@@ -66,10 +66,11 @@
     },
     {
       "name": "writing-skills",
-      "description": "Skills that rewrite replies for the reader",
+      "description": "Skills that rewrite replies for the reader or read them aloud",
       "source": "./skills",
       "skills": [
         "./skills/tldr",
+        "./skills/speak",
         "./skills/cursor/unslop",
         "./skills/aminblg/simple-english"
       ]
