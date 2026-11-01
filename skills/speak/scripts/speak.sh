@@ -73,7 +73,7 @@ if [[ -z $key ]]; then
 fi
 api=${SPEAK_API:-https://api.elevenlabs.io} # tests point this at a local fake
 voice=${SPEAK_VOICE:-yj30vwTGJxSHezdAGsv9}
-model=${SPEAK_MODEL:-eleven_v4}
+model=${SPEAK_MODEL:-eleven_v4_turbo}
 
 # ponytail: regex Markdown strip; it also drops '_' in snake_case. Use pandoc -t plain if it reads badly.
 clean() {
