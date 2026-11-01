@@ -18,6 +18,11 @@ cat >"$dir/bin/pgrep" <<EOF
 [ "\$*" = "-af ^[^ ]*tailscaled be-child ssh .*herdr-core" ] && { cat "$dir/clients" 2>/dev/null; exit 0; }
 exec /usr/bin/pgrep "\$@"
 EOF
+cat >"$dir/bin/ioreg" <<EOF
+#!/bin/sh
+[ -e "$dir/idle" ] || exit 1
+echo "  |   \"HIDIdleTime\" = \$(cat "$dir/idle")000000000"
+EOF
 cat >"$dir/bin/ssh" <<EOF
 #!/bin/sh
 for a; do host=\$cmd; cmd=\$a; done
@@ -117,6 +122,16 @@ check "pause stops the remote player" waitfor remote_paused
 check "pause again resumes it" waitfor remote_playing
 "$here/speak.sh" stop
 check "stop ends the remote player" waitfor remote_gone
+
+echo 30 >"$dir/idle"
+out=$(echo hello | "$here/speak.sh")
+check "plays on a client used 30 seconds ago" [ "$out" = "speak.sh: reading 6 characters on 100.64.0.9" ]
+"$here/speak.sh" stop
+echo 600 >"$dir/idle"
+out=$(echo hello | "$here/speak.sh")
+check "plays here when the client was idle 10 minutes" [ "$out" = "speak.sh: reading 6 characters on local" ]
+"$here/speak.sh" stop
+rm -f "$dir/idle"
 
 rm -f "$dir/ssh-hosts"
 echo hello | SPEAK_TARGET=local "$here/speak.sh" >/dev/null
