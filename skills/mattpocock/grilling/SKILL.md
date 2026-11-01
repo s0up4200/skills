@@ -7,9 +7,13 @@ Interview the user relentlessly until you reach a shared understanding. Map this
 
 Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
 
+Open each round with one line that states the goal of the session and the decisions settled so far. When a fact found since the last round changes a recommendation that you already gave, say so by name before the questions, for example "This changes my answer to Q1 from yes to skip, because ...". A changed recommendation hidden in a new question reads as a new problem, and the user loses the goal.
+
 Format a round like so:
 
 ```
+🎯 <goal> · settled: <decision>, <decision>
+
 ❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
 
 ➡️ <your recommended answer>
@@ -27,7 +31,7 @@ Start each question body with a short scenario in the product, with concrete val
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
 
-Finding _facts_ is your job, never the user's. When a recommendation rests on how an external API, library, or tool behaves, read its current reference before you recommend, also when the repo already uses it. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent with a fresh context window to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
+Finding _facts_ is your job, never the user's. Before the first round, find each fact that the tree depends on, so that a later round does not reopen a settled question. For a security question, trace each path by which an attacker reaches the asset, and ask the first round only when every path is known. When a recommendation rests on how an external API, library, or tool behaves, read its current reference before you recommend, also when the repo already uses it. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent with a fresh context window to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
 
 When a recommended answer changes what a live system filters, grabs, deletes, or moves, and the history of that system is at hand (logs, a database copy, an API listing), replay the proposed rule against that history before you recommend it. Give the result in the question, for example "of the last 40 grabs, this rule would have blocked 3, and all 3 were real duplicates".
 
