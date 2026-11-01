@@ -6,7 +6,7 @@ set -uo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 dir=$(mktemp -d) real=${XDG_RUNTIME_DIR:?}
 trap 'kill "$srv" 2>/dev/null; "$here/speak.sh" stop; rm -rf "$dir"' EXIT
-export XDG_RUNTIME_DIR=$dir PATH=$dir/bin:$PATH
+export XDG_RUNTIME_DIR=$dir PATH=$dir/bin:$PATH SPEAK_VOICE=v1 SPEAK_MODEL=m1
 mkdir -p "$dir/bin"
 # mpv finds PipeWire through XDG_RUNTIME_DIR, so link the real sockets in.
 ln -s "$real/pipewire-0" "$real/pulse" "$dir/"
@@ -87,7 +87,7 @@ EOF
 waitfor has_requests 1
 want="Title Read this, see the docs. Done at now. "
 check "strips Markdown, code, tables, URLs" [ "$(jq -r .text "$dir/requests" | tr -s " \n" " ")" == "$want" ]
-want="good eleven_v4_turbo /v1/text-to-speech/UgBBYS2sOqTuMpoF3BR0/stream?output_format=mp3_44100_128"
+want="good m1 /v1/text-to-speech/v1/stream?output_format=mp3_44100_128"
 check "sends key, model, and path" [ "$(jq -r '[.key, .model_id, .path] | join(" ")' "$dir/requests")" == "$want" ]
 check "plays in the background" waitfor playing
 "$here/speak.sh" pause
@@ -104,7 +104,7 @@ check "splits long text into chunks" waitfor has_requests 3
 "$here/speak.sh" stop
 
 echo bad >"$dir/key"
-echo hello | "$here/speak.sh" >/dev/null
+check "returns the ElevenLabs error" eval '[[ $(echo hello | "$here/speak.sh" 2>&1) == *"ElevenLabs: Invalid API key bad" ]]'
 check "shows the ElevenLabs error message" waitfor noticed "ElevenLabs: Invalid API key bad"
 
 rm -f "$dir/key" "$dir/notices"

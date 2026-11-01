@@ -30,7 +30,7 @@ on_target() { ssh -o BatchMode=yes -o ConnectTimeout=5 "$(<"$targetf")" "$1"; }
 # Show an error where the user listens: a macOS notice on a remote Mac, else a notice here.
 notify() {
   local m=${1//[\"\']/} # quotes would break the AppleScript and the remote shell
-  echo "speak.sh: $m" >&2
+  echo "speak.sh: $m" | tee "$run/err" >&2
   [[ $(<"$targetf") != local ]] &&
     on_target "osascript -e 'display notification \"$m\" with title \"speak\"'" 2>/dev/null && return
   notify-send speak "$m"
@@ -56,8 +56,16 @@ if [[ -z ${SPEAK_CHILD:-} ]]; then
   "$0" stop
   t=$(target)
   # setsid makes the child a process-group leader, so stop kills curl and mpv with it.
+  n=$(wc -m <"$tmp")
+  rm -f "$run/err" "$run/body"
   SPEAK_TARGET=$t SPEAK_CHILD=1 setsid -f "$0" "$tmp" </dev/null >>"$log" 2>&1
-  echo "speak.sh: reading $(wc -m <"$tmp") characters on $t"
+  # Wait up to 3 s for audio (over 1 KiB, larger than an error body) or an error, so the caller sees a failure.
+  for _ in {1..30}; do
+    [[ -s $run/err ]] && { cat "$run/err" >&2; exit 1; }
+    (($(stat -c %s "$run/body" 2>/dev/null || echo 0) > 1024)) && break
+    sleep 0.1
+  done
+  echo "speak.sh: reading $n characters on $t"
   exit 0
 fi
 
@@ -96,7 +104,6 @@ tts() {
     notify "ElevenLabs: $(jq -r '.detail.message // .detail // "request failed"' "$run/body" 2>/dev/null || echo 'request failed')"
     break
   done
-  rm -f "$run/body"
 }
 
 play() {
