@@ -87,7 +87,7 @@ EOF
 waitfor has_requests 1
 want="Title Read this, see the docs. Done at now. "
 check "strips Markdown, code, tables, URLs" [ "$(jq -r .text "$dir/requests" | tr -s " \n" " ")" == "$want" ]
-want="good eleven_v4_turbo /v1/text-to-speech/6WwXjDDEMyNmFG95zycZ/stream?output_format=mp3_44100_128"
+want="good eleven_v4_turbo /v1/text-to-speech/UgBBYS2sOqTuMpoF3BR0/stream?output_format=mp3_44100_128"
 check "sends key, model, and path" [ "$(jq -r '[.key, .model_id, .path] | join(" ")' "$dir/requests")" == "$want" ]
 check "plays in the background" waitfor playing
 "$here/speak.sh" pause
