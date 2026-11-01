@@ -36,7 +36,9 @@ class H(http.server.BaseHTTPRequestHandler):
         with open(d + "/requests", "a") as f:
             f.write(json.dumps({"path": self.path, "key": self.headers["xi-api-key"], **json.loads(body)}) + "\n")
         if self.headers["xi-api-key"] == "bad":
-            self.send_response(401); self.end_headers(); return
+            msg = b'{"detail": {"message": "Invalid API key \\"bad\\""}}'
+            self.send_response(401); self.send_header("Content-Length", str(len(msg))); self.end_headers()
+            self.wfile.write(msg); return
         data = open(d + "/silence.mp3", "rb").read()
         self.send_response(200); self.send_header("Content-Length", str(len(data))); self.end_headers()
         self.wfile.write(data)
@@ -98,7 +100,7 @@ check "splits long text into chunks" waitfor has_requests 3
 
 echo bad >"$dir/key"
 echo hello | "$here/speak.sh" >/dev/null
-check "reports a failed request" waitfor noticed "request failed"
+check "shows the ElevenLabs error message" waitfor noticed "ElevenLabs: Invalid API key bad"
 
 rm -f "$dir/key" "$dir/notices"
 echo hello | "$here/speak.sh" >/dev/null

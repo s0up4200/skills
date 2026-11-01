@@ -25,9 +25,11 @@ case $(ps -o state= -p "$p") in T*) kill -CONT "$p" ;; *) kill -STOP "$p" ;; esa
 on_target() { ssh -o BatchMode=yes -o ConnectTimeout=5 "$(<"$targetf")" "$1"; }
 # Show an error where the user listens: a macOS notice on a remote Mac, else a notice here.
 notify() {
+  local m=${1//[\"\']/} # quotes would break the AppleScript and the remote shell
+  echo "speak.sh: $m" >&2
   [[ $(<"$targetf") != local ]] &&
-    on_target "osascript -e 'display notification \"$1\" with title \"speak\"'" 2>/dev/null && return
-  notify-send speak "$1"
+    on_target "osascript -e 'display notification \"$m\" with title \"speak\"'" 2>/dev/null && return
+  notify-send speak "$m"
 }
 
 case "${1:-}" in
@@ -79,13 +81,17 @@ chunk() {
     { b = b (b == "" ? "" : "\n\n") $0 }
     END { if (b != "") printf "%s%c", b, 0 }'
 }
+# Each response also goes to $run/body, so a failure can show the error message that ElevenLabs sent.
 tts() {
   while IFS= read -r -d '' c; do
     jq -n --arg t "$c" --arg m "$model" '{text: $t, model_id: $m}' |
-      curl -fsS -H @<(printf 'xi-api-key: %s\n' "$key") -H 'Content-Type: application/json' --data-binary @- \
-        "$api/v1/text-to-speech/$voice/stream?output_format=mp3_44100_128" ||
-      { notify "ElevenLabs request failed. See $log on $(hostname)"; break; }
+      curl -sS --fail-with-body -H @<(printf 'xi-api-key: %s\n' "$key") -H 'Content-Type: application/json' \
+        --data-binary @- "$api/v1/text-to-speech/$voice/stream?output_format=mp3_44100_128" |
+      tee "$run/body" && continue
+    notify "ElevenLabs: $(jq -r '.detail.message // .detail // "request failed"' "$run/body" 2>/dev/null || echo 'request failed')"
+    break
   done
+  rm -f "$run/body"
 }
 
 play() {
