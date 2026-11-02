@@ -38,7 +38,8 @@ notify() {
 
 case "${1:-}" in
   stop)
-    [[ -s $pidf ]] && kill -- -"$(<"$pidf")" 2>/dev/null
+    # SIGKILL: a player hung on audio output ignores SIGTERM, and a leaked mpv blocks MPRIS clients.
+    [[ -s $pidf ]] && kill -KILL -- -"$(<"$pidf")" 2>/dev/null
     [[ -s $targetf && $(<"$targetf") != local ]] && on_target "$remote_stop" 2>/dev/null
     rm -f "$pidf" "$targetf"
     exit 0 ;;

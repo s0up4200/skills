@@ -139,5 +139,14 @@ check "SPEAK_TARGET=local plays here" waitfor playing
 check "SPEAK_TARGET=local uses no ssh" [ ! -e "$dir/ssh-hosts" ]
 "$here/speak.sh" stop
 
+# A hung player ignores SIGTERM; stop must still end it.
+printf '#!/bin/sh\ntrap "" TERM\nwhile :; do sleep 0.1; done\n' >"$dir/bin/mpv"
+chmod +x "$dir/bin/mpv"
+echo hello | SPEAK_TARGET=local "$here/speak.sh" >/dev/null
+waitfor playing
+group=$(<"$pidf")
+"$here/speak.sh" stop
+check "stop kills a player that ignores SIGTERM" waitfor gone "$group"
+
 check "rejects empty input" eval '! "$here/speak.sh" </dev/null 2>/dev/null'
 exit "$fail"
