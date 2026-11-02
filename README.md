@@ -32,11 +32,11 @@ Register this repo as a plugin marketplace for bundle-based installation:
 
 ### Manual
 
-Clone and symlink individual skills directly:
+Clone the repo to a folder that you keep, and link each skill that you want. A `git pull` in the clone then updates each linked skill.
 
 ```bash
-git clone https://github.com/s0up4200/skills.git /tmp/s0up4200-skills
-cp -r /tmp/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
+git clone https://github.com/s0up4200/skills.git ~/s0up4200-skills
+ln -s ~/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 ```
 
 ## Available Skills
