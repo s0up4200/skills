@@ -1,0 +1,5 @@
+interface:
+  display_name: "Security Audit"
+  short_description: "Audit a whole repo for security holes"
+policy:
+  allow_implicit_invocation: false
