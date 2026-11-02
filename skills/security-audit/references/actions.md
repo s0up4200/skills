@@ -57,7 +57,17 @@ Write one note for each picked finding, in the bugs folder for the project in th
 
 ## D: Open issue
 
-Create one issue for each picked finding with `gh issue create`, or with the steps in `docs/agents/issue-tracker.md` when the repo has it. The body holds the card of the finding, as in a vault note.
+Create one issue for each picked finding with `gh issue create`, or with the steps in `docs/agents/issue-tracker.md` when the repo has it. Start the body with an alert that gives the risk and the verdict, so that a reader sees how urgent the issue is before the details. Use `[!CAUTION]` for Risk 7 to 10, `[!WARNING]` for 4 to 6, and `[!NOTE]` for 1 to 3. For a not proven finding, add what decides it:
+
+```markdown
+> [!CAUTION]
+> Risk 8/10 · proven · found by security-audit on 2026-11-02
+
+> [!WARNING]
+> Risk 5/10 · not proven: depends on whether the reverse proxy strips `X-Forwarded-For` · found by security-audit on 2026-11-02
+```
+
+Then the body holds the card of the finding, as in a vault note.
 
 ## E: Draft advisory
 
