@@ -91,6 +91,7 @@ Copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 | [research](skills/mattpocock/research/) | Research a question in primary sources and write the findings to a Markdown file. |
 | [retro](skills/mattpocock/retro/) | Conduct a retrospective on a coding session. |
 | [setup-matt-pocock-skills](skills/mattpocock/setup-matt-pocock-skills/) | Set up a repo for the engineering skills: issue tracker, triage labels, and doc layout. |
+| [software-factory](skills/mattpocock/software-factory/) | Shared terms for designing a software factory: the tasks it runs and the services it uses. Use it with a grilling session. In progress upstream. Explicit invocation only |
 | [tdd](skills/mattpocock/tdd/) | Test-driven development. |
 | [to-spec](skills/mattpocock/to-spec/) | Turn the conversation into a spec and publish it to the issue tracker. |
 | [to-tickets](skills/mattpocock/to-tickets/) | Break a plan or spec into tracer-bullet tickets with blocking edges. |

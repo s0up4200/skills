@@ -6,7 +6,7 @@ This file records the upstream commit, the local changes, and the license of eac
 
 The skills in `skills/mattpocock/` are copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 
-**Upstream commit:** `d1478fcb140db0b93c0c8df17bcfd311844749d0` (2026-10-29, v1.3.2)
+**Upstream commit:** `4ae2317ddb22b046e26455e4f9c9b3aaaf62212d` (2026-10-31, v1.3.2 and 3 commits)
 
 ### Copied skills
 
@@ -14,7 +14,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 
 - `skills/engineering/<name>`: ask-matt, code-review, codebase-design, diagnosing-bugs, domain-modeling, grill-with-docs, implement, implement-spec, improve-codebase-architecture, pr, prototype, research, retro, setup-matt-pocock-skills, tdd, to-spec, to-tickets, triage, wayfinder, wizard
 - `skills/productivity/<name>`: grill-me, grilling, handoff, teach, writing-for-agents
-- `skills/in-progress/<name>`: chief-of-staff
+- `skills/in-progress/<name>`: chief-of-staff, software-factory
 
 ### Local changes
 
@@ -27,7 +27,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `implement` posts each spec decision that the user makes as a `Brief amendment` comment on the issue, so that the Spec reviewer of `code-review` sees the decision. The comment states each decision as an edit to the spec, not as a question and answer. A spec question that the agent answers itself stays a departure. The Spec reviewer lists each amendment that it used, so that the user can see an amendment that does not match an answer.
 - `implement` lists each departure from the spec before the commit. It posts all of them on the issue in one `Brief amendment (agent decision)` comment without an ask, and commits without a wait for the user. The user checks the departures on the issue. Before 2026-10-26, the agent asked the user about each departure and waited for the answers. A subagent of a coordinator sent each changed requirement to the coordinator. The user almost never changed a departure, so the wait cost time and gave no value.
 - `implement` runs the test gate of the agent's instructions at the end, in place of the full test suite. It runs the full suite only when the instructions define no test gate.
-- `implement` and `implement-spec` call `field-test` on a local rig when the repo instructions ask for a live run, or the change is visible in the UI. `implement` calls it before `code-review`. `implement-spec` calls it once on the integration branch, in the main agent, after the code-review fixes, because parallel rigs compete for ports and browser tabs and only the main agent can ask the user. A run on the production host needs the PR image from CI, so it comes after the push.
+- `implement` and `implement-spec` call `field-test` on a local rig when the repo instructions ask for a live run, or the change is visible in the UI. `implement` calls it before `code-review`. `implement-spec` calls it once on the integration branch, in the main agent, after the code-review fixes, because parallel rigs compete for ports and browser tabs and only the main agent can ask the user. A run on the production host needs the PR image from CI, so it comes after the push. A fresh implementer subagent fixes the live-run failures, as upstream does for each ticket and for the code-review fixes.
 - `implement` does the checks that the PR template and the agent's instructions ask for before a pull request, for example the performance measurements of autobrr/qui, before the commit. Before 2026-10-29, the agent found these checks only in `/pr`, after the context was full. It runs `field-test` and each measurement in a subagent with a fresh context window, so that the main context stays small. A regression that one fix does not remove stops the run before the pull request, and the agent asks the user.
 - `implement` calls the tool of the `compact` mod after the commit when no other step of the user's message follows. The focus keeps what the PR body needs, the numbers of the checks word for word, the path of each measurement report, and the paths of the captures. Each measurement subagent saves its full report to a file outside the repo, and the PR body gets the short form from `pr`. Before 2026-11-03, the agent kept the report word for word for the PR body, and autobrr/qui#3767 got three full benchstat tables for a result within noise. When the agent's instructions let finished work open a pull request without an ask, the tool's `then` prompt starts `pr` after the compaction.
 - `implement` finishes the live run of a visual change only after it saved a before and an after capture, and its final reply lists their paths. The capture rule was only in `field-test`. On 2026-10-29, a rook run reported correct colors with no captures, and `/pr` built both versions again to take them.
@@ -68,7 +68,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `wizard` gives the user the command to run the script in their own terminal (`bash <path>`), because a Claude Code `!` command gets no keyboard input and the wizard stops at its first prompt. `template.sh` writes `${e}[Enter keeps current]` in `ask()`, so that the template passes shellcheck (SC1087).
 - `diagnosing-bugs`: Phase 1 has a paragraph on network throughput bugs: a sustained-load loop, one path segment at a time.
 - `improve-codebase-architecture` finds hot spots with a count of changes per file over six months, or over all of the history when that window has fewer than about 50 commits. Upstream `git log --oneline` lists no files. A bundled `scripts/change-coupling.sh` lists the file pairs that change in the same commits, with the code-maat degree and limits. The brief of the explorer sub-agent carries the scope, the vocabulary, the glossary, and the ADRs, because a sub-agent sees none of what the main agent loaded. The main agent checks the facts of each card before the badge, and reads `DEEPENING.md` by its path for the dependency category. After the report, the agent files each picked candidate as a `needs-grilling` issue, plus the repo's refactor label, for a later grilling session. A rejection ADR is written at once when the user says yes, because no code waits for it. The agent serves the report on the tailnet with `tailscale serve` on a free HTTPS port, through a local `http.server`, because `tailscale serve` sends a file only as root. It opens the file locally only when the host has no tailnet, and offers to stop serving. `HTML-REPORT.md` loads the Tailwind v4 browser CDN, follows the system dark mode in Tailwind and in Mermaid, and drops `securityLevel: "loose"`. The Mermaid example colours the leak edge with `linkStyle` and writes edge labels in the quoted pipe form, because an inline label breaks on a period (upstream [#1256](https://github.com/mattpocock/skills/issues/1256)). The Tone examples use "module" where they said "wrapper" or "layer". The sources are in `docs/research/improve-codebase-architecture.md`. If upstream fixes #1256 or [#651](https://github.com/mattpocock/skills/issues/651), keep the upstream text.
-- `chief-of-staff`: the Wiki section keeps the wiki in the notes vault that the user's instructions name, and the vault's rules win where they conflict. Without the line, the agent gets two sets of rules for one folder. The Subagents section keeps each step that asks the user in the chief session, because a subagent cannot talk to the user. Without that line, each goal had to find the split again. The Subagents section also has each subagent commit only the paths that it names, because subagents in one repo share one staging area. On 2026-10-24, one vault commit took the staged deletions of another agent. Upstream keeps the skill in `skills/in-progress`, so expect changes at each sync. If upstream moves it, update the path above.
+- `chief-of-staff`: the Wiki section keeps the upstream rule that looks for a shared wiki first, and then keeps the wiki in the notes vault that the user's instructions name, and the vault's rules win where they conflict. Without the line, the agent gets two sets of rules for one folder. The Subagents section keeps each step that asks the user in the chief session, because a subagent cannot talk to the user. Without that line, each goal had to find the split again. The Subagents section also has each subagent commit only the paths that it names, because subagents in one repo share one staging area. On 2026-10-24, one vault commit took the staged deletions of another agent. Upstream keeps the skill in `skills/in-progress`, so expect changes at each sync. If upstream moves it, update the path above.
 
 ### Skipped upstream changes
 
@@ -87,7 +87,7 @@ To see the upstream changes since the recorded commit (add `--stat` for a summar
 ```sh
 git clone https://github.com/mattpocock/skills.git /tmp/mattpocock-skills
 cd /tmp/mattpocock-skills
-git diff d1478fc..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents skills/in-progress/chief-of-staff
+git diff 4ae2317..HEAD -- skills/engineering skills/productivity/grill-me skills/productivity/grilling skills/productivity/handoff skills/productivity/teach skills/productivity/writing-for-agents skills/in-progress/chief-of-staff skills/in-progress/software-factory
 ```
 
 Apply the changes that you want. Then update the upstream commit in this file.
@@ -124,7 +124,7 @@ SOFTWARE.
 
 The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https://github.com/cursor/plugins).
 
-**Upstream commit:** `7c493a17e4d8c7c87941f82f1c2c3b286b23e51d` (2026-10-23)
+**Upstream commit:** `ae5650febf4320793844c12c4adaa937f417f8da` (2026-10-31)
 
 ### Copied skills
 
@@ -140,7 +140,7 @@ The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https:
 ```sh
 git clone https://github.com/cursor/plugins.git /tmp/cursor-plugins
 cd /tmp/cursor-plugins
-git diff 7c493a17..HEAD -- pstack/skills/unslop
+git diff ae5650fe..HEAD -- pstack/skills/unslop
 ```
 
 ### License

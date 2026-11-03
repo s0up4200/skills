@@ -26,7 +26,7 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 3. Create the integration branch. If the issue tracker closes work through PRs, or the user asks for one, open a draft PR after the first merge in step 5 (a branch with no commits ahead of main can't open one), marked as closing the spec and tickets.
 
-4. Use **implementer subagents** to implement each ticket, each in its own worktree on its own branch. Each implementer subagent:
+4. Use a fresh **implementer subagent** for each ticket, each in its own worktree on its own branch. Each implementer subagent:
    - confirms its worktree is based on the integration branch before starting, and resets onto it if not;
    - calls the Skill tool with `tdd` to build the ticket;
    - writes the Domain Docs that its ticket lists, with the code;
@@ -36,9 +36,9 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 6. If this changes the **frontier** of available tickets, kick off more **implementer subagents** to work on the new tickets. This allows for maximum concurrency.
 
-7. Once all tickets are complete, call the Skill tool with `code-review` on the integration branch. Fix all issues raised by the code review in a single **implementer subagent**.
+7. Once all tickets are complete, call the Skill tool with `code-review` on the integration branch. Fix all issues raised by the code review in a single fresh **implementer subagent**.
 
-8. If the repo instructions ask for a live run, or the spec changes something that a user sees in the UI, call the Skill tool with `field-test` on the integration branch, on a local rig. Run it yourself, once for the whole spec. Parallel rigs in the **implementer subagents** would compete for ports and browser tabs, and only you can ask the user for a confirmation. Fix each failure in a single **implementer subagent**, then run the failed observable again.
+8. If the repo instructions ask for a live run, or the spec changes something that a user sees in the UI, call the Skill tool with `field-test` on the integration branch, on a local rig. Run it yourself, once for the whole spec. Parallel rigs in the **implementer subagents** would compete for ports and browser tabs, and only you can ask the user for a confirmation. Fix each failure in a single fresh **implementer subagent**, then run the failed observable again.
 
 9. Read the pull request template of the repo and each rule in your instructions that applies before a pull request opens, and do each check on the integration branch, for example performance measurements in a subagent with a fresh context window. If a draft PR exists, mark it ready for review. Otherwise, resolve each ticket the way the issue tracker closes work, and report the integration branch.
 
