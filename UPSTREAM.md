@@ -18,6 +18,7 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 
 ### Local changes
 
+- `research` runs `git check-ignore -v` on the note and reports whether git tracks it. In autobrr/qui, `docs/*` is ignored, and on 2026-11-03 two of five research agents said so while three did not.
 - `code-review`: step 6, "Act on the findings", comes from [mattpocock/skills#1044](https://github.com/mattpocock/skills/issues/1044). If upstream merges that issue, keep the upstream text.
 - `pr`: the skill uses the PR template of the repository. The default body is one sentence. The evidence section lists only checks that CI cannot see. The prose goes through `simple-english` and `unslop` in a section before the template sections, so that the pass comes before the body is shown or posted. The skill offers to install them when they are missing. After it opens a pull request, it runs `verify-review` on it, which waits for the first bot review and compacts the session when it stops.
 - Glossary entries and ADRs are Domain Docs in the plan until implementation. `domain-modeling`, `grill-with-docs`, `wayfinder`, and `improve-codebase-architecture` record them in the ticket resolution or the spec. `triage` records them in the agent brief. `to-spec` has a Domain Docs section, and `to-tickets` adds each entry to the ticket whose code it describes. `implement` and `implement-spec` write them on the implementation branch with the code.
