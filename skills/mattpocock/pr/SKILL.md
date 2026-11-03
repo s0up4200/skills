@@ -180,6 +180,29 @@ Give evidence only for what CI cannot see: a manual run of the built binary, rea
 
 Screenshots are the best evidence when the change is visual and the environment can make them. Show a before and an after.
 
+### Performance
+
+When the template or the repo instructions ask for a Performance section, write it from the full measurement report. If the session kept the report's path, read the file. Give the reviewer the result, and leave the raw tool output in the file:
+
+1. One sentence with the conclusion: faster, slower, or within noise, and by how much.
+2. One table with a row for each measured path and a column for each metric. Each cell holds base → head, and the difference or `~` for within noise.
+3. One line with the workload, the environment, the method, and the base and head revisions.
+
+Fit each item that the template comment or the repo instructions ask for into these three parts. When they ask for the raw tool output, put it under the table in a collapsed `<details>` block. When nothing in the diff can affect performance, follow the template: keep the section with one sentence that says why, or delete it.
+
+```markdown
+## Performance
+
+The new field adds no measurable cost to the torrent list.
+
+| Path | Time | Memory | Allocs |
+|---|---|---|---|
+| `GetTorrentsWithFilters`, 1 instance | 9.83 → 9.69 ms ~ | 25.4 → 24.9 MiB ~ | 757 → 759 ~ |
+| `GetCrossInstanceTorrentsWithFilters`, 2 instances | 23.7 → 22.7 ms ~ | 64.7 → 63.1 MiB ~ | 41.01k → 41.02k +0.03% |
+
+10,000 torrents per instance from a fake qBittorrent, page limit 300. `go test -bench`, base and head alternated 10 times, `~` is within noise per benchstat. Base bddc8de, head c03f858, go1.27.3 on a Ryzen 7 8745HS.
+```
+
 ### Merge danger
 
 Use one line. Add a sentence only when the risk is not clear from the line. If the template has no section for risk, put the line at the end of the section that describes the change.
