@@ -20,8 +20,6 @@ while read -r file; do
   grep -q "\"./$dir\"" .claude-plugin/marketplace.json || { echo "$dir: not in .claude-plugin/marketplace.json"; fail=1; }
   lines=$(wc -l <"$file")
   ((lines < 500)) || { echo "$file: $lines lines, keep it under 500"; fail=1; }
-  # Remove a skill from this list when its body is under the cap.
-  [[ $dir == skills/mobile-adapt ]] && continue
   bytes=$(awk 'f>=2; /^---$/ && f<2 {f++}' "$file" | wc -c)
   ((bytes < 15000)) || { echo "$file: body has $bytes bytes, keep it under 15000"; fail=1; }
 done < <(find skills -name SKILL.md | sort)
