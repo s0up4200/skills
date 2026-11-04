@@ -54,7 +54,7 @@ For each finding, write down the claim in one sentence before you look at the co
 
 Answer these at the current head of the branch, with the file open:
 
-- Does the flagged behavior still exist? An outdated thread, or a later commit, may have removed the line. Then the finding is stale, and the evidence is the commit that resolved it.
+- Does the flagged behavior still exist? A later commit may have removed the line. Then the finding is stale.
 - Is the premise true? Read the function, its callers, and the tests that exercise it. A finding about a path nobody reaches, or an input the type system excludes, is wrong.
 - Is the flagged behavior deliberate? A code comment, a document, the PR body, a linked issue, or a downstream verifier that corrects an optimistic check can make a "defect" a design decision. Fixing it inverts a tradeoff the maintainer chose on purpose.
 - Which failure mode is cheaper for the real user flow? A bot weights every branch equally. The maintainer does not.
@@ -96,7 +96,7 @@ Every public comment goes out under the user's account. Start each reply and eac
 > 🤖 **<model> responding on behalf of <login>**
 ```
 
-Use the model name that the harness states, else the harness name, and the login from `gh api user --jq .login`. Post each reply, and put its full text in the report (step 6), so the user sees what went out. The reply for a judgment call waits with its finding: it sits under its option in the report, and the user's answer approves it. A reply or review answer to a person (`ai` is false) also waits: put it in the report, and post it after the user approves it, because a person reads a tone that a bot ignores. Post with:
+Use the model name that the harness states, else the harness name, and the login from `gh api user --jq .login`. Post each reply, and put its full text in the report (step 6). The reply for a judgment call waits with its finding: it sits under its option in the report, and the user's answer approves it. A reply or review answer to a person (`ai` is false) also waits: put it in the report, and post it after the user approves it, because a person reads a tone that a bot ignores. Post with:
 
 ```bash
 gh api "repos/$repo/pulls/$pr/comments/$comment_id/replies" -f body="$body"
@@ -113,7 +113,7 @@ Resolve or keep each thread by this list.
 - A fixed finding (confirmed, stale, or a judgment call settled with a fix): resolve the thread, for every reviewer.
 - A declined finding (wrong, or a judgment call settled without a fix) from a bot other than CodeRabbit: reply, then resolve the thread.
 - A declined finding from CodeRabbit (author `coderabbitai`): reply, and keep the thread open, so that CodeRabbit can answer the reply. On a later run, resolve it when the finding is fixed at head or CodeRabbit accepted your reply. Until then, count it as waiting on CodeRabbit.
-- A declined finding from a person: reply, and keep the thread open. The thread is then waiting, and the next run skips it.
+- A declined finding from a person: reply, and keep the thread open, so that it is waiting (step 1).
 
 A reply to a declined judgment call gives the reason that applies to this case, such as a fix that costs more than the failure, or hardware that nobody can test on. The finding was true, and a reply that calls the check wrong teaches the bot to skip a real defect.
 
@@ -127,7 +127,7 @@ The answer cites commit SHAs, so post it after the push.
 
 ## 5. Rate the Codex findings
 
-Codex ends each comment with "Useful? React with 👍 / 👎." Add one reaction to the first comment of each Codex thread:
+Codex (author `chatgpt-codex-connector`) ends each comment with "Useful? React with 👍 / 👎." Add one reaction to the first comment of each Codex thread, and rate no other bot:
 
 - 👍 for a finding that led to a fix: **confirmed**, or a **judgment** settled with a fix.
 - 👎 for a finding that did not: **wrong**, or a **judgment** settled without a fix.
@@ -137,8 +137,6 @@ Codex ends each comment with "Useful? React with 👍 / 👎." Add one reaction 
 ```bash
 gh api "repos/$repo/pulls/comments/$comment_id/reactions" -f content=+1   # or -1
 ```
-
-Rate only Codex comments (author `chatgpt-codex-connector`).
 
 ## 6. Report
 
