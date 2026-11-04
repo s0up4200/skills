@@ -7,14 +7,17 @@ Serves a synthetic library with enough shape for qui to connect, sync, list,
 and open a details panel. Every maindata poll bumps upspeed on each torrent,
 so stream deltas carry rows and a handler that drops its row on an empty
 delta shows up as stale values. GET /_counts returns requests per path as
-JSON; diff two snapshots for a paired request count. Binds 127.0.0.1 only.
+JSON; diff two snapshots for a paired request count.
+GET /_torrent?hash=<hash>&state=moving&progress=0.5 sets fields on one torrent,
+so a run can see a state change. The first hash is "%040x" % 1.
+Binds 127.0.0.1 only.
 """
 import json
 import sys
 import time
 from collections import Counter
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlparse
 
 PORT = int(sys.argv[1])
 COUNT = int(sys.argv[2]) if len(sys.argv) > 2 else 2000
@@ -85,9 +88,16 @@ class Handler(BaseHTTPRequestHandler):
         self.do_GET()
 
     def do_GET(self):
-        path = urlparse(self.path).path
+        url = urlparse(self.path)
+        path = url.path
         if path == "/_counts":
             self.send(json.dumps(counts, indent=1).encode())
+            return
+        if path == "/_torrent":
+            fields = dict(parse_qsl(url.query))
+            t = torrents[fields.pop("hash")]
+            t.update({k: float(v) if k == "progress" else v for k, v in fields.items()})
+            self.send(b"{}")
             return
         counts[path] += 1
         if path == "/api/v2/auth/login":

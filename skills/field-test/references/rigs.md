@@ -13,10 +13,21 @@ Traps:
 - Comparing against the pre-fix binary: `git worktree add <dir> HEAD`, copy `web/dist` in, `go build ./cmd/qui`. Grep the served bundle for a code signature to know which build a tab is running; the service worker precaches chunks across binary swaps on the same port.
 - The binary embeds `web/dist` (`web/build.go`), so `go build ./cmd/qui` after `pnpm build` includes the new frontend. A new worktree has only `web/dist/.gitkeep`. `make frontend` also copies the bundle to `internal/web/dist`, but no code reads that copy. Measure chunk sizes in `web/dist`. A Vite build of an edit that changes only a comment is byte-identical, so use a real statement to make the chunk hashes change.
 
+## Loopback-only rig
+
+Start a rig that uses only stubs in a loopback-only network namespace, so that no request can reach a real host:
+
+```sh
+unshare -rn bash -c "ip link set lo up && exec <rig command>"
+```
+
+A dev build skips the update check. Set `QUI__CHECK_FOR_UPDATES=false` for a build with a release version.
+
 ## Mock Torznab indexer
 
 A short Python `HTTPServer` on a spare port answering `t=caps` with a caps document and searches with an RSS body of crafted candidates. Register it with `POST /api/torznab/indexers` as a native backend. Serve `/a` healthy and `/b` with 500s to exercise error outcomes. Point it at `127.0.0.1`; nothing in a rig touches a real tracker.
 
+- qui waits 60 s between requests to one native backend. If the test is not about this wait, register the mock with `"backend":"jackett","indexer_id":"rig"`. On 2026-11-04, `mock-torznab.py` answered two `POST /api/torznab/search` calls in a row with no wait on this backend, and 60 s apart on a native backend.
 - The native backend sends each request to `base_url` itself, with no `/api` suffix. A mock that routes on a path prefix must match `/b`, not `/b/`.
 - Pass `"categories":[2000]` to `POST /api/torznab/search`. Without categories, qui guesses the content type from the query. A synthetic title can come out as music, and then qui skips every indexer and returns zero results with no error.
 
@@ -111,7 +122,7 @@ Teardown: `docker rm -f rig-qbit rig-ssh`, `git worktree remove --force` the dev
 
 The container is the default: it answers every endpoint the way qBittorrent does and never drifts from a WebUI version. Reach for the stub only when the library has to be big (thousands of rows in a second) or shaped (hybrid v1+v2 hashes, chosen tracker domains, a torrent removed on demand), or when the test needs a request count and the sniffer is more setup than the question deserves.
 
-`scripts/stub-qbit.py <port> [count]` in this skill: login, capabilities, a synthetic library (2000 torrents by default), and a per-path request counter at `GET /_counts`. Every maindata poll bumps `upspeed` on each row, so stream deltas carry rows; a static library makes every delta empty and hides a handler that drops its row on an empty frame. Copy `/_counts` before and after a window and subtract for a paired request count. The stub answers only what qui asked for when it was written; an endpoint it does not know returns `[]`, so a new call path can pass here and fail on the container. A dead host such as `127.0.0.1:1` puts the instance into a 60 s backoff that survives repointing, so `POST /api/instances/{id}/test` to reconnect.
+`scripts/stub-qbit.py <port> [count]` in this skill: login, capabilities, a synthetic library (2000 torrents by default), and a per-path request counter at `GET /_counts`. `GET /_torrent?hash=<hash>&state=moving&progress=0.5` changes one torrent during a run. Poll the qui API until the change shows, because qui reads it at its next sync. Every maindata poll bumps `upspeed` on each row, so stream deltas carry rows; a static library makes every delta empty and hides a handler that drops its row on an empty frame. Copy `/_counts` before and after a window and subtract for a paired request count. The stub answers only what qui asked for when it was written; an endpoint it does not know returns `[]`, so a new call path can pass here and fail on the container. A dead host such as `127.0.0.1:1` puts the instance into a 60 s backoff that survives repointing, so `POST /api/instances/{id}/test` to reconnect.
 
 To test a qBittorrent that is slow to answer, add a toggle to the stub that holds each `/api/v2/sync/maindata` answer for 75 s. That is longer than the 10 s timeout of qui for an incremental sync. Turn the toggle on only after the table shows rows. Each build needs its own healthy first sync. Before the next build connects to the same stub, turn the toggle off, reload the tab, and make sure that the maindata count in `/_counts` rises. Then turn the toggle on again. On 2026-10-19 the second build stalled until the toggle went off.
 
