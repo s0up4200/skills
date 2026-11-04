@@ -4,7 +4,7 @@ Use a local rig when the change cannot wait for a CI image, when it must not tou
 
 ## qui binary on an alternate port against real config
 
-Copy `~/.config/qui/` and a `VACUUM INTO` copy of the database into the scratchpad, then run the built binary with `--config-dir <dir> --data-dir <dir>` on a free port. Point it at whatever qBittorrent the test needs. Insert nothing into `api_keys` by hand; the permission classifier blocks it and it is the wrong way anyway. Mint the key through the UI, or ask the user.
+Copy `~/.config/qui/` and a `VACUUM INTO` copy of the database into the scratchpad, then run the built binary with `--config-dir <dir> --data-dir <dir>` on a free port. Point it at whatever qBittorrent the test needs. Mint an API key through the UI, or ask the user. The permission classifier blocks an insert into `api_keys`.
 
 Traps:
 
@@ -62,7 +62,7 @@ echo "ls /data" | sftp -q -i $R/key/id -P <ssh port> -o StrictHostKeyChecking=no
   -o UserKnownHostsFile=/dev/null rig@127.0.0.1
 ```
 
-Make sure that the `sftp` check lists `downloads` before you add qui. Then one failure in qui is a qui failure, not an SSH failure. qui accepts a PEM private key without a passphrase. The key from the `ssh-keygen` line above works.
+Make sure that the `sftp` check lists `downloads` before you add qui. Then one failure in qui is a qui failure, not an SSH failure. qui accepts a PEM private key without a passphrase, such as the key from `ssh-keygen` above.
 
 qBittorrent setup: log in with the temporary password from `docker logs rig-qbit`. With `app/setPreferences`, send `web_ui_host_header_validation_enabled:false`, `web_ui_csrf_protection_enabled:false`, and `queueing_enabled:false`. qBittorrent removes a trailing slash from `save_path`: a default save path of `/data/downloads/` comes back as `/data/downloads`. Thus this rig cannot make a scan root with a trailing slash. A duplicate root comes out byte-identical.
 
@@ -107,7 +107,7 @@ curl -s -b $C $U/api/instances/$ID/orphan-scan/runs/$(jq -r .id <<<"$RUN") | jq 
 pkill -f "[s]erve --config-dir $D"
 ```
 
-Build the develop binary in a worktree with `make backend`. A new worktree has an empty `web/dist`. Copy `web/dist` from the main checkout before the build, and delete the copy after the build.
+Build the develop binary with the steps in the first section and in the paired-binary traps.
 
 Teardown: `docker rm -f rig-qbit rig-ssh`, `git worktree remove --force` the develop worktree, and delete the rig dir. Then make sure that no rig port is still listening.
 
