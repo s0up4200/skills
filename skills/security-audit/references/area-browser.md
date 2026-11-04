@@ -33,3 +33,12 @@ Treat each of these as attacker text: a torrent name, the file names in a torren
 - `frame-ancestors` in a CSP, or `X-Frame-Options`. Without one, another page can frame the app (clickjacking). Score it low unless one click does harm.
 - A `Content-Security-Policy` limits the harm of an XSS. Its absence raises the risk of an XSS finding, but is no finding alone.
 - An open redirect: a route that redirects to a URL from the query.
+
+## Browser state
+
+- Prototype pollution: a key from the attacker reaches a deep merge or a path assignment, and later code reads the polluted property in a check, a navigation, or a render. Pollution with no such reader is not a finding. `JSON.parse` and a shallow copy are not enough.
+- DOM clobbering: injected `id` or `name` attributes shadow a global or a config value that code trusts. Prove both the markup path and the use.
+- Service worker: who controls the script and its imports, and how wide its scope is. A worker that caches personal responses with no user in the cache policy can serve them after a logout or an account switch.
+- `storage` events and `BroadcastChannel` that carry identity or commands between tabs with no tie to the current session.
+- Cross-site leaks: an attacker page learns a secret fact through a load error, a frame count, a redirect, or the timing of a request with the victim's cookies. Name the fact. Generic timing differences are not a finding.
+- `window.opener`: a link with `target="_blank"` to a page that the attacker controls, or a retained window that can navigate a privileged page. Check `noopener` and `Cross-Origin-Opener-Policy`.

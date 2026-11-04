@@ -43,3 +43,25 @@ Only for an app with more than one user or role:
 
 - OAuth and OIDC: the `state` value is checked, and the redirect URL is an exact match against the config.
 - A redirect after login (`?next=`, `?redirect=`): it accepts only a path on the same site. `//evil.example` and `https:evil.example` are other sites.
+- SAML: the element whose signature passes is the element that the code reads the identity from. Check the unsigned path, the XML parser, the validity window, the audience, and replay.
+
+## Second factors and recovery
+
+Only for an app that has them:
+
+- MFA: adding, replacing, or turning off a factor, and making recovery codes, need fresh proof of identity. A first factor alone cannot do it, and a removed factor stops working.
+- Step-up: the challenge is tied to the user, the session, the action, and an expiry, and it works once. Compare the UI, the API, and the recovery path.
+- WebAuthn and passkeys: registration and login check the challenge, the RP ID, the origin, and that the credential belongs to the account.
+- Account linking: adding an email, an external login, or a device needs a current session, proof that the party owns the new identity, and a callback tied to the account that started it.
+- Password reset and recovery are often the weakest login. The token is random, tied to one user and one action, expires, and works once. The link does not take its host from the request. A reset ends the old tokens and sessions.
+
+## Requests between a proxy and the app
+
+Only when the docs or the config put a proxy or a cache in front of the app. What the proxy does is often outside the repo, so the verdict is often not proven: say what decides it.
+
+- Framing: the proxy and the app disagree on where a request ends, through two `Content-Length` values, `Transfer-Encoding`, or an HTTP/2 downgrade. It matters mostly for a custom parser. Go `net/http` refuses most of these forms, so read what the code does before you report it.
+- `Host` and `X-Forwarded-Host`: a value from the client that builds an absolute URL, a reset link, a callback, or a tenant route. Check that the proxy strips the client's copy.
+- Cache poisoning: a request value changes the response, but the cache key leaves it out. Compare the key with each header and cookie that changes the response.
+- Cache deception: a private route that the cache takes for a static file, for example `/account/x.css`. Check `Cache-Control` on private responses.
+- Response headers: input in `Location`, `Set-Cookie`, or another header. Check whether the framework refuses a line break first.
+- mTLS: the app trusts a client certificate header from any peer, or maps the text of a certificate subject to the wrong account.

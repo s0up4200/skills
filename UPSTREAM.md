@@ -223,3 +223,42 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## cloudflare/security-audit-skill
+
+`skills/security-audit` is our own skill, not a copy. Parts of its checklists and its run tracking are adapted from [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill).
+
+**Upstream commit:** `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8` (2026-09-14)
+
+### Adapted parts
+
+- The checklists `area-logic.md`, `area-data.md`, `area-availability.md`, `area-ai.md`, `area-native.md`, `area-messaging.md`, and `area-local.md` are shorter forms of `ATTACK-CLASSES.md` and the matching upstream companion files. They use the verdicts of our skill, and some have added Go notes. The sections added to `area-access.md`, `area-browser.md`, `area-supply-chain.md`, and `area-deployment.md` come from the other companion files.
+- `prior-runs.md` and `coverage.md` are a small form of the upstream coverage ledger and its rules for prior runs. Upstream uses JSON and Node validators. We use Markdown, with no validator and no coverage critic agents.
+
+### License
+
+The adapted parts use the license of the upstream repository:
+
+```
+MIT License
+
+Copyright (c) 2025-2026 Cloudflare, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

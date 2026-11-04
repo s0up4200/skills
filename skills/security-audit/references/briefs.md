@@ -1,4 +1,4 @@
-This file holds the brief of an area agent (step 3 of `SKILL.md`), the brief of a re-check agent (step 4), and the format of `findings.md`.
+This file holds the brief of an area agent (step 3 of `SKILL.md`), the brief of a re-check agent (step 4), and the formats of `findings.md` and `coverage.md`.
 
 Each agent starts with a fresh context window and sees only its brief, so the brief carries everything, with absolute paths. Fill each `<…>` slot.
 
@@ -11,6 +11,7 @@ Repo: <absolute path>
 Scope: <path, or "the whole repo">
 Checklist: read <absolute path of references/area-<x>.md> and check each item against the code in scope.
 Scanner output: <absolute paths of the files in scanners/ for this area, or "none">
+Earlier runs: <first work, last work, and known list of this area from prior.md, or "none">
 
 Threat model: read <run folder>/threat-model.md
 
@@ -19,7 +20,9 @@ Rules:
 - Write the location and the kind of a secret, never its value.
 - Cite each file and line from code that you read in this run.
 
-Method: find the entry points first. Then follow the data from each input in the threat model to the place where it does harm, the sink. Read the whole path. A finding is a path from an input that an attacker in the threat model controls to a sink, with no guard that stops it. A scanner hit is a lead: keep it only when the input reaches the sink this way. A path that the by-design list allows is not a finding.
+Method: find the entry points first. Then follow the data from each input in the threat model to the place where it does harm, the sink. Read the whole path. A finding is a path from an input that an attacker in the threat model controls to a sink, with no guard that stops it. A scanner hit is a lead: keep it only when the input reaches the sink this way. A path that the by-design list allows is not a finding. A "Bar for a finding" section in the checklist also applies.
+
+Do the first work from the earlier runs first, then the rest of the checklist, then the last work. A path on the known list is not a new finding, and a different path to the same sink is.
 
 Risk scale, from 1 to 10: 1 to 3 is minor or unlikely. 4 to 6 is real but contained. 7 to 10 is a security breach, data loss, or a crash, that an attacker in the threat model can reach.
 
@@ -33,7 +36,14 @@ Return each finding in this form:
 - Fix: <the smallest change that blocks the path, and where>
 - Risk: <N>/10. <one sentence: why this score>
 
-Then a list "Checked, no finding": one line for each checklist item that applies, with the guard and its path:line, or the reason that the item does not apply.
+Then the coverage, so that the next run knows where this one stopped:
+
+## Coverage
+- Read: <the folders and files that you read>
+- Inputs followed: <each input of the threat model that you followed to its end>
+- <checklist item>: <one of: checked, guard at path:line | finding, its title | n/a, the reason | not reached, the reason>
+
+An item is one bullet of the checklist. Name it as `<heading>: <its first words>`, copied exactly, so that the next run can match it. Give each item one line. Write "not reached" for an item that you did not finish: a gap on the record is useful, and a guess is not.
 ```
 
 ## Re-check brief
@@ -53,7 +63,7 @@ Finding:
 
 Rules:
 - Change no file in the repo. Send nothing to GitHub, and send no request to any host.
-- To run a test or a small program, copy the repo to <run folder>/recheck-<id>/ and run it there, against local code and local fakes only.
+- To run a test or a small program, copy the repo to <run folder>/recheck-<id>/ and run it there, against local code and local fakes only. Keep it small and give it a timeout: a load test can stop a shared service and proves nothing that the code does not show.
 - Write the location and the kind of a secret, never its value.
 
 Try each way to disprove it:
@@ -94,6 +104,8 @@ Return:
 - Fix: <the change>
 - Proof: <the hops or the test, from the re-check agent>
 - Risk change: <old> → <new>, <reason>. Only when the re-check agent changed it.
+- Carried from: <folder name of the earlier run> <its ID>. Only for a carried finding.
+- Pick: <the letter and the name of the option from step 6, and the URL or path of what it made>. Added in step 6.
 
 ## F2 · <title> · Risk 5/10 · not proven
 - …
@@ -106,4 +118,24 @@ Return:
 - Files: <path:line>
 - Claim: <one sentence>
 - Reason: <the guard and its path:line, or the reason>
+```
+
+## Coverage file
+
+`coverage.md` is what the next run reads to find the gaps. Build it from the coverage of each area agent.
+
+```markdown
+# Coverage: <repo> · <scope> · <date>
+
+- Commit: <full hash>, <clean or dirty>
+- Gaps: <count>
+
+## Gaps
+- Input that no agent followed: <input>
+- Not reached: <area> · <item> · <reason>
+
+## <area>
+- Read: <folders and files>
+- Inputs followed: <inputs>
+- <checklist item>: <checked, guard at path:line | finding F2 | n/a, the reason | not reached, the reason>
 ```

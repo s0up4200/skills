@@ -58,6 +58,7 @@ Then change the version, the file, the hash, and the pin date in this file and i
       <header>...</header>
       <section id="findings" class="space-y-10">...</section>
       <section id="fix-first">...</section>
+      <section id="coverage">...</section>
     </main>
   </body>
 </html>
@@ -73,14 +74,14 @@ The page follows the system color scheme. Give each color class a `dark:` pair (
 
 ## Header
 
-The repo name, the date, and the scope. One line with who can reach the app, from the threat model. One count line, for example: "4 proven · 2 not proven · 3 disproved, with the reasons in findings.md". Then a small legend: red arrow = the attack path, dashed line = where the fix blocks it. No introduction paragraph.
+The repo name, the date, and the scope. One line with who can reach the app, from the threat model. One count line, for example: "4 proven · 2 not proven · 3 disproved, with the reasons in findings.md". When an earlier run exists, one more line, for example: "Since 2026-11-02: 3 new · 2 carried · 1 gone". Then a small legend: red arrow = the attack path, dashed line = where the fix blocks it. No introduction paragraph.
 
 ## Finding card
 
 Each finding is one `<article id="F1">`, in order of risk from high to low. The diagram carries the weight. The prose is short and plain.
 
 - **Title**: the ID and a short name of the hole, for example "F1 · The indexer test button fetches any URL".
-- **Badge row**: `Risk N/10` (7 to 10 red, 4 to 6 amber, 1 to 3 slate), `proven` (emerald) or `not proven` (slate outline), and a tag for the area.
+- **Badge row**: `Risk N/10` (7 to 10 red, 4 to 6 amber, 1 to 3 slate), `proven` (emerald) or `not proven` (slate outline), a tag for the area, and `carried` (slate outline) for a carried finding.
 - **Files**: a monospaced list, `font-mono text-sm`, as path:line.
 - **What an attacker does**: the attack steps, one line each.
 - **Who is exposed**: one sentence.
@@ -118,6 +119,10 @@ When the Mermaid layout fights the point, draw the path as `<div>` boxes and inl
 ## Fix first
 
 One larger card at the end: the finding to fix first, one sentence on why, and a link to its card. Pick by risk, then by how many users the hole exposes, then by how small the fix is.
+
+## What this run did not cover
+
+A short list at the end: the commit, each gap from `coverage.md`, and each area that was skipped with its reason. Then one line: "One run does not find everything. The next run starts with these gaps." With no gaps, keep the line, so that a clean run does not read as proof that the repo is safe.
 
 ## Serve the report
 

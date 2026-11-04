@@ -10,7 +10,7 @@ Read these once, before the questions:
 
 ## The questions
 
-Ask one question for each finding in the report, all in one message, in order of risk. Start the message with one line: the repo, the scope, the count of findings, and the URL or the path of the report. Leave out an option that does not show for the finding, and keep the letters of the others:
+Ask one question for each finding in the report, all in one message, in order of risk. For a carried finding, `references/prior-runs.md` says when the earlier pick stands. Start the message with one line: the repo, the scope, the count of findings, and the URL or the path of the report. Leave out an option that does not show for the finding, and keep the letters of the others:
 
 ```markdown
 **F1 · The indexer test button fetches any URL** · Risk 8/10 · proven
@@ -36,7 +36,7 @@ D is only for a private repo: an issue in a public repo shows the hole to everyo
 
 After the last finding, add: **S: Stop serving the report**, yes or no. Leave it out when the report opened from a local file. Then a last line, for example: "Reply with a letter for each finding, for example `F1 A, F2 C, S yes`."
 
-Do the picks in this order: by design, vault notes, issues, advisories, stop serving, then each fix now, one at a time in order of risk, then fresh window last. If the report is still served when the run ends, offer to stop serving it again in the last reply.
+Add each pick to its finding in `findings.md`, with the URL or the path of what it made, so that the next run can read it. Do the picks in this order: by design, vault notes, issues, advisories, stop serving, then each fix now, one at a time in order of risk, then fresh window last. If the report is still served when the run ends, offer to stop serving it again in the last reply.
 
 ## A: Fix now
 
@@ -83,7 +83,7 @@ Write the text to `<run folder>/advisory-<id>.md`, and give the user the absolut
 
 ## F: By design
 
-Drop the finding for this run. Write no file and no ADR about it. Each run starts fresh, so no file lists the risks that the user accepted.
+Record the pick in `findings.md` in the run folder, and nowhere else: no file in the repo and no ADR. Later runs leave out the same claim while its files stay unchanged. When a file changes, the risk that the user accepted may have changed too, so the claim can come back.
 
 ## Sources
 

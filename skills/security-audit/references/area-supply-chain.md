@@ -22,6 +22,15 @@ Read each workflow, with the actionlint and zizmor output as leads.
 - Self-hosted runners in a public repo: a fork pull request can run code on the machine.
 - Release workflows: who can start them (a tag push, a manual run), and what they sign or publish.
 
+## Build and release
+
+- Generated code, vendored archives, and binary blobs that ship with no review. Regenerate them locally and compare, and find who controls the input of the generator.
+- A cache, an artifact, or a workspace that a lower-trust job fills and a higher-trust job later restores and runs or releases. Check the cache key and who produced the artifact.
+- Tests, signing, and publishing that refer to a tag or a file name and not one digest. A file that changes between the test and the release skips the test.
+- Build context: a Docker `COPY .` or a package with no ignore file that ships secrets or local config. Name the real credential or private data.
+- A consumer of a release that checks only that a signature is valid, and not which workflow, branch, or key signed it.
+- Plugins and extensions: an install or update hook that runs before the authenticity check, a plugin that gets more host rights than it declares, or a publisher who can replace another. A user who installs a plugin for that user's own process crosses no boundary.
+
 ## Sources
 
 Checked on 2026-11-02. Read the source again when a version is newer than the one named here.
