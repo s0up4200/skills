@@ -102,6 +102,8 @@ Cross-check the monitor against one known-present pattern whenever you report st
 
 Report the command you ran and the output you saw, quoted, for each observable. Then say plainly what the run did not exercise: a path that needs a natural announce, a size collision that never happened, an indexer that was rate limited. A partial field test reported as partial is useful. A partial field test reported as green is a future incident.
 
+When the run shows a bug outside the change, run `gh issue list --search '<endpoint or symptom>' --state all` before you report it as new, and give the issue number if one exists.
+
 The same message carries the cleanup evidence from step 7: the end checks and their output. A verdict without it is not finished.
 
 Update the PR body's "How has this been tested?" section with the live result in one or two sentences. Update memory with what was proven and what was left.

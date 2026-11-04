@@ -39,7 +39,7 @@ BIN=$1; P=$2; D=$R/cfg-$P; rm -rf $D; mkdir -p $D
 $BIN generate-config --config-dir $D >/dev/null 2>&1
 sed -i -E 's/^#? *logLevel *=.*/logLevel = "DEBUG"/; s/^#? *port *=.*/port = '"$P"'/; s/^#? *host *=.*/host = "127.0.0.1"/' $D/config.toml
 setsid $BIN serve --config-dir $D --data-dir $D > $D/qui.log 2>&1 < /dev/null &
-for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:$P/api/health && break; sleep 0.5; done
+for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:$P/health && break; sleep 0.5; done
 U=http://127.0.0.1:$P; C=$D/cookies; X=(-H 'X-Requested-With: XMLHttpRequest' -H 'Content-Type: application/json')
 curl -s "${X[@]}" -c $C -d '{"username":"rig","password":"rig-password"}' $U/api/auth/setup >/dev/null
 curl -s "${X[@]}" -c $C -b $C -d '{"username":"rig","password":"rig-password"}' $U/api/auth/login >/dev/null
