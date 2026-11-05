@@ -127,7 +127,7 @@ SOFTWARE.
 
 The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https://github.com/cursor/plugins).
 
-**Upstream commit:** `ae5650febf4320793844c12c4adaa937f417f8da` (2026-10-31)
+**Upstream commit:** `2776ddd2355d6d6c8747d3964600f28daf62f049` (2026-11-05)
 
 ### Copied skills
 
@@ -143,7 +143,7 @@ The skills in `skills/cursor/` are copies of skills from [cursor/plugins](https:
 ```sh
 git clone https://github.com/cursor/plugins.git /tmp/cursor-plugins
 cd /tmp/cursor-plugins
-git diff ae5650fe..HEAD -- pstack/skills/unslop
+git diff 2776ddd2..HEAD -- pstack/skills/unslop
 ```
 
 ### License
