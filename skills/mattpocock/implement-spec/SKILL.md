@@ -38,7 +38,7 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 7. Once all tickets are complete, call the Skill tool with `code-review` on the integration branch. Fix all issues raised by the code review in a single fresh **implementer subagent**.
 
-8. If the repo instructions ask for a live run, or the spec changes something that a user sees in the UI, call the Skill tool with `field-test` on the integration branch, on a local rig. Run it yourself, once for the whole spec. Parallel rigs in the **implementer subagents** would compete for ports and browser tabs, and only you can ask the user for a confirmation. Fix each failure in a single fresh **implementer subagent**, then run the failed observable again.
+8. If the spec names a live proof, the repo instructions ask for a live run, or the spec changes something that a user sees in the UI, call the Skill tool with `field-test` on the integration branch, on a local rig. Run it yourself, once for the whole spec. Parallel rigs in the **implementer subagents** would compete for ports and browser tabs, and only you can ask the user for a confirmation. Fix each failure in a single fresh **implementer subagent**, then run the failed observable again.
 
 9. Read the pull request template of the repo and each rule in your instructions that applies before a pull request opens, and do each check on the integration branch, for example performance measurements in a subagent with a fresh context window. If a draft PR exists, mark it ready for review. Otherwise, resolve each ticket the way the issue tracker closes work, and report the integration branch.
 

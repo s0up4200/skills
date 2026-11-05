@@ -79,6 +79,7 @@ A list of testing decisions that were made. Include:
 - A description of what makes a good test (only test external behavior, not implementation details)
 - Which modules will be tested
 - Prior art for the tests (i.e. similar types of tests in the codebase)
+- The live proof: the observable that fails if the change is broken, and what the old build shows for it. If tests alone prove the change, write `None` and the reason.
 
 ## Out of Scope
 
