@@ -15,7 +15,7 @@ If the commit is gone, or the repo has no git, treat each file as changed. A fil
 
 ## Sort the earlier work
 
-Build `prior.md` in the run folder with this table. "Cited files" are the files of a finding, or the guard of a checklist item.
+Build `prior.md` in the run folder with this table. "Cited files" are the `Files` field of a finding, or the guard of a checklist item.
 
 | Earlier state | Cited files | This run |
 |---|---|---|
@@ -26,6 +26,7 @@ Build `prior.md` in the run folder with this table. "Cited files" are the files 
 | item: not reached | any | First work for its area. |
 | item: checked | changed | First work for its area. |
 | item: checked | unchanged | Last work for its area, after the rest of the checklist. |
+| item: outside the repo | any | Last work for its area. Another run cannot settle it from the same code. |
 | input: in this threat model, and no earlier run followed it | any | First work for each area that it touches. |
 
 An input counts as followed when an earlier `coverage.md` lists it, or when an earlier finding starts at it. An item matches by its exact name. An item with no match is new work, so it goes with the rest of the checklist.
@@ -51,6 +52,7 @@ The known list holds only the ID, the title, and the files of each finding. An a
 
 ## Carried findings in later steps
 
+- Step 3: a finding to check again goes through step 4 as a new finding, also when its area agent finds a guard. Thus a fix gets an independent check, and the finding does not just disappear.
 - Step 4: each carried finding gets its verdict from the current code. The agent reads the cited code again and corrects the lines. A verdict of disproved means that the hole is gone, and the reason names what closed it.
 - `findings.md`: a carried finding gets a new ID, in order of risk with the rest, and a `Carried from` line.
 - Step 6: a carried finding with an earlier pick of Vault note, Open issue, or Draft advisory keeps that pick and gets no new question, because the record already exists. Each other carried finding gets its question again, because the hole is still in the code.

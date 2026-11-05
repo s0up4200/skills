@@ -18,7 +18,7 @@ Two rules hold for the whole run, for you and for each agent:
 
 ## Run folder
 
-Make a new folder for each run: `<state>/security-audit/<repo key>/<YYYYMMDD-HHMMSS>/`, with mode `0700` on `<state>/security-audit`. `<state>` is `$XDG_STATE_HOME`, else `~/.local/state` (`%LOCALAPPDATA%` on Windows). `<repo key>` is the owner and the name from the `origin` remote, for example `acme-mediadesk`, else the name of the folder. The folder is outside the repo, so a commit never publishes a hole. It stays after the run and after a reboot, because the next run reads it, so it must not be in a temporary folder. If it cannot be created, ask the user for a path outside the repo. It holds:
+Make a new folder for each run: `<state>/security-audit/<repo key>/<timestamp>/`, with mode `0700` on `<state>/security-audit`. `<state>` is `$XDG_STATE_HOME`, else `~/.local/state` (`%LOCALAPPDATA%` on Windows). `<timestamp>` comes from `date -u +%Y%m%d-%H%M%S`: always UTC, so that the names sort in order of time. `<repo key>` is the owner and the name from the `origin` remote, for example `acme-mediadesk`, else the name of the folder. The folder is outside the repo, so a commit never publishes a hole. It stays after the run and after a reboot, because the next run reads it, so it must not be in a temporary folder. If it cannot be created, ask the user for a path outside the repo. It holds:
 
 - `threat-model.md`, from step 1.
 - `prior.md`, from step 1, when an earlier run exists.
@@ -93,7 +93,7 @@ Done when each area agent returned its findings and its coverage, and `coverage.
 
 ## 4. Re-check agents
 
-An agent that finds a hole tends to believe its own finding, so a second agent tries to disprove it. Give each new finding of Risk 4 or more its own re-check agent. Give all the new findings of Risk 1 to 3 to one shared re-check agent. Give all the carried findings to one more shared agent, whatever their risk: an earlier run proved each one, so this agent only checks that it still holds. Start them all at once, each with a fresh context window, with the re-check brief in `references/briefs.md`.
+An agent that finds a hole tends to believe its own finding, so a second agent tries to disprove it. Give each new finding of Risk 4 or more its own re-check agent. Give all the new findings of Risk 1 to 3 to one shared re-check agent. Give all the carried findings to one more shared agent, whatever their risk: an earlier run proved each one, so this agent only checks that it still holds. Start no agent for an empty group. Start them all at once, each with a fresh context window, with the re-check brief in `references/briefs.md`.
 
 Each verdict is **proven**, **not proven**, or **disproved**. A re-check agent can change the risk score. Keep its score, and record the change.
 

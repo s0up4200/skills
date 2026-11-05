@@ -41,9 +41,9 @@ Then the coverage, so that the next run knows where this one stopped:
 ## Coverage
 - Read: <the folders and files that you read>
 - Inputs followed: <each input of the threat model that you followed to its end>
-- <checklist item>: <one of: checked, guard at path:line | finding, its title | n/a, the reason | not reached, the reason>
+- <checklist item>: <one of: checked, guard at path:line | finding, its title | n/a, the reason | outside the repo, what decides it | not reached, the reason>
 
-An item is one bullet of the checklist. Name it as `<heading>: <its first words>`, copied exactly, so that the next run can match it. Give each item one line. Write "not reached" for an item that you did not finish: a gap on the record is useful, and a guess is not.
+An item is one bullet of the checklist. Name it as `<heading>: <the first five words of the bullet>`, copied exactly, so that the next run can match it. Give each item one line. Write "outside the repo" when a fact that the repo cannot show decides the item, for example a proxy setting. Write "not reached" only for work that you did not finish: a gap on the record is useful, and a guess is not.
 ```
 
 ## Re-check brief
@@ -137,5 +137,5 @@ Return:
 ## <area>
 - Read: <folders and files>
 - Inputs followed: <inputs>
-- <checklist item>: <checked, guard at path:line | finding F2 | n/a, the reason | not reached, the reason>
+- <checklist item>: <checked, guard at path:line | finding F2 | n/a, the reason | outside the repo, what decides it | not reached, the reason>
 ```
