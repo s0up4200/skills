@@ -14,7 +14,7 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 
 2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-Check with the user that these seams match their expectations.
+Report the seams in your final reply. Ask the user only about a seam that the session did not discuss.
 
 3. Write the spec using the template below, then publish it to the project issue tracker in one of two ways:
    - If the conversation grilled an existing issue that has no sub-issues, and the spec covers the whole issue, replace the body of that issue with the spec. Remove its triage-role label, whatever role it had. Post no comment on it. The tracker keeps the old body in the edit history.
