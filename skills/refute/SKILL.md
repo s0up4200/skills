@@ -14,7 +14,7 @@ The skill changes the plan text only. It writes no code, and it writes to the is
 ## 1. Find the plan
 
 - A path: read the file.
-- An issue number: read the body and each comment, with the read operation of the repo's issue tracker doc if it has one.
+- An issue number: read the body and each comment, with the read operation of the repo's issue tracker doc if it has one. Then find its open children through that doc's Child ticket operation, and read each one the same way. On GitHub, `gh issue view <n> --json subIssues` lists them. If the tracker has no such operation, search the open issues for `Part of #<n>`. Put each issue under a heading with its number. A plan can fail in the gap between two tickets, so the reviewer needs all of them in one text.
 - No argument: use the plan in the current conversation. Write it out in full in a file in your scratchpad.
 
 If you find no plan, ask for one and stop.
