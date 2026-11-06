@@ -17,7 +17,7 @@ For a request body not listed here, read `internal/web/swagger/openapi.yaml` in 
 
 - Torrent list with the qBittorrent sync out of the path: `GET /api/instances/{id}/torrents?prefer=cache`. Use it when timing list code; without it qBittorrent network time swamps the delta. It measures the cache-hit path of the counts: no sync runs in the request, so the counts cache hits on nearly every request. A claim about a counts cache miss needs a different rig. With no requests at all, the allocation profile shows the SSE tick path, and subscribers do not show in `qui.log` at the default level.
 - SSE: `GET /api/stream?streams=<url-encoded JSON array of {key,instanceId,page,limit,sort,order,filters}>`. The response JSON keys are `counts` and `preferences`.
-- Counts oracle: page the whole library out of the API (`limit` caps at 2000) and rebuild counts in Python, then compare with `counts.trackers`. Totals close only when every announce hostname of a tracker is counted; check the arithmetic before calling a mismatch a bug.
+- Counts oracle: page the whole library out of the API with `page`, from 0 (`limit` caps at 2000, a larger value falls back to 300, and the route ignores `offset`) and rebuild counts in Python, then compare with `counts.trackers`. Totals close only when every announce hostname of a tracker is counted; check the arithmetic before calling a mismatch a bug.
 
 ## Other services
 

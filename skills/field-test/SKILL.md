@@ -60,7 +60,7 @@ The steps below are written for a compose deployment with SQLite. A deployment t
 Order matters:
 
 1. Back up the compose file: `cp compose.yaml compose.yaml.bak-pr<N>`.
-2. If the PR adds a migration, snapshot the live SQLite first: `sqlite3 -readonly qui.db ".backup backups/pre-pr<N>-<UTC stamp>.db"`. Migrations are one way. A `develop` image tolerates an extra migration row and extra columns, so an additive migration can be reverted by image alone; a rename or drop needs the snapshot to go back.
+2. Compare migrations: `git diff --name-status <running revision> <image revision> -- <migrations folder>`. A running build behind the base branch also gets migrations that the PR did not add. If the diff lists one, tell the user what it changes, and snapshot the live SQLite first: `sqlite3 -readonly qui.db ".backup backups/pre-pr<N>-<UTC stamp>.db"`. Migrations are one way. A `develop` image starts with an extra migration row and extra columns, but a rename or drop needs the snapshot to go back.
 3. Repoint `image:` to `ghcr.io/autobrr/qui:pr-<N>`, then `docker compose pull qui && docker compose up -d qui`.
 4. Verify: container up, revision label matches, first log lines show the expected version, the UI answers on its usual address.
 
@@ -68,10 +68,12 @@ Record the swap in memory at once (image tag, backup file names, whether the use
 
 ## 4. Drive the behaviour
 
-Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. `references/recipes.md` lists the endpoints that field tests use most (cross-seed search, webhook check and apply, SSE, orphan scan, backups) and how to make synthetic torrents.
+Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. Read `references/recipes.md` whole before you write a request. It lists the common endpoints (cross-seed search, webhook check and apply, SSE, orphan scan, backups) and how to make synthetic torrents.
 
 Rules on a production host, where the data is real:
 
+- Bound each script on the host: `ulimit -v`, `timeout`, and a fixed maximum for each loop. Run one page first and read the count, because a route can ignore an unknown parameter.
+- Give the script a control, a request that must return data. The script exits with an error when the control fails or returns no rows, so a failed request cannot read as a pass.
 - Read before you write. Start with searches, checks, log reads, and read-only database queries. Anything that adds, deletes, moves, rechecks, or relabels a torrent, or writes settings, gets a one-line confirmation from the user first, with the exact target named. The user's real torrents are seeding for real trackers; a wrong delete or a stray recheck is not undone by reverting the image.
 - Prefer a synthetic torrent for the trigger, built with a name the repo rule allows (real title and group tag, invented release). Real library torrents are fine to search against and match against; never publish their names, tracker URLs, or save paths anywhere outside the session.
 - Real trackers see the search, and so do Prowlarr's rate limits. Keep it to the passes the observable needs. Pass `{"cache_mode":"bypass"}` only when a cached response would hide the change; the 7-day search cache serves identical reruns.
@@ -120,7 +122,7 @@ Tear down a local rig in the same turn that reads the last observable, also when
 
 - Delete synthetic torrents from qBittorrent (with files if the rig created them) and any rig files on the host. On a production host, name each one before deleting it so the user can object.
 - Kill every process the test started, local and remote. Keep a ledger of process groups and listeners as you create them; a killed SSH session leaves remote zsh wrappers and tails behind. Use `pkill -xf "<exact command line>"`; `pgrep -f` without `-x` matches your own shell and kills the session.
-- Revert the compose file to `:develop` and `docker compose pull qui && docker compose up -d qui`, unless the user said to keep the PR image running. A PR image left pinned must be in memory with the reason, and flipped back after the PR merges.
+- Revert the compose file to `:develop` and `docker compose pull qui && docker compose up -d qui`, unless the user said to keep the PR image running. Keep the pull when the swap applied a migration, because a row that an older build writes can miss a value that the new build needs. A PR image left pinned must be in memory with the reason, and flipped back after the PR merges.
 - Leave DB snapshots in place; note their names and sizes so the user can delete them after the merge.
 - Tell the user the temporary API key can be revoked.
 - Watch the log for one polling interval after cleanup and confirm it stays quiet.

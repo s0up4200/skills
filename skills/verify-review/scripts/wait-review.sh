@@ -11,7 +11,8 @@
 #                              more minutes for it. Greptile counts only after it
 #                              reviewed two commits, because a repo can set it to
 #                              review only when the pull request opens.
-#   check-failed <name> <url>  a check that is not a bot review failed on <head-sha>
+#   check-failed <name> <url>  a check that is not a bot review failed on <head-sha>.
+#                              One line per check name, with its latest failed run.
 #   conflict <head-sha>        the branch conflicts with its base branch
 #   comment <login> <url>      a person other than you commented or reviewed after the
 #                              first wait on this pull request
@@ -66,9 +67,11 @@ github_reviews() {
 }
 
 github_events() {
-  jq -r --arg bots "$bot_checks" '.check_runs[]
+  # Each event, such as a new label, starts another run of a check on the same head.
+  jq -r --arg bots "$bot_checks" '[.check_runs[]
     | select(.conclusion=="failure" or .conclusion=="timed_out" or .conclusion=="startup_failure")
-    | select(.name|test($bots;"i")|not)
+    | select(.name|test($bots;"i")|not)]
+    | group_by(.name) | map(max_by(.id)) | .[]
     | "check-failed \(.name) \(.html_url)"' "$tmp/checks.json"
   jq -r --arg sha "$sha" 'select(.mergeable_state=="dirty") | "conflict \($sha)"' "$tmp/pr.json"
   jq -rn --arg me "$me" --arg since "$start" \
