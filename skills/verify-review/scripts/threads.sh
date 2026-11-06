@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Print the open review findings of a pull request as one JSON array: an object for
-# each unresolved review thread, then an object for each review body that still needs
+# each unresolved review thread, then an object for each bot PR comment with findings
+# outside the diff, then an object for each review body that still needs
 # an answer. Bots and people both count. Each body in the output has its HTML
 # comments (<!-- ... -->) removed. The filters below read the full body.
 # Usage: threads.sh <owner/repo> <pr-number>
@@ -13,6 +14,12 @@
 # A review drops out when you posted a comment on the PR that holds
 # <!-- verify-review: <review_id> -->, when it is dismissed or yours, when its body
 # is empty, or when it is a bot review with no findings in its body.
+# A comment object has: kind ("comment"), comment_id, author, ai (true), url,
+# created_at, commit (the SHA in its first blob link, or null), body. It is a bot
+# PR comment that holds findings outside the diff (Greptile's
+# <!-- greptile_outside_diff -->). It drops out when you posted a comment that holds
+# <!-- verify-review: comment-<comment_id> -->. The prefix keeps a comment ID apart
+# from a review ID, because the two come from separate number sequences.
 set -euo pipefail
 # A mise-managed gh wrapper prints status lines to stdout, which breaks jq.
 export MISE_QUIET=1
@@ -45,8 +52,18 @@ while :; do
   if [ "$(jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage' <<<"$page")" != true ]; then break; fi
   cursor=$(jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor' <<<"$page")
 done
-done_ids=$(gh api --paginate "repos/$repo/issues/$pr/comments" | jq -cs --arg me "$me" 'add
-  | [.[] | select(.user.login == $me) | .body | scan("<!-- verify-review: ([0-9]+) -->")[0] | tonumber]')
+comments=$(gh api --paginate "repos/$repo/issues/$pr/comments" | jq -cs 'add // []')
+done_ids=$(jq -c --arg me "$me" '[.[] | select(.user.login == $me) | .body
+  | scan("<!-- verify-review: ([0-9]+) -->")[0] | tonumber]' <<<"$comments")
+done_comments=$(jq -c --arg me "$me" '[.[] | select(.user.login == $me) | .body
+  | scan("<!-- verify-review: comment-([0-9]+) -->")[0] | tonumber]' <<<"$comments")
+out=$(jq -c --argjson prev "$out" --argjson skip "$done_comments" '$prev + [.[]
+  | select(((.user.type=="Bot") or (.user.login|test("\\[bot\\]$")))
+      and (.body|test("<!-- greptile_outside_diff -->")))
+  | select(.id | IN($skip[]) | not)
+  | {kind:"comment", comment_id:.id, author:.user.login, ai:true, url:.html_url, created_at,
+     commit:([.body|scan("/blob/([0-9a-f]{40})/")[0]][0]),
+     body:(.body|gsub("<!--[\\s\\S]*?-->";""))}]' <<<"$comments")
 # Findings that never became threads. ponytail: a bot body counts only with CodeRabbit
 # section titles; add a pattern when another bot puts findings in its review body.
 gh api --paginate "repos/$repo/pulls/$pr/reviews" | jq -s --argjson t "$out" --argjson skip "$done_ids" --arg me "$me" '

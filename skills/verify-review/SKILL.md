@@ -35,14 +35,16 @@ Stop if it is closed. Read the PR body and each issue that the second command pr
 Then list the open findings:
 
 ```bash
-scripts/threads.sh owner/repo "$pr"    # unresolved threads, then review bodies with no answer yet
+scripts/threads.sh owner/repo "$pr"    # unresolved threads, then bot comments and review bodies with no answer
 ```
 
-Each object has a `kind`: `thread` or `review`, and `ai` tells a bot from a person. A **waiting** thread ends with your reply, so the next move is the reviewer's: skip it, and count it in the report.
+Each object has a `kind`: `thread`, `comment`, or `review`, and `ai` tells a bot from a person. A **waiting** thread ends with your reply, so the next move is the reviewer's: skip it, and count it in the report.
 
-Some findings never become threads. A person often writes the whole review in its body, as a list, and CodeRabbit puts "Nitpick", "Outside diff range", and "Duplicate" items there. Each item in a review body is one finding; keep the reviewer's own label for it, such as "must fix" or "non-blocking". A review body has no thread to resolve, so its record is the **review answer**, one PR comment (step 4). The script skips each review that has your review answer, so the next run knows that the review is done. A review body with no finding (an "LGTM" approval) gets no answer; count it in the report.
+Some findings never become threads. A person often writes the whole review in its body, as a list, and CodeRabbit puts "Nitpick", "Outside diff range", and "Duplicate" items there. Each item in a review body is one finding; keep the reviewer's own label for it, such as "must fix" or "non-blocking". A review body has no thread to resolve, so its record is the **review answer**, one PR comment (step 4). A review body with no finding (an "LGTM" approval) gets no answer; count it in the report.
 
-When the user names a plain PR comment, verify its claim the same way and give it a verdict. Post a reply or edit the PR body only after the user approves that exact write.
+A `comment` holds bot findings outside the diff (Greptile). Treat it as a bot review body; `commit` is the commit it read.
+
+When the user names any other plain PR comment, verify its claim the same way and give it a verdict. Post a reply or edit the PR body only after the user approves that exact write.
 
 Check out the pull request when the fixes need its branch. `gh pr checkout "$pr"` tracks the source repository, a fork included, so a plain `git push` lands there. Add `--worktree` when the current working tree must stay as it is.
 
@@ -120,7 +122,7 @@ A reply to a declined judgment call gives the reason that applies to this case, 
 Each review body with findings gets one review answer, a PR comment that goes through every item in the reviewer's order: fixed in which commit, refuted with the evidence, or left as it is and why. When an item is an open judgment call, hold the whole answer until the user answers it, so one comment covers every item. Address a person by `@login` and link the review. End the comment with the marker line that the script looks for:
 
 ```bash
-gh api "repos/$repo/issues/$pr/comments" -f body="$body"   # last line: <!-- verify-review: $review_id -->
+gh api "repos/$repo/issues/$pr/comments" -f body="$body"   # last line: <!-- verify-review: $review_id -->, or comment-$comment_id
 ```
 
 The answer cites commit SHAs, so post it after the push.
