@@ -75,6 +75,10 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `diagnosing-bugs`: Phase 1 has a paragraph on network throughput bugs: a sustained-load loop, one path segment at a time.
 - `improve-codebase-architecture` finds hot spots with a count of changes per file over six months, or over all of the history when that window has fewer than about 50 commits. Upstream `git log --oneline` lists no files. A bundled `scripts/change-coupling.sh` lists the file pairs that change in the same commits, with the code-maat degree and limits. The brief of the explorer sub-agent carries the scope, the vocabulary, the glossary, and the ADRs, because a sub-agent sees none of what the main agent loaded. The main agent checks the facts of each card before the badge, and reads `DEEPENING.md` by its path for the dependency category. After the report, the agent files each picked candidate as a `needs-grilling` issue, plus the repo's refactor label, for a later grilling session. A rejection ADR is written at once when the user says yes, because no code waits for it. The agent serves the report on the tailnet with `tailscale serve` on a free HTTPS port, through a local `http.server`, because `tailscale serve` sends a file only as root. It opens the file locally only when the host has no tailnet, and offers to stop serving. `HTML-REPORT.md` loads the Tailwind v4 browser CDN, follows the system dark mode in Tailwind and in Mermaid, and drops `securityLevel: "loose"`. The Mermaid example colours the leak edge with `linkStyle` and writes edge labels in the quoted pipe form, because an inline label breaks on a period (upstream [#1256](https://github.com/mattpocock/skills/issues/1256)). The Tone examples use "module" where they said "wrapper" or "layer". The sources are in `docs/research/improve-codebase-architecture.md`. If upstream fixes #1256 or [#651](https://github.com/mattpocock/skills/issues/651), keep the upstream text.
 - `chief-of-staff`: the Wiki section keeps the upstream rule that looks for a shared wiki first, and then keeps the wiki in the notes vault that the user's instructions name, and the vault's rules win where they conflict. Without the line, the agent gets two sets of rules for one folder. The Subagents section keeps each step that asks the user in the chief session, because a subagent cannot talk to the user. Without that line, each goal had to find the split again. The Subagents section also has each subagent commit only the paths that it names, because subagents in one repo share one staging area. On 2026-10-24, one vault commit took the staged deletions of another agent. For a large chunk of work, the Procedures section asks the user whether to build the tickets with `implement-spec` or one at a time with `implement`, because the user wants to pick. Upstream always runs `implement-spec`. Upstream keeps the skill in `skills/in-progress`, so expect changes at each sync. If upstream moves it, update the path above.
+- `code-review` carries a lowered-bar list in step 3: a threshold moved to the easier side, a test made easier, a new `nolint` or `t.Skip`, a stub or an empty catch, or a new entry in an exception or allow list. A hit is a required fix, a third kind of finding next to hard violations and judgement calls, unless the diff or a commit message gives a reason. The Standards sub-agent gets the commit list with the full messages, because `--oneline` hides a reason in the commit body. The Spec sub-agent keeps `--oneline`, because it must not see the author's reasons.
+- `code-review` has four more smells in the baseline: Moved Complexity, Bolted-on Conditional, Near-Copy, and Silent Fallback. The baseline no longer says that all of its smells come from Fowler.
+- `code-review` tells both sub-agents to read the callers, guards, and tests before they report a finding, to label an old defect apart from a regression from this change, and to report nothing when they find nothing. It says "regression" because step 5 uses "new" for a finding that no PR comment touched. The sentences in the severity check and in step 6 no longer say that a sub-agent sees only the diff.
+- `handoff` records each verification command with its result, the state of the working tree, and each approval still pending. A later session counts an approval only when the handoff or the tracker records it.
 
 ### Skipped upstream changes
 
@@ -270,13 +274,19 @@ SOFTWARE.
 
 ## addyosmani/agent-skills
 
-`skills/refute` is our own skill, not a copy. It rewrites one idea from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills).
+`skills/refute` is our own skill, not a copy. It rewrites one idea from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills). Other skills and the local evals rewrite more ideas from that repo. No skill is copied.
 
 **Upstream commit:** `301b02b12bff98e4688e6984af6556802322bbde` (2026-11-01)
 
 ### Adapted parts
 
 - `refute` comes from `doubt-driven-development`: a fresh agent that gets the plan and the requirements but not the reasoning, four classes for the findings, and a limit of 3 rounds. Upstream applies it to each decision during the work and offers a second model. Our skill starts only when the user types it, attacks a finished plan, and has no question about a second model.
+- The lowered-bar list of `code-review` comes from `constraint-driven-development`, which flags a loosened `CONSTRAINTS.md` in review. Our list works on any diff, with no `CONSTRAINTS.md`.
+- The four new smells of `code-review` come from `code-review-and-quality`. So does the rule to read the callers, guards, and tests before a finding, to label old defects apart from regressions, and to allow zero findings.
+- The delete, move, and overwrite rule in `security-audit/references/area-files.md` comes from `security-and-hardening`.
+- The new rule of `handoff` comes from `context-engineering`.
+- The local firing evals use the `tool_used` graders with `input_match` from `evals/plugin`.
+- Three rules in the dotfiles repo of the user come from this repo too: the optimization rule from `performance-optimization`, the rule that a log line names what started a job from `observability-and-instrumentation`, and the crash and rollback rule from `test-driven-development`.
 
 ### License
 

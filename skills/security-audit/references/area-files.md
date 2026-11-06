@@ -1,12 +1,13 @@
-This file is the checklist of the files area (step 3 of `SKILL.md`). The area covers each place where input from outside reaches the file system, a parser, a command, or SQL. Check each item against the code in scope.
+This file is the checklist of the files area (step 3 of `SKILL.md`). The area covers each place where input from outside or stored data reaches the file system as a path, and where input from outside reaches a parser, a command, or SQL. Check each item against the code in scope.
 
-## Paths from input
+## Paths from input or stored data
 
 - `filepath.Join(base, input)` does not stop `..`: `Join("/data", "../../etc/passwd")` is `/etc/passwd`. Guards that work: `filepath.IsLocal(input)` (Go 1.20), `os.Root` or `os.OpenInRoot` (Go 1.24), or `filepath.Rel(base, joined)` with a check that the result does not start with `..`. A `strings.HasPrefix(joined, base)` check passes `/data-other` when the base is `/data`; add the separator.
 - An absolute path from input: `Join` keeps the base, but `os.Open(input)` and `filepath.Abs(input)` do not.
 - A symlink inside the base that points out of it: path cleaning does not see it. `os.Root` does.
 - Torrents: each file path inside a `.torrent` (the `path` list of `files`) and the torrent name can hold `..`, a `/`, or an absolute path. Follow them to each create, move, rename, link, and delete.
 - An HTTP file route: `http.FileServer` cleans the path, but a handler that builds a path from `r.URL.Query()` or a route value does not.
+- Before a delete, move or overwrite on a path that comes from data, confirm that the resolved path is under an allowed root, is at least one level below it, and has ownership evidence read before the operation. On refusal, log the path and stop, with no fallback to a broader path.
 
 ## Archives and uploads
 

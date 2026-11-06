@@ -1,6 +1,9 @@
 {
+  "name": "s0up4200-skills",
+  "owner": {
+    "name": "s0up4200"
+  },
   "metadata": {
-    "owner": "s0up4200",
     "version": "1.0.0",
     "pluginRoot": "./skills"
   },

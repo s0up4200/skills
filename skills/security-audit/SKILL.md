@@ -46,7 +46,7 @@ Then pick the areas. Each area that applies gets one agent and has a checklist i
 | Login and API access | serves HTTP, gRPC, or another network API | `area-access.md` |
 | Browser | has a web UI or renders HTML | `area-browser.md` |
 | Outbound requests | fetches a URL that the config, a user, or a remote response sets | `area-outbound.md` |
-| Files | reads or writes a path from input, extracts archives, parses untrusted files, or puts input in a command or SQL | `area-files.md` |
+| Files | reads, writes, or deletes a path from input or stored data, extracts archives, parses untrusted files, or puts input in a command or SQL | `area-files.md` |
 | Secrets | always applies | `area-secrets.md` |
 | Supply chain and CI | has a lockfile, a `go.mod`, or `.github/workflows/` | `area-supply-chain.md` |
 | Deployment | has a Dockerfile, compose or Kubernetes files, unit files, install scripts, default config, defaults in code such as a listen address, or infrastructure as code | `area-deployment.md` |

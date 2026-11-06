@@ -10,6 +10,14 @@ This repo is public. A skill gets hosts, repository names, and paths from the en
 
 When another session asks for a skill change, read the source it cites (a workflow, a script, a doc) and make sure that each claim about it is true before you write it into the skill.
 
+## Local Evals
+
+The evals stay out of git, because this repo is public. These paths are local: `evals/` (the firing cases and `evals/RESULTS.md`), each older `skills/*/evals/`, `.claude-plugin/plugin.json`, and the `*-workspace/` folders. Run the firing cases at the repo root. A run costs tokens, so run it only when the user asks. The results have no pass or fail gate, so `--threshold 0` keeps a low score from exiting with code 1:
+
+```
+claude plugin eval . --ablation none --threshold 0 --model claude-opus-5-5 --max-cost-usd 5 --trust-plugin --no-publish
+```
+
 ## Repository Structure
 
 ```
@@ -133,8 +141,9 @@ This file should be updated when platform behavior changes. The SKILL.md body sh
 
 ```json
 {
+  "name": "s0up4200-skills",
+  "owner": { "name": "s0up4200" },
   "metadata": {
-    "owner": "soup",
     "version": "1.0.0",
     "pluginRoot": "./skills"
   },

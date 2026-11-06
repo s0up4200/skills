@@ -9,3 +9,4 @@ node_modules/
 *~
 *-workspace/
 evals/
+.claude-plugin/plugin.json
