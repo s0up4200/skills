@@ -1,6 +1,6 @@
 ---
 name: focus
-description: Recommend what the user should work on next in a GitHub or Forgejo repo. It ranks all open work, and puts first the teammates who wait on the user. Then come PRs to merge, the user's own claims, refactors of code that keeps breaking, PRs from outside contributors, and issues to implement or triage. When the user names an epic (a tracking issue with sub-issues and blocked-by edges), it shows that epic. Use when the user types "/focus", or asks "what should I work on next", "where do I focus", "who waits on me", "what is free to pick up", "what is blocked", "is my ticket unblocked yet", or "status of the epic", or names a tracking issue such as owner/repo#123. Not for a sweep of every open issue for fixed or stale ones, which github-resolution-audit covers, and not for PR merge conflicts, which pr-conflicts covers.
+description: Recommend what the user should work on next in a GitHub or Forgejo repo. It ranks all open work, and puts first the teammates who wait on the user. Then come PRs to merge, the user's own claims, refactors of code that keeps breaking, PRs from outside contributors, and issues to implement or triage. When the user names an epic (a tracking issue with sub-issues and blocked-by edges), it shows that epic. Use when the user types "/focus", or asks "what should I work on next", "where do I focus", "who waits on me", "what is free to pick up", "which issues can I implement next", "what is blocked", "is my ticket unblocked yet", or "status of the epic", or names a tracking issue such as owner/repo#123. Not for a sweep of every open issue for fixed or stale ones, which github-resolution-audit covers, and not for PR merge conflicts, which pr-conflicts covers.
 ---
 
 # Focus
@@ -39,6 +39,8 @@ The base directory is printed when the skill loads. The script prints one line p
 - `review requested: me` on a PR, and `new commits since my review`.
 - `asks me` on an issue: a comment after the user's last comment mentions the user. A team comment after the user's last comment that proposes a plan or asks to take the issue waits on the user too, with no mention. Read each `last:` line for it.
 - `blocking` and `blockedBy` on an issue, with only the open edges. An issue that blocks two or more open issues is a gate. Finishing a gate frees the most work.
+- `body blockers` on an issue: the issues and PRs that a "Blocked by" line or a "Blocked by" section of the body names. The script does not read their state. For each issue that you rank under Implement, read it with `gh issue view N --repo OWNER/REPO --json state`. An open one blocks the issue.
+- `closing PRs` on an issue: the open PRs that close it. Somebody already works on the issue.
 - `epic N/M done` on a tracking issue, and `epic #N` on its sub-issues.
 
 If a comment that the script cut can mean that the work is done, or that somebody asks the user a question, read the issue with `gh issue view N --json comments`.
@@ -84,7 +86,7 @@ Ignore drafts, `wontfix` issues, and `needs-info` issues with no reply from the 
 3. The user's own work: the user's PR with requested changes, then the user's ready claims, gates first.
 4. Refactor: an open issue with a refactor label that is free or claimed by the user, and that nothing open blocks. Put first a refactor that is a gate or that touches a hot spot. When no refactor issue touches the top hot spot, name that file as a candidate for `/codebase-design`.
 5. Review an outside contributor's PR, with the same conditions as in rank 1. A review request to the user comes first.
-6. Implement: a free `ready-for-agent` issue that nothing open blocks. Gates first, then bugs before enhancements. Next step: `/implement`, on a new branch.
+6. Implement: a free `ready-for-agent` issue. Free means no assignee, no closing PR, no open `blockedBy` edge or body blocker, and no label whose description says that the fix needs a change in another project. Gates first, then bugs before enhancements, then the oldest issue. Next step: `/implement`, on a new branch.
 7. Triage: a `needs-triage` issue, or a `needs-info` issue that has a reply from the reporter after the last maintainer comment. An outside reporter's question that waits for an answer goes here too. Next step: `/triage`.
 8. `ready-for-human`: name it. The user does this work, not an agent.
 9. Grill: a `needs-grilling` issue, the maintainer's own parked idea. Next step: `/grill-with-docs`, then `/to-spec`.
@@ -113,7 +115,14 @@ owner/repo
   Epics:     #100 2/9 done, #140 0/4 done
 ```
 
-Link each number. Leave empty lines out. The `Epics` line shows progress only. For the tree of one epic, the user runs `/focus #N`.
+Link each number. Leave empty lines out.
+
+When the user asks for issues to implement, list up to five free ones from rank 6. Give each one the commands for its own worktree, so that the user can run several sessions at once:
+
+```
+git worktree add ../<repo>-wt-<N> -b fix/<slug> origin/HEAD
+/implement <issue URL>
+``` The `Epics` line shows progress only. For the tree of one epic, the user runs `/focus #N`.
 
 ## 6. Ask only what changes the answer
 

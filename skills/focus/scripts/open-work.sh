@@ -10,7 +10,9 @@
 # "team:SLUG" for a team).
 # Issue line: number, title (cut to 70 characters), assignees, labels, the
 # sub-issue progress when the issue is an epic, the parent epic, the OPEN
-# blocking and blockedBy edges, last update, "reporter replied" when the
+# blocking and blockedBy edges (owner/repo#N for another repo), the
+# blockers that a "Blocked by" line or section of the body names (their
+# state unread), the open PRs that close the issue, last update, "reporter replied" when the
 # issue author commented after the last maintainer comment (an OWNER,
 # MEMBER, or COLLABORATOR comment among the last 10), "asks me" when a
 # comment after the user's last comment mentions the user, and the last
@@ -52,14 +54,22 @@ gh api graphql --paginate -F owner="$owner" -F name="$name" -f query='
 query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
   issues(states:OPEN,first:50,after:$endCursor,orderBy:{field:UPDATED_AT,direction:DESC}){
     pageInfo{hasNextPage endCursor}
-    nodes{number title author{login} updatedAt
+    nodes{number title author{login} updatedAt body
+      closedByPullRequestsReferences(first:5,includeClosedPrs:false){nodes{number}}
       assignees(first:5){nodes{login}} labels(first:10){nodes{name}} parent{number}
       subIssuesSummary{total completed}
-      blocking(first:20){nodes{number state}} blockedBy(first:20){nodes{number state}}
+      blocking(first:20){nodes{number state}} blockedBy(first:20){nodes{number state repository{nameWithOwner}}}
       comments(last:10){nodes{author{login} authorAssociation createdAt body}}}}}}' |
-jq -r --arg me "$me" 'def cut($k): if length > $k then .[:$k] + "[cut]" else . end;
-def edges($name): [.nodes[] | select(.state == "OPEN") | "#\(.number)"]
+jq -r --arg me "$me" --arg repo "$repo" 'def cut($k): if length > $k then .[:$k] + "[cut]" else . end;
+def edges($name): [.nodes[] | select(.state == "OPEN")
+    | "\(if (.repository.nameWithOwner // $repo) == $repo then "" else .repository.nameWithOwner end)#\(.number)"]
   | if length > 0 then " | \($name): \(join(" "))" else "" end;
+def body_blockers: (.body // "") as $b
+  | [($b | scan("(?:^|\\n)[ \\t]*\\**blocked by:?\\**:?(.*)"; "i") | .[0]),
+     ($b | scan("(?:^|\\n)#+[ \\t]*blocked by[ \\t]*((?:\\n(?!#).*)*)"; "i") | .[0])] | join("\n")
+  | [scan("(?:https://github\\.com/)?([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)?(?:/(?:issues|pull)/|#)([0-9]+)")
+     | "\(if (.[0] // $repo) == $repo then "" else .[0] end)#\(.[1])"] | unique
+  | if length > 0 then " | body blockers: \(join(" "))" else "" end;
 .data.repository.issues.nodes[]
   | .author.login as $op | .comments.nodes as $cs
   | ([$cs[] | select(.authorAssociation | IN("OWNER", "MEMBER", "COLLABORATOR")) | .createdAt] | max) as $maint
@@ -73,7 +83,8 @@ def edges($name): [.nodes[] | select(.state == "OPEN") | "#\(.number)"]
     + (if (.labels.nodes | length) > 0 then " | labels: \([.labels.nodes[].name] | join(" "))" else "" end)
     + (if .subIssuesSummary.total > 0 then " | epic \(.subIssuesSummary.completed)/\(.subIssuesSummary.total) done" else "" end)
     + (if .parent then " | epic #\(.parent.number)" else "" end)
-    + (.blocking | edges("blocking")) + (.blockedBy | edges("blockedBy"))
+    + (.blocking | edges("blocking")) + (.blockedBy | edges("blockedBy")) + body_blockers
+    + ([.closedByPullRequestsReferences.nodes[] | "#\(.number)"] | if length > 0 then " | closing PRs: \(join(" "))" else "" end)
     + " | updated \(.updatedAt[:10])"
     + (if $ask then " | asks me (\($ask.author.login // "ghost") \($ask.createdAt[:10]))" else "" end)
     + (if $maint and $rep and $rep > $maint then " | reporter replied" else "" end)
