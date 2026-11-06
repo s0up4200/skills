@@ -90,7 +90,7 @@ Copies of skills from [mattpocock/skills](https://github.com/mattpocock/skills).
 | [prototype](skills/mattpocock/prototype/) | Build a throwaway prototype to answer a design question. |
 | [research](skills/mattpocock/research/) | Research a question in primary sources and write the findings to a Markdown file. |
 | [retro](skills/mattpocock/retro/) | Conduct a retrospective on a coding session. |
-| [setup-matt-pocock-skills](skills/mattpocock/setup-matt-pocock-skills/) | Set up a repo for the engineering skills: issue tracker, triage labels, and doc layout. |
+| [setup-matt-pocock-skills](skills/mattpocock/setup-matt-pocock-skills/) | Set up a repo for the engineering skills: issue tracker, triage labels, doc layout, module design rules, and the check command in AGENTS.md. |
 | [software-factory](skills/mattpocock/software-factory/) | Shared terms for designing a software factory: the tasks it runs and the services it uses. Use it with a grilling session. In progress upstream. Explicit invocation only |
 | [tdd](skills/mattpocock/tdd/) | Test-driven development. |
 | [to-spec](skills/mattpocock/to-spec/) | Turn the conversation into a spec and publish it to the issue tracker. |

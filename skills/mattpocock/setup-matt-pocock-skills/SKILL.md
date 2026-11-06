@@ -1,6 +1,6 @@
 ---
 name: setup-matt-pocock-skills
-description: "Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, and domain doc layout. Run before first use, or rerun to upgrade an existing setup."
+description: "Configure this repo for the engineering skills: set up its issue tracker, triage label vocabulary, domain doc layout, module design rules, and check command in AGENTS.md. Run in a new project or before first use, or rerun to upgrade an existing setup."
 disable-model-invocation: true
 ---
 
@@ -11,6 +11,8 @@ Configure or upgrade the per-repo configuration that the engineering skills assu
 - **Issue tracker**: where issues live (GitHub, GitLab, Forgejo, or local Markdown)
 - **Triage labels**: the strings used for the six canonical triage roles
 - **Domain docs**: where `GLOSSARY.md` and ADRs live, and the consumer rules for reading them
+- **Module design**: the deep-module rules that every agent in the repo writes code by
+- **Check**: the one command that gates a commit
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -21,7 +23,9 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 Look at the current repo to understand its starting state. Read whatever exists; don't assume:
 
 - `git remote -v` and `.git/config`: which host and repository does this clone use? Read any recorded tracker choice.
-- `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section in either?
+- `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, and `CLAUDE.local.md` at the repo root: which exist, and is each a real file, a symlink, or a `CLAUDE.md` that only imports `@AGENTS.md`? Is there already an `## Agent skills`, `## Module design`, or `## Check` section?
+- Does the repo have code yet? `git ls-files` shows source files beyond docs and config.
+- The check command: the command that CI runs on each push (`.github/workflows/`, `.forgejo/workflows/`, `.gitlab-ci.yml`), a root `check.sh`, or a `check` target in the `Makefile` or `package.json` scripts.
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root. A `CONTEXT.md` or `CONTEXT-MAP.md` there is the same file under its old name: the skills read only the `GLOSSARY` names.
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/`: does this skill's prior output already exist?
@@ -69,30 +73,57 @@ If exploration found `CONTEXT.md` or `CONTEXT-MAP.md`, rename it with `git mv` t
 
 Offer **multi-context** (a root `GLOSSARY-MAP.md` pointing to per-context `GLOSSARY.md` files) only when exploration found monorepo signals. Then confirm which layout they want.
 
+**Section D: Module design.** In a repo with no code yet, write the section without asking. In a repo with code, ask exactly one question:
+
+> Add the module design rules to the instructions file? (recommended: **yes**)
+
+Ask because existing code can break the rules, for example an interface with one implementation, and a later agent then reads the rules as a call to refactor that code.
+
+**Section E: Check.** When exploration found exactly one gate command, write the `## Check` section with it. When it found several, ask which one gates a commit. When it found none, leave the section out: a placeholder is a stale line on every turn, and a rerun adds the section once the command exists.
+
 ### 3. Confirm and edit
 
 Show the user a draft of:
 
-- The `## Agent skills` block to add to whichever of `CLAUDE.md` / `AGENTS.md` is being edited (see step 4 for selection rules)
+- The file change from step 4: a new `AGENTS.md`, or the proposed `git mv CLAUDE.md AGENTS.md`
+- The `## Check`, `## Module design`, and `## Agent skills` sections for the instructions file
 - The contents of `docs/agents/issue-tracker.md`, `docs/agents/domain.md`, and `docs/agents/triage-labels.md` (the last only when `triage` is installed)
 
 Let them edit before writing.
 
 ### 4. Write
 
-**Pick the file to edit:**
+**Pick the file to edit.** Write the instructions to `AGENTS.md`, so that every coding agent reads one file. Codex reads only `AGENTS.md`. Claude Code v2.1.277 and later reads `AGENTS.md` when no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` is in the working directory or above it ([docs](https://code.claude.com/docs/en/memory#agents-md)).
 
-- If `CLAUDE.md` exists, edit it.
-- Else if `AGENTS.md` exists, edit it.
-- If neither exists, ask the user which one to create; don't pick for them.
+- Neither file exists: create `AGENTS.md`.
+- `AGENTS.md` is the real file: edit it. A `CLAUDE.md` that is a symlink to it, or that imports `@AGENTS.md`, stays as it is.
+- Only `CLAUDE.md` exists: propose `git mv CLAUDE.md AGENTS.md` in the step 3 draft. On a yes, move it and edit `AGENTS.md`. On a no, edit `CLAUDE.md`.
+- `CLAUDE.md` is the real file and `AGENTS.md` is a symlink to it: edit `CLAUDE.md`, because the Edit tool refuses to write through a symlink.
+- Both are real files with different text: each tool reads only one of them. Show the user the difference and ask which to keep, then write to that one.
 
-Never create `AGENTS.md` when `CLAUDE.md` already exists (or vice versa); always edit the one that's already there.
+If a `CLAUDE.local.md` sits next to `AGENTS.md`, tell the user that Claude Code then reads `CLAUDE.md` files only and skips `AGENTS.md`.
 
-If an `## Agent skills` block already exists in the chosen file, update its contents in-place rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
+If a section already exists in the chosen file, update its contents in place rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
 
-The block:
+The sections, in this order. Leave out `## Check` and `## Module design` when Sections D and E left them out:
 
 ```markdown
+## Check
+
+Run `<command>` before you commit.
+
+## Module design
+
+- Build deep modules: a lot of behaviour behind a small interface. Before you
+  add a wrapper or helper, apply the deletion test: keep it only if deleting
+  it would spread complexity across its callers.
+- Add a seam only where two adapters vary across it, usually production
+  plus a test fake.
+- Pass dependencies in, and return results.
+- Use a reducer when state is several flags that can contradict each other.
+- The interface is the test surface. After you deepen a module, replace the
+  tests of its old shallow parts with tests at the new interface.
+
 ## Agent skills
 
 ### Issue tracker
