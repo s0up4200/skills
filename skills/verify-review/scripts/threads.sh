@@ -3,7 +3,8 @@
 # each unresolved review thread, then an object for each bot PR comment with findings
 # outside the diff, then an object for each review body that still needs
 # an answer. Bots and people both count. Each body in the output has its HTML
-# comments (<!-- ... -->) removed. The filters below read the full body.
+# comments (<!-- ... -->) removed. A bot body also loses its icons, its prompts for
+# agents, and its review info. The filters below read the full body.
 # Usage: threads.sh <owner/repo> <pr-number>
 # A thread object has: kind ("thread"), id (GraphQL thread id for resolveReviewThread),
 # path, line, author, ai (bool), comment_id (REST id of the first comment, for replies),
@@ -67,9 +68,13 @@ out=$(jq -c --argjson prev "$out" --argjson skip "$done_comments" '$prev + [.[]
 # Findings that never became threads. ponytail: a bot body counts only with CodeRabbit
 # section titles; add a pattern when another bot puts findings in its review body.
 gh api --paginate "repos/$repo/pulls/$pr/reviews" | jq -s --argjson t "$out" --argjson skip "$done_ids" --arg me "$me" '
-  $t + [add[] | select(.state != "DISMISSED" and .user.login != $me and (.body|length>0))
+  def strip_bot: gsub("<picture>[\\s\\S]*?</picture>";"")
+    | gsub("<details>\\s*<summary>\\s*Prompt (for AI Agents|to fix all issues)</summary>[\\s\\S]*?</details>";"")
+    | gsub("<h6>[\\s\\S]*?</h6>";"");
+  ($t + [add[] | select(.state != "DISMISSED" and .user.login != $me and (.body|length>0))
     | select(.id | IN($skip[]) | not)
     | ((.user.type=="Bot") or (.user.login|test("\\[bot\\]$"))) as $ai
     | select(($ai|not) or (.body|test("(Nitpick|Outside diff range|Duplicate) comments( \\(|: )[0-9]+")))
     | {kind:"review", review_id:.id, author:.user.login, ai:$ai, url:.html_url,
-       submitted_at, state, commit:.commit_id, body:(.body|gsub("<!--[\\s\\S]*?-->";""))}]'
+       submitted_at, state, commit:.commit_id, body:(.body|gsub("<!--[\\s\\S]*?-->";""))}])
+  | map(if .ai then .body |= strip_bot else . end)'

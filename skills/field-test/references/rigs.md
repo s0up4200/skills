@@ -4,7 +4,7 @@ Use a local rig when the change cannot wait for a CI image, when it must not tou
 
 ## qui binary on an alternate port against real config
 
-Copy `~/.config/qui/` and a `VACUUM INTO` copy of the database into the scratchpad, then run the built binary with `--config-dir <dir> --data-dir <dir>` on a free port. Point it at whatever qBittorrent the test needs. Mint an API key through the UI, or ask the user. The permission classifier blocks an insert into `api_keys`.
+Copy `~/.config/qui/` and a `VACUUM INTO` copy of the database into the scratchpad, then run the built binary with `--config-dir <dir> --data-dir <dir>` on a free port. Point it at whatever qBittorrent the test needs. If you know the login of the rig, sign in and send `POST /api/api-keys` with `{"name":…,"instanceIds":[],"permissions":[{"area":…,"level":…}]}`. The reply holds the key. Otherwise, mint the key through the UI, or ask the user. The permission classifier blocks an insert into `api_keys`.
 
 Traps:
 
