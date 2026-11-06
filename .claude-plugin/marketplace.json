@@ -35,6 +35,7 @@
         "./skills/perf-review",
         "./skills/security-audit",
         "./skills/go-proverbs",
+        "./skills/refute",
         "./skills/fix-one-thing"
       ]
     },

@@ -63,6 +63,7 @@ ln -s ~/s0up4200-skills/skills/mobile-adapt ~/.claude/skills/mobile-adapt
 | [tldr](skills/tldr/) | Rewrite the last reply as a short version in simple terms, with the simple-english reply rules and an unslop pass. Runs on `/tldr` or on a message that is only "tldr" |
 | [speak](skills/speak/) | Read a summary or a full document aloud in an ElevenLabs voice. The audio plays on the machine that you listen on: this machine, or a Herdr client that connects over Tailscale SSH. It needs `mpv`, `jq`, `socat`, `secret-tool`, and an ElevenLabs API key |
 | [go-proverbs](skills/go-proverbs/) | Question a Go plan or spec with the 19 Go proverbs from Rob Pike's Gopherfest 2015 talk before any code exists |
+| [refute](skills/refute/) | Send a finished plan to a fresh agent that tries to break it, before code exists. The skill fixes the plan or asks you, for at most 3 rounds. Explicit invocation only |
 | [native-web](skills/native-web/) | Replace custom JavaScript and UI libraries with native web platform features — 42 tips from htmlcat.net with support tiers and caveats |
 | [qbittorrent-upstream](skills/qbittorrent-upstream/) | Audit unreleased qBittorrent WebAPI and session changes and map each onto the work go-qbittorrent and qui need before the next release |
 | [field-test](skills/field-test/) | Run a code change live on a local test setup or on the production server, prove the change with one chosen result, count the requests that qui sends to qBittorrent, and clean up. The host facts stay in a private folder outside the repo |
