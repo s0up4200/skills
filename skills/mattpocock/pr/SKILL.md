@@ -213,4 +213,6 @@ The blast radius is the potential impact or scope of the changes introduced by t
 
 ## After the PR opens
 
-When you opened the pull request in this turn, run the `verify-review` skill on it next. It waits for the first bot review, and it compacts the session when it stops.
+When you opened the pull request in this turn, start `verify-review` on it. It waits for the first bot review, and it compacts the session when it stops.
+
+If the session has the tool `mcp__compact__after_turn`, start `verify-review` through it, so that it gets a fresh context. Call the tool as the last step, with a `focus` that keeps the pull request link, the branch, the worktree, and each item that the user still must hear about, for example a skipped step or a departure that is not on the issue, and with `then`: `Call the Skill tool with "verify-review" on <pull request link>.` Without the tool, call the Skill tool with "verify-review" in the same turn.
