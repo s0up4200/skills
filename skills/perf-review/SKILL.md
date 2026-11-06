@@ -1,7 +1,7 @@
 ---
 name: perf-review
 effort: high
-description: Review Go and TypeScript code for performance problems — allocations, GC pressure, O(n²) algorithms, N+1 queries, slow SQL statements, unbounded concurrency, blocked event loops, re-render storms. Works on uncommitted changes, a commit range, a branch, or a full PR. Use when the user says "perf review", "check performance", "find bad allocs", "is this slow", "review allocations", "will this scale", or asks for a performance pass on a diff, branch, or PR. Do not use for general correctness review or style review — this skill only hunts performance.
+description: Review Go and TypeScript code for performance problems. Use before you answer when the user asks "is this slow" or "will this scale" about code, says "perf review", "check performance", "find bad allocs", or "review allocations", or asks for a performance pass on a diff, branch, or PR. Covers allocations, GC pressure, O(n²) algorithms, N+1 queries, slow SQL statements, unbounded concurrency, blocked event loops, and re-render storms. Do not use for general correctness review or style review — this skill only hunts performance.
 ---
 
 # Performance Review
