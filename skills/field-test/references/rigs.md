@@ -13,6 +13,9 @@ Traps:
 - `PUT /api/instances/{id}` needs `name` and `host`, or qui answers 400 `Name and host are required`. Also send `username`: without it qui answers 200 and clears the stored username and password. A password, an API key, basic auth, and link settings that you leave out keep their values.
 - Comparing against the pre-fix binary: `git worktree add <dir> HEAD`, copy `web/dist` in, `go build ./cmd/qui`. Grep the served bundle for a code signature to know which build a tab is running; the service worker precaches chunks across binary swaps on the same port.
 - The binary embeds `web/dist` (`web/build.go`), so `go build ./cmd/qui` after `pnpm build` includes the new frontend. A new worktree has only `web/dist/.gitkeep`. `make frontend` also copies the bundle to `internal/web/dist`, but no code reads that copy. Measure chunk sizes in `web/dist`. A Vite build of an edit that changes only a comment is byte-identical, so use a real statement to make the chunk hashes change.
+- In a command that also starts the server, the kill pattern matches its own shell: the shell's text holds the unbracketed `qui serve`, and the call dies with exit 144. Stop the server in a separate Bash call.
+- Unlock the premium themes on a rig with this row: `sqlite3 <dir>/qui.db "insert into licenses (license_key, product_name, status, provider, username) values ('LOCAL-RIG-NOT-A-REAL-LICENSE','premium-access','active','dodo','');"`. qui does not send a row with an empty `username` to the provider.
+- When the user will watch the rig, give the URL and the login in the same message that says the rig is up.
 
 ## Loopback-only rig
 
