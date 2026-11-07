@@ -82,6 +82,8 @@ Rules on a production host, where the data is real:
 
 On a local rig none of this applies except the naming rule, which is about what gets published, not where it runs.
 
+When the change is about recovery from a dropped connection, read `references/network-faults.md` before you wait for a natural drop.
+
 ## 4b. UI changes need the real browser
 
 A frontend change is not field-tested by curl. Drive the page in a browser: headless Playwright on a local rig, the Claude in Chrome tools on the production host. Read `references/browser.md` before the first browser step. It has the browser for each mode, phone widths, the service-worker trap, and the observables.
