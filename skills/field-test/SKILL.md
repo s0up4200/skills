@@ -48,10 +48,10 @@ Never copy a locally built binary into the container. The image tag must describ
 
 First check whether the PR is merged: `gh pr view <N> --json state,mergeCommit`. On a merged PR the image is stale and `develop` already holds the change, so neither one is the old build. Compare the merge commit with its parent on a local rig. Never run an older image against the production database, because the migrations since then are one way. Ask the user before you edit the body of a merged PR.
 
-- For qui, a PR from a branch in the main repo gets `ghcr.io/autobrr/qui:pr-<N>` from the Release workflow. Forks do not push images. Other projects: check the host file, and the repo's release workflow for a `type=ref,event=pr` tag rule.
+- For qui, a PR from a branch in the main repo gets `ghcr.io/autobrr/qui:pr-<N>` from the Release workflow. A PR from a fork gets the same tag when a maintainer runs `gh workflow run build-pr-image.yml -R autobrr/qui -f pr=<N>`. Other projects: check the host file, and the repo's release workflow for a `type=ref,event=pr` tag rule.
 - Wait for the build: `gh pr checks <N>`, or query the runs by commit: `gh api "repos/<owner>/<repo>/actions/runs?head_sha=<sha>" --jq '.workflow_runs[]|[.name,.status,.conclusion]|@tsv'`. `gh run list --branch` can list runs that are months old first.
 - Confirm the tag exists before touching the server: `docker manifest inspect ghcr.io/autobrr/qui:pr-<N> >/dev/null && echo built`. The tag exists from the first build of the PR, so after a later push it can still point at the old build. Wait for the run of the new head first.
-- After the swap, read `org.opencontainers.image.revision` off the running image and compare it with the PR head. PR images build from GitHub's ephemeral merge commit, so the revision is the merge commit, not the branch head; `gh pr view <N> --json mergeCommit,headRefOid` shows both.
+- After the swap, read `org.opencontainers.image.revision` off the running image and compare it with the PR head. An in-repo PR image builds from GitHub's ephemeral merge commit, so its revision is the merge commit; a fork PR image carries the PR head. `gh pr view <N> --json mergeCommit,headRefOid` shows both.
 
 ## 3. Snapshot, then swap
 
@@ -64,11 +64,11 @@ Order matters:
 3. Repoint `image:` to `ghcr.io/autobrr/qui:pr-<N>`, then `docker compose pull qui && docker compose up -d qui`.
 4. Verify: container up, revision label matches, first log lines show the expected version, the UI answers on its usual address.
 
-Record the swap in memory at once (image tag, backup file names, whether the user wants it kept). The user restarts the stack on their own schedule, and a forgotten pin looks like a revert.
+Record the swap at once in the user's notes, where their instructions say notes go (image tag, backup file names, whether the user wants it kept). The user restarts the stack on their own schedule, and a forgotten pin looks like a revert.
 
 ## 4. Drive the behaviour
 
-Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. Read `references/recipes.md` whole before you write a request. It lists the common endpoints (cross-seed search, webhook check and apply, SSE, orphan scan, backups) and how to make synthetic torrents.
+Use the API, not the UI, unless the change is visual. On a production host, ask the user for a temporary API key at the start; they mint one on request and revoke it afterwards. Never mint one by inserting into the database, and never reuse a key you find lying around without asking. Read `references/recipes.md` whole before you write a request. It lists the common endpoints (cross-seed search, webhook check and apply, SSE, orphan scan, backups), the limits on searches that reach real trackers, and how to make synthetic torrents.
 
 Rules on a production host, where the data is real:
 
@@ -76,8 +76,6 @@ Rules on a production host, where the data is real:
 - Give the script a control, a request that must return data. The script exits with an error when the control fails or returns no rows, so a failed request cannot read as a pass.
 - Read before you write. Start with searches, checks, log reads, and read-only database queries. Anything that adds, deletes, moves, rechecks, or relabels a torrent, or writes settings, gets a one-line confirmation from the user first, with the exact target named. The user's real torrents are seeding for real trackers; a wrong delete or a stray recheck is not undone by reverting the image.
 - Prefer a synthetic torrent for the trigger, built with a name the repo rule allows (real title and group tag, invented release). Real library torrents are fine to search against and match against; never publish their names, tracker URLs, or save paths anywhere outside the session.
-- Real trackers see the search, and so do Prowlarr's rate limits. Keep it to the passes the observable needs. Pass `{"cache_mode":"bypass"}` only when a cached response would hide the change; the 7-day search cache serves identical reruns.
-- Sonarr and Radarr answer lookups from the real library. A synthetic name still resolves if its title is a real show, which is the point; expect the cached row in `arr_id_cache` to persist past the test.
 - One variable per run. If the observable does not appear, check the trivial explanations first: cached response, wrong instance, torrent not at 100%, indexer excluded by content filtering, backoff after a failed login.
 
 On a local rig none of this applies except the naming rule, which is about what gets published, not where it runs.
@@ -86,7 +84,7 @@ When the change is about recovery from a dropped connection, read `references/ne
 
 ## 4b. UI changes need the real browser
 
-A frontend change is not field-tested by curl. Drive the page in a browser: headless Playwright on a local rig, the Claude in Chrome tools on the production host. Read `references/browser.md` before the first browser step. It has the browser for each mode, phone widths, the service-worker trap, and the observables.
+A frontend change is not field-tested by curl. Drive the page in a browser. Read `references/browser.md` before the first browser step. It has the browser for each mode, phone widths, the service-worker trap, and the observables.
 
 A **visual change** changes how the page looks: the layout, the styling, the text, or an element that appears or goes away. Each visual change gets a before capture from a build of the base branch and an after capture, saved to disk during the run, because the rig is gone after step 7. Report a check of a value or a state, such as a field that shows a new default, in text only.
 
@@ -98,9 +96,7 @@ Before you start a desktop app, read `references/desktop-app.md`. It keeps the a
 
 Grep the log on the remote end. The local shell wraps `grep` as ugrep, which never flushes rare matches on a long-lived pipe, so a local filter looks alive and delivers nothing. Rotated logs are gzipped: `zgrep`.
 
-For anything longer than a single request, arm a monitor and prove it delivers before you report "watching": send a sentinel through the full chain and wait for it to arrive. `references/monitoring.md` has the working recipe (keepalives, reconnect loop, foreground tail, sentinel, cleanup of orphaned remote tails).
-
-Cross-check the monitor against one known-present pattern whenever you report status. Silence is not evidence.
+For anything longer than a single request, arm a monitor and prove it delivers before you report "watching": send a sentinel through the full chain and wait for it to arrive. Before you arm a monitor, read `references/monitoring.md`: the working recipe (keepalives, reconnect loop, foreground tail, sentinel, the status cross-check, cleanup of orphaned remote tails).
 
 ## 6. Verdict and report
 
@@ -110,11 +106,11 @@ When the run shows a bug outside the change, run `gh issue list --search '<endpo
 
 The same message carries the cleanup evidence from step 7: the end checks and their output. A verdict without it is not finished.
 
-Update the PR body's "How has this been tested?" section with the live result in one or two sentences. Update memory with what was proven and what was left.
+Update the PR body's "How has this been tested?" section with the live result in one or two sentences. Name what was left unproven in the same section.
 
-A run with a visual change is done only when its before and after captures are published as Evidence. If a capture is missing, take it now, while the rig still runs. Publish the captures and recordings before the teardown in step 7: run `brrbin publish --help` and follow it, then put the Evidence link in that section. brrbin publishes only for an open PR; until the PR opens, keep the files in the scratchpad. Only the maintainers can open an Evidence, so a capture can show torrent names, tracker names, and save paths. Mask passkeys, announce URLs, and API keys.
+A run with a visual change is done only when its before and after captures are published as Evidence: before the teardown in step 7, follow "Publish the Evidence" in `references/browser.md`.
 
-A screenshot that you attach to GitHub is public. Capture it from a rig with synthetic data. If the bug shows only on real data, blur the names, trackers, and save paths before the image leaves the session.
+A screenshot that you attach to GitHub is public. Capture it from a rig with synthetic data. If the bug shows only on real data, blur the names, trackers, and save paths before the image leaves the session. In every capture, an Evidence included, mask passkeys, announce URLs, and API keys.
 
 ## 7. Clean up, and prove it
 
@@ -124,7 +120,7 @@ Tear down a local rig in the same turn that reads the last observable, also when
 
 - Delete synthetic torrents from qBittorrent (with files if the rig created them) and any rig files on the host. On a production host, name each one before deleting it so the user can object.
 - Kill every process the test started, local and remote. Keep a ledger of process groups and listeners as you create them; a killed SSH session leaves remote zsh wrappers and tails behind. Use `pkill -xf "<exact command line>"`; `pgrep -f` without `-x` matches your own shell and kills the session.
-- Revert the compose file to `:develop` and `docker compose pull qui && docker compose up -d qui`, unless the user said to keep the PR image running. Keep the pull when the swap applied a migration, because a row that an older build writes can miss a value that the new build needs. A PR image left pinned must be in memory with the reason, and flipped back after the PR merges.
+- Revert the compose file to `:develop` and `docker compose pull qui && docker compose up -d qui`, unless the user said to keep the PR image running. Keep the pull when the swap applied a migration, because a row that an older build writes can miss a value that the new build needs. A PR image left pinned must be in the user's notes with the reason, and flipped back after the PR merges.
 - Leave DB snapshots in place; note their names and sizes so the user can delete them after the merge.
 - Tell the user the temporary API key can be revoked.
 - Watch the log for one polling interval after cleanup and confirm it stays quiet.

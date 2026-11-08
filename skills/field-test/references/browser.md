@@ -19,7 +19,7 @@ Sections marked "Chrome" below apply only to the Claude in Chrome tools.
 
 Use a script for each before and after pair, each timing run, and each step that needs Node. Use `playwright cli` (below) to explore a page when you do not yet know the selector or the flow. `docs/research/browser-automation-alternatives.md` in the skills repo compares the other tools and gives the sources.
 
-Write one script per question in the scratchpad, run it, and read what it prints and saves. Proven 2026-10-27 with Playwright 1.64.1 and the Arch `chromium` package:
+Write one script per question in the scratchpad, run it, and read what it prints and saves. Proven 2026-10-27 with the Arch `chromium` package:
 
 ```bash
 PW="$(dirname "$(readlink -f "$(mise which playwright 2>/dev/null || command -v playwright)")")/../playwright" node check.mjs
@@ -37,7 +37,7 @@ await page.goto('http://127.0.0.1:<port>/');
 await browser.close();
 ```
 
-- `PW` is the absolute path of the global Playwright package, so the script needs no `node_modules` and no `NODE_PATH`. A `.cjs` script loads it with `require(process.env.PW)`. When mise installs Playwright, the first `playwright` on `PATH` can be a wrapper script outside the package, so the lookup asks `mise which` first. If `$PW/index.mjs` does not exist, find the package before you decide that Playwright is not installed.
+- `PW` is the absolute path of the global Playwright package, so the script needs no `node_modules` and no `NODE_PATH`. A `.cjs` script loads it with `require(process.env.PW)`. When mise installs Playwright, the first `playwright` on `PATH` can be a wrapper script outside the package, so the lookup asks `mise which` first. `mise which playwright` fails until `playwright` ran once through mise, because mise installs it on first use. If `$PW/index.mjs` does not exist, find the package before you decide that Playwright is not installed.
 - Launch the system Chromium through `executablePath`, so the run never depends on a browser that Playwright downloads.
 - A new context starts with no service worker, no cache, and no cookies. Each run loads the bundle that the rig serves now.
 - The `dialog` handler dismisses a native `confirm` or `alert`, so the dialog traps of Chrome do not apply.
@@ -67,7 +67,7 @@ For a GIF, run `ffmpeg -y -i run.mp4 -vf fps=10,scale=480:-1 run.gif` with the s
 
 ### `playwright cli` for exploration
 
-Playwright 1.64.1 bundles a CLI that keeps a headless browser open between commands and prints a few hundred bytes per step. Run it from the scratchpad, because it writes snapshots and logs to `.playwright-cli/` in the working directory:
+Playwright bundles a CLI that keeps a headless browser open between commands and prints a few hundred bytes per step. Run it from the scratchpad, because it writes snapshots and logs to `.playwright-cli/` in the working directory:
 
 ```bash
 export PLAYWRIGHT_MCP_EXECUTABLE_PATH=/usr/bin/chromium
@@ -149,7 +149,11 @@ the verdict rather than approximating.
 
 ## Captures for a person
 
-For each visual change (step 4b of the main skill defines it), take a before and an after capture for a person while the page shows the result. Follow the screenshot rules in `~/github/soup/dotfiles/agents/docs/browser.md`. Record the path of each saved file. Step 6 of the main skill publishes these files as Evidence.
+For each visual change (step 4b of the main skill defines it), take a before and an after capture for a person while the page shows the result. Follow the screenshot rules in `~/github/soup/dotfiles/agents/docs/browser.md`. Record the path of each saved file.
+
+### Publish the Evidence
+
+Step 6 of the main skill sends you here when the run has a visual change. If a capture is missing, take it now, while the rig still runs. Publish the captures and recordings before the teardown in step 7: run `brrbin publish --help` and follow it, then put the Evidence link in the "How has this been tested?" section of the PR body. brrbin publishes only for an open PR; until the PR opens, keep the files in the scratchpad. Only the maintainers can open an Evidence, so a capture can show torrent names, tracker names, and save paths; step 6 of the main skill says what to mask.
 
 ## Page traps
 
@@ -184,4 +188,4 @@ Proven 2026-10-01 for a before-and-after measurement:
 
 ## Cleanup
 
-Make sure that each Playwright script reached `browser.close()`, that `playwright cli list` shows `(no browsers)`, and that `pgrep -f '[p]laywright_chromiumdev_profile'` finds no browser that either one left. The brackets keep the pattern from matching your own shell. In Chrome, close the tabs you opened and unregister a service worker you registered on a local rig. In both, and delete synthetic torrents through the API rather than through the UI's delete dialog (see the dialog trap).
+Make sure that each Playwright script reached `browser.close()`, that `playwright cli list` shows `(no browsers)`, and that `pgrep -f '[p]laywright_chromiumdev_profile'` finds no browser that either one left. The brackets keep the pattern from matching your own shell. In Chrome, close the tabs you opened and unregister a service worker you registered on a local rig. In both, delete synthetic torrents through the API rather than through the UI's delete dialog (see the dialog trap).

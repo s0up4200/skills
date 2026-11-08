@@ -20,7 +20,7 @@ Make sure that the `sftp` check lists `downloads` before you add qui. Then one f
 
 qBittorrent setup: log in with the temporary password from `docker logs rig-qbit`. With `app/setPreferences`, send `web_ui_host_header_validation_enabled:false`, `web_ui_csrf_protection_enabled:false`, and `queueing_enabled:false`. qBittorrent removes a trailing slash from `save_path`: a default save path of `/data/downloads/` comes back as `/data/downloads`. Thus this rig cannot make a scan root with a trailing slash. A duplicate root comes out byte-identical.
 
-Synthetic torrent: make a 1 MiB file under `$R/data/downloads/<name>`, run `nice -n 19 env GOMAXPROCS=2 mkbrr create <dir> -o rig.torrent --workers 1`, then send `torrents/add` with `savepath=/data/downloads` and `skip_checking=true`.
+Synthetic torrent: make a 1 MiB file under `$R/data/downloads/<name>`, run `nice -n 19 env GOMAXPROCS=2 mkbrr create <dir> -o rig.torrent --workers 1`, then send `torrents/add` with `savepath=/data/downloads` and `seedMode=true` (`skip_checking=true` before qBittorrent 5.3).
 
 Remote mode needs four qui calls, in this order. If you do not pin the host key, the instance stays in filesystem mode `none` and a scan does not use SFTP.
 

@@ -21,12 +21,12 @@ Wine is not Windows. File locking, sharing modes, case-insensitive paths on a Li
 
 ## Windows 11 VM
 
-Use the VM when Wine is not enough, for example for self-update or file locks. The user starts it with `omarchy-windows-vm launch`. The container is `omarchy-windows`, and the compose file is `~/.config/windows/docker-compose.yml`. Its `PASSWORD` value is the Windows password. Do not print it.
+Use the VM when Wine is not enough, for example for self-update or file locks. The user starts it with `omarchy-windows-vm launch`. The container is `omarchy-windows`, the compose file is `/var/lib/omarchy/windows/docker-compose.yml`, and the Windows password is in `~/.config/windows/credentials`. Do not print it.
 
 - Cross-build into `~/Windows/qui-test/`. Inside the VM this is `\\host.lan\Data`. The user copies the files to `C:\qui` and runs qui from there. Delete `~/Windows/qui-test` afterwards.
 - qui in the VM binds `127.0.0.1:7476`. Only the VM browser and PowerShell scripts in the VM reach it, so the user drives the UI.
 - A fake release version in `-ldflags "-X github.com/autobrr/qui/internal/buildinfo.Version=<old version>"` makes the real signed release the update target.
-- CI runs no Go tests on Windows. `GOOS=windows go test -c` builds a test exe. In PowerShell, quote the flags: `"-test.run=Name" "-test.v"`.
+- CI has a Windows compile gate (`lint.yml`, on windows-2025): `go vet ./...` on every PR, and `go test ./...` when the PR touches `cmd`, `internal`, `pkg`, or `go.mod`. To run a test in the VM, `GOOS=windows go test -c` builds a test exe. In PowerShell, quote the flags: `"-test.run=Name" "-test.v"`.
 - In PowerShell, use `cmd /c move /Y`, because `Move-Item` rejects `/Y`. Use `[IO.File]::ReadAllText`, because `ConvertTo-Json` hangs on a `Get-Content -Raw` string in PowerShell 5.1.
 - In Task Scheduler, "Run only when user is logged on" skips the password prompt and keeps the processes visible in `tasklist`.
 - To block writes for an error-path test, run `icacls C:\qui /deny "${env:USERNAME}:(W)"` after qui starts. Undo it with `icacls C:\qui /remove:d $env:USERNAME`.

@@ -1,7 +1,5 @@
 # Local rigs when the production host is the wrong tool
 
-Use a local rig when the change cannot wait for a CI image, when it must not touch real trackers, when it needs a crafted indexer response, or when a throwaway qBittorrent is safer than the real one.
-
 ## qui binary on an alternate port against real config
 
 Copy `~/.config/qui/` and a `VACUUM INTO` copy of the database into the scratchpad, then run the built binary with `--config-dir <dir> --data-dir <dir>` on a free port. Point it at whatever qBittorrent the test needs. If you know the login of the rig, sign in and send `POST /api/api-keys` with `{"name":…,"instanceIds":[],"permissions":[{"area":…,"level":…}]}`. The reply holds the key. Otherwise, mint the key through the UI, or ask the user. The permission classifier blocks an insert into `api_keys`.
@@ -9,9 +7,9 @@ Copy `~/.config/qui/` and a `VACUUM INTO` copy of the database into the scratchp
 Traps:
 
 - `cd dir && nohup ./qui serve ... &` makes `$!` the wrapper shell; `kill $!` leaves qui alive and the next binary logs `bind: address already in use`. Use `setsid` and kill with `pkill -f "[q]ui serve --config-dir <dir>"` (the bracket keeps the pattern from matching your own shell).
-- `qui serve` fails without a `config.toml`; run `qui generate-config --config-dir <dir>` first on a fresh dir, then `POST /api/auth/setup`, then `POST /api/instances` with `hasLocalFilesystemAccess: true`. Every POST, PUT, PATCH, or DELETE after login needs `-H 'X-Requested-With: XMLHttpRequest'`, or qui answers 403 `Missing X-Requested-With header` (`internal/api/middleware/auth.go`).
+- On a fresh dir, `qui serve` writes a default `config.toml` into `--config-dir`. Then send `POST /api/auth/setup`, then `POST /api/instances` with `hasLocalFilesystemAccess: true`. Every POST, PUT, PATCH, or DELETE after login needs `-H 'X-Requested-With: XMLHttpRequest'`, or qui answers 403 `Missing X-Requested-With header` (`internal/api/middleware/auth.go`).
 - `PUT /api/instances/{id}` needs `name` and `host`, or qui answers 400 `Name and host are required`. Also send `username`: without it qui answers 200 and clears the stored username and password. A password, an API key, basic auth, and link settings that you leave out keep their values.
-- Comparing against the pre-fix binary: `git worktree add <dir> HEAD`, copy `web/dist` in, `go build ./cmd/qui`. Grep the served bundle for a code signature to know which build a tab is running; the service worker precaches chunks across binary swaps on the same port.
+- Comparing against the pre-fix binary: `git worktree add <dir> $(git merge-base origin/develop HEAD)`, copy `web/dist` in, and build with `make backend` (see the log-format note below). Use `HEAD` in place of the merge base only while the fix is not committed. Grep the served bundle for a code signature to know which build a tab is running; the service worker precaches chunks across binary swaps on the same port.
 - The binary embeds `web/dist` (`web/build.go`), so `go build ./cmd/qui` after `pnpm build` includes the new frontend. A new worktree has only `web/dist/.gitkeep`. `make frontend` also copies the bundle to `internal/web/dist`, but no code reads that copy. Measure chunk sizes in `web/dist`. A Vite build of an edit that changes only a comment is byte-identical, so use a real statement to make the chunk hashes change.
 - In a command that also starts the server, the kill pattern matches its own shell: the shell's text holds the unbracketed `qui serve`, and the call dies with exit 144. Stop the server in a separate Bash call.
 - Unlock the premium themes on a rig with this row: `sqlite3 <dir>/qui.db "insert into licenses (license_key, product_name, status, provider, username) values ('LOCAL-RIG-NOT-A-REAL-LICENSE','premium-access','active','dodo','');"`. qui does not send a row with an empty `username` to the provider.
@@ -29,7 +27,7 @@ A dev build skips the update check. Set `QUI__CHECK_FOR_UPDATES=false` for a bui
 
 ## Mock Torznab indexer
 
-A short Python `HTTPServer` on a spare port answering `t=caps` with a caps document and searches with an RSS body of crafted candidates. Register it with `POST /api/torznab/indexers` as a native backend. Serve `/a` healthy and `/b` with 500s to exercise error outcomes. Point it at `127.0.0.1`; nothing in a rig touches a real tracker.
+A short Python `HTTPServer` on a spare port answering `t=caps` with a caps document and searches with an RSS body of crafted candidates. Register it with `POST /api/torznab/indexers` as a native backend. `scripts/mock-torznab.py` in this skill always answers 200; to exercise error outcomes, add a path that answers 500 to a copy of it. Point it at `127.0.0.1`; nothing in a rig touches a real tracker.
 
 - qui waits 60 s between requests to one native backend. If the test is not about this wait, register the mock with `"backend":"jackett","indexer_id":"rig"`. On 2026-11-04, `mock-torznab.py` answered two `POST /api/torznab/search` calls in a row with no wait on this backend, and 60 s apart on a native backend.
 - The native backend sends each request to `base_url` itself, with no `/api` suffix. A mock that routes on a path prefix must match `/b`, not `/b/`.
@@ -41,7 +39,7 @@ A short Python `HTTPServer` on a spare port answering `t=caps` with a caps docum
 
 More container gotchas:
 
-- `torrentcreator/addTask` ignores its `trackers` parameter. Add the trackers afterwards with `POST /api/v2/torrents/addTrackers`. A host under `.test` fails in seconds with `Host not found (authoritative)`, which gives a dead tracker with no network.
+- `torrentcreator/addTask` reads its `trackers` parameter with the trackers separated by `|` (read in the qBittorrent source, not yet proven live). If they do not show, add them afterwards with `POST /api/v2/torrents/addTrackers`. A host under `.test` fails in seconds with `Host not found (authoritative)`, which gives a dead tracker with no network.
 - A 4 MiB recheck finishes inside the 100 ms poll of qui, and qui reports that the piece check did not start. Use a file of 1 GiB for a recheck test.
 - For a test with two pool members, run a second qBittorrent container on the same docker network that seeds the full release, and connect it with `POST /api/v2/torrents/addPeers` (this works on private torrents). Build with `format=v1`, because a hybrid torrent adds pad files and breaks the match. Set `source=` to get distinct hashes.
 - To boot qui with auth off, set `QUI__AUTH_DISABLED=true`, `QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA=true`, and `QUI__AUTH_DISABLED_ALLOWED_CIDRS=127.0.0.0/8`. With only one of the two flags, qui logs a warning and keeps auth on. Then a URL such as `/instances/1?modal=add-torrent` opens straight away.
@@ -50,16 +48,16 @@ More container gotchas:
 
 ## Automation rules on a rig
 
-`POST /api/instances/{id}/automations/apply` runs every enabled rule once. Create the rules with a long `intervalSeconds`, such as 86400, and start each run yourself. When a rule ignores a rig torrent, its log line shows a `matchedTrackers` count lower than the torrent count. Two causes:
+`POST /api/instances/{id}/automations/apply` runs every enabled rule once. Create the rules with a long `intervalSeconds`, such as 86400, and start each run yourself. When a rule ignores a rig torrent, its log line shows a `matchedTrackers` count lower than the torrent count. Two known triggers:
 
-- qBittorrent queues torrents by default, and the rules skip a torrent in the `queuedUP` state. After login, send `{"queueing_enabled":false}` with `app/setPreferences`.
+- qBittorrent queues torrents by default, and a queued rig torrent can be left out; the cause is unknown (a queued torrent may have no `tracker` value yet). After login, send `{"queueing_enabled":false}` with `app/setPreferences`.
 - After a rule acts on a torrent, a delete included, qui skips that hash for 2 minutes (`SkipWithin`). To reuse a torrent for the next scenario, add it again and wait 2 minutes before you apply the rules. The hardlink index stays cached for 10 minutes, so the wait keeps the same index.
 
 ## Stub qBittorrent, for large or crafted libraries only
 
 The container is the default: it answers every endpoint the way qBittorrent does and never drifts from a WebUI version. Reach for the stub only when the library has to be big (thousands of rows in a second) or shaped (hybrid v1+v2 hashes, chosen tracker domains, a torrent removed on demand), or when the test needs a request count and the sniffer is more setup than the question deserves.
 
-`scripts/stub-qbit.py <port> [count]` in this skill: login, capabilities, a synthetic library (2000 torrents by default), and a per-path request counter at `GET /_counts`. `GET /_torrent?hash=<hash>&state=moving&progress=0.5` changes one torrent during a run. Poll the qui API until the change shows, because qui reads it at its next sync. Every maindata poll bumps `upspeed` on each row, so stream deltas carry rows; a static library makes every delta empty and hides a handler that drops its row on an empty frame. Copy `/_counts` before and after a window and subtract for a paired request count. The stub answers only what qui asked for when it was written; an endpoint it does not know returns `[]`, so a new call path can pass here and fail on the container. A dead host such as `127.0.0.1:1` puts the instance into a 60 s backoff that survives repointing, so `POST /api/instances/{id}/test` to reconnect.
+`scripts/stub-qbit.py <port> [count]` in this skill: login, capabilities, a synthetic library (2000 torrents by default), and a per-path request counter at `GET /_counts`. `GET /_torrent?hash=<hash>&state=moving&progress=0.5` changes one torrent during a run. Poll the qui API until the change shows, because qui reads it at its next sync. Every maindata poll bumps `upspeed` on each row, so stream deltas carry rows; a static library makes every delta empty and hides a handler that drops its row on an empty frame. Copy `/_counts` before and after a window and subtract for a paired request count. The stub answers only what qui asked for when it was written; an endpoint it does not know returns `[]`, so a new call path can pass here and fail on the container. A dead host such as `127.0.0.1:1` puts the instance into a backoff from 10 s up to 60 s; a `PUT /api/instances/{id}` or `POST /api/instances/{id}/test` clears it.
 
 To test a qBittorrent that is slow to answer, add a toggle to the stub that holds each `/api/v2/sync/maindata` answer for 75 s. That is longer than the 10 s timeout of qui for an incremental sync. Turn the toggle on only after the table shows rows. Each build needs its own healthy first sync. Before the next build connects to the same stub, turn the toggle off, reload the tab, and make sure that the maindata count in `/_counts` rises. Then turn the toggle on again. On 2026-10-19 the second build stalled until the toggle went off.
 
