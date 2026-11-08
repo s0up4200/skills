@@ -65,3 +65,7 @@ One component signals another, and the receiver reads the subject from a differe
 **Test:** a signal and its data travel on different paths: an add followed by a read of a list, a message that carries an ID that the receiver then reads from a cache or a replica.
 
 **Fix:** carry the data or its key in the signal (use the hash or the ID that the add already knows), or make the receiver wait for a version at least as new as the write, with a deadline.
+
+## Sources
+
+- Martin Kleppmann and Chris Riccomini, _Designing Data-Intensive Applications_, 2nd edition, O'Reilly, February 2026, ISBN 9781098119065: https://oreilly.com/catalog/errata.csp?isbn=9781098119065

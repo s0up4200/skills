@@ -63,3 +63,8 @@ A delete acts on a decision that is older than the delete. A scan lists the file
 **Test:** list the steps from the decision to the delete. A hit is any of these: no check of the item again at delete time; a candidate list kept across a slow step (a network call, a wait for the user, a long walk of the disk) with no check after it; a file compared only by path or name, with no compare of its identity (device and inode, `os.SameFile`, or a content hash) and no check of its link count.
 
 **Fix:** check each item again right before its delete, against the current state, and compare files by identity. Skip a file with more than one link, unless every link is in the delete set. When a preview showed the user the list, delete only items from that list: check each one again, skip and report each one that no longer qualifies, and add none.
+
+## Sources
+
+- Martin Kleppmann and Chris Riccomini, _Designing Data-Intensive Applications_, 2nd edition, O'Reilly, February 2026, ISBN 9781098119065: https://oreilly.com/catalog/errata.csp?isbn=9781098119065
+- Eric Evans, _Domain-Driven Design: Tackling Complexity in the Heart of Software_, Addison-Wesley, 2003, ISBN 0-321-12521-5: https://www.domainlanguage.com/ddd/

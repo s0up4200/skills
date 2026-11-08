@@ -57,3 +57,8 @@ The diff makes a validation stricter in a function that also loads existing data
 **Test:** a stricter rejection in a function that a load path calls: startup, a list, a restore, a sync of stored rows. Also an import or restore that does not keep the stored IDs, so references break.
 
 **Fix:** apply the strict check to new input only. On the load path, choose for each case: accept the old value, repair it and log each repair, or show it to the user as invalid. Keep the stored IDs on a restore.
+
+## Sources
+
+- Martin Kleppmann and Chris Riccomini, _Designing Data-Intensive Applications_, 2nd edition, O'Reilly, February 2026, ISBN 9781098119065: https://oreilly.com/catalog/errata.csp?isbn=9781098119065
+- Eric Evans, _Domain-Driven Design: Tackling Complexity in the Heart of Software_, Addison-Wesley, 2003, ISBN 0-321-12521-5: https://www.domainlanguage.com/ddd/

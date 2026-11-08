@@ -69,3 +69,10 @@ A fix for a lost update, a check-then-insert, a split write, or a stale writer i
 **Test:** the diff fixes one of the rules above, and no test starts several callers at once against a real local database.
 
 **Fix:** a test that starts at least 8 callers at once, released together (for example by a closed channel), on each database that the repo supports, and checks the invariant at the end. Prove the test: remove the guard, see the test fail, and put the guard back.
+
+## Sources
+
+- Martin Kleppmann and Chris Riccomini, _Designing Data-Intensive Applications_, 2nd edition, O'Reilly, February 2026, ISBN 9781098119065: https://oreilly.com/catalog/errata.csp?isbn=9781098119065
+- Eric Evans, _Domain-Driven Design: Tackling Complexity in the Heart of Software_, Addison-Wesley, 2003, ISBN 0-321-12521-5: https://www.domainlanguage.com/ddd/
+- PostgreSQL 18 documentation, "Transaction Isolation", read on 2026-11-08: read committed is the default level. https://www.postgresql.org/docs/current/transaction-iso.html
+- SQLite documentation, "Transaction", read on 2026-11-08: one write transaction at a time, and what `BEGIN IMMEDIATE` does. https://www.sqlite.org/lang_transaction.html
