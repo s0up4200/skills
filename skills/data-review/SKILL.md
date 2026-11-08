@@ -12,7 +12,7 @@ The rules come from _Designing Data-Intensive Applications_, 2nd edition (Kleppm
 
 ## Step 1: Pick the scope
 
-Take the fixed point that the caller passes. With none, use the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (for example `origin/develop`). When `origin/HEAD` is not set, the command exits 128: use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds. With none of these, ask. A local `main` can be far behind, or missing. If `origin` is a fork, use the remote of the parent repository in place of `origin`, as `code-review` does.
+Take the fixed point that the caller passes. With none, use the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (for example `origin/develop`). When `origin/HEAD` is not set, the command exits 128: read the default branch from the remote with `git ls-remote --symref origin HEAD`, and only when that fails, use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds. With none of these, ask. A local `main` can be far behind, or missing. If `origin` is a fork, use the remote of the parent repository in place of `origin`, as `code-review` does. Fetch the default branch before the diff, also as `code-review` does, because a remote-tracking branch can be old.
 
 | Work | Command |
 |---|---|
@@ -23,7 +23,7 @@ Take the fixed point that the caller passes. With none, use the default branch: 
 | a GitHub PR number or URL | `gh pr diff <number>` |
 | named files | read them in full |
 
-When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. A new file that holds a sync loop is the main target. For a GitHub PR, read the code at its head, not the current working tree: `git fetch origin pull/<number>/head`, then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. Say what scope you chose.
+When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. A new file that holds a sync loop is the main target. For a GitHub PR, read the code at its head, not the current working tree: `git fetch <remote> pull/<number>/head`, where `<remote>` is the remote of the repository that holds the PR (the parent in a fork), then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. Say what scope you chose.
 
 ## Step 2: Map the data
 
@@ -39,7 +39,7 @@ The step is done when each thing that the diff writes or deletes has its writer 
 
 Read each reference whose branch the diff touches, and apply each of its rules to each hunk in that branch:
 
-- A write to a database, a key-value store, or a file that the app owns, and a write to a remote system that more than one path of the app makes (an add, a delete, a settings change) → `references/writes.md`
+- A write to a database, a key-value store, or a file that the app owns, and a write that changes state on a remote system (an add, a delete, a settings change) → `references/writes.md`
 - A call to another system, and the retries, fan-outs, queues, and worker loops around it → `references/calls.md`
 - A sync loop, poller, cache, memo, or copied value, and each delete of files or rows that a scan or a list decides → `references/copies.md`
 - A stored or wire format: tagged structs, migrations, JSON columns, config and state files, stored enums, response fields → `references/formats.md`

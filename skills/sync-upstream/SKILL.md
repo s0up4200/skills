@@ -9,14 +9,13 @@ argument-hint: "[mattpocock|cursor|aminblg, default mattpocock]"
 
 Bring the copies in `skills/<source>/` up to upstream HEAD, with only the changes the user accepts, and tell the user what the release changes in how they work.
 
-The installed skills are links to the checkout in `~/github/soup/skills`, so that checkout stays on `main` and holds only merged changes. Before step 1, make a worktree on a new branch, and run every step in it:
+The installed skills are links into one checkout of this repo, `<checkout>`. This command prints it:
 
 ```sh
-git -C ~/github/soup/skills fetch origin
-git -C ~/github/soup/skills worktree add -b chore/sync-upstream-<date> ../.worktrees/skills-sync-upstream-<date> origin/HEAD
+git -C "$(readlink -f ~/.claude/skills/code-review)" rev-parse --show-toplevel
 ```
 
-If `origin/HEAD` is not set, use `origin/main`.
+The checkout stays on `main` and holds only merged changes. Run steps 1 to 3 in it, because they change no file. Step 4 makes a worktree for the changes.
 
 `UPSTREAM.md` is the source of truth for each source: the recorded upstream commit, the copied skills and their upstream paths, and the local changes. Read its section for the source before you start.
 
@@ -62,13 +61,20 @@ The step is done when every item has an answer and the user confirms the list.
 
 ## 4. Apply the accepted changes
 
+Make a worktree on a new branch, named for the upstream commit, and make every change of steps 4 and 5 in it. If `origin/HEAD` is not set, use `origin/main`.
+
+```sh
+git -C <checkout> fetch origin
+git -C <checkout> worktree add -b chore/sync-upstream-<short sha> ../.worktrees/skills-sync-upstream-<short sha> origin/HEAD
+```
+
 Apply only the answers from step 3. Then update `UPSTREAM.md`: the full commit SHA, its date and version, the diff command, each new local change, and each upstream change that the user skipped, so that the next sync does not ask again.
 
 The step is done when every remaining line of `diff -ru` is a recorded local change or a recorded skip.
 
 ## 5. Commit and open a pull request
 
-Run the commit gate in `CODING_STANDARDS.md` of the global agent rules. Commit in the worktree, push the branch with `git push -u origin <branch>`, and open a pull request with the `pr` skill. No commit goes to `main`. The change installs when the user merges the pull request and the checkout pulls `main` (`git -C ~/github/soup/skills pull --ff-only`). After that pull, remove the worktree (`git -C ~/github/soup/skills worktree remove <worktree>`).
+Run the commit gate in `CODING_STANDARDS.md` of the global agent rules. Commit in the worktree, push the branch with `git push -u origin <branch>`, and open a pull request with the `pr` skill. No commit goes to `main`. The change installs when the user merges the pull request and the checkout pulls `main` (`git -C <checkout> pull --ff-only`). After that pull, link each new skill into each folder where the other skills are linked, remove the link of each deleted skill, and remove the worktree (`git -C <checkout> worktree remove <worktree>`).
 
 The HTTPS push can wait on a credential prompt that has no terminal. If `git push` does not finish in 30 seconds, stop it and ask the user to run `! git -C <worktree> push -u origin <branch>`.
 
@@ -84,4 +90,4 @@ Give the user:
 2. The workflow changes: link each accepted change to the usage numbers. A change to a skill that the user runs often matters most. A new step that belongs after a skill they run often, or a new skill that replaces a sequence they repeat, comes next. Name the numbers, for example "`code-review` ran in 324 sessions, `retro` in 21".
 3. The migration: the affected repos from step 6, ranked by the sessions of the affected skills in each repo, from the top projects in step 2.
 
-End with a "You need to do:" list: the push if it failed, the merge (after it, the pull and the worktree removal from step 5), and the migration batch with your pick of repos to start with.
+End with a "You need to do:" list: the push if it failed, the merge (after it, the pull, the links, and the worktree removal from step 5), and the migration batch with your pick of repos to start with.

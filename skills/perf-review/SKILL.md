@@ -10,7 +10,7 @@ Review code changes for performance problems and report them. Do not change code
 
 ## Step 1: Pick the scope
 
-Ask git what changed. For a branch, take the fixed point that the caller passes. With none, use the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (for example `origin/develop`). When `origin/HEAD` is not set, the command exits 128: use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds. With none of these, ask. A local `main` can be far behind, or missing. If `origin` is a fork, use the remote of the parent repository in place of `origin`, as `code-review` does. Pick the first case that matches the request:
+Ask git what changed. For a branch, take the fixed point that the caller passes. With none, use the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (for example `origin/develop`). When `origin/HEAD` is not set, the command exits 128: read the default branch from the remote with `git ls-remote --symref origin HEAD`, and only when that fails, use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds. With none of these, ask. A local `main` can be far behind, or missing. If `origin` is a fork, use the remote of the parent repository in place of `origin`, as `code-review` does. Fetch the default branch before the diff, also as `code-review` does, because a remote-tracking branch can be old. Pick the first case that matches the request:
 
 | Request | Command |
 |---|---|
@@ -21,7 +21,7 @@ Ask git what changed. For a branch, take the fixed point that the caller passes.
 | a GitHub PR number or URL | `gh pr diff <number>` |
 | "this file", "this package" | Read the named files directly |
 
-When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. For a GitHub PR, read the code at its head, not the current working tree: `git fetch origin pull/<number>/head`, then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
+When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. For a GitHub PR, read the code at its head, not the current working tree: `git fetch <remote> pull/<number>/head`, where `<remote>` is the remote of the repository that holds the PR (the parent in a fork), then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
 
 ## Step 2: Read beyond the diff
 

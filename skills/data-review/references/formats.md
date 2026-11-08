@@ -38,7 +38,7 @@ The diff renames, removes, or retypes a field that is stored or sent, or makes a
 
 **Test:** a change to a name, a tag, a type, or an enum value of an encoded type, with no read path for the old shape, no single decoder that upgrades old shapes, or no test that decodes a payload of the previous release. A write of only the new shape that a supported old reader still reads is a hit too. A cast with no validation (`JSON.parse(raw) as Settings`) of stored data is a hit.
 
-**Fix:** read every stored shape through one decode-and-upgrade function. Add a golden test: a payload captured from the previous release, committed as a fixture, that must still decode to the right values. Change a field in steps: add the new field, write both, and keep reading the old one. Stop writing the old field when no supported reader needs it, and remove the old read when no stored data or supported backup holds the old shape.
+**Fix:** read every stored shape through one decode-and-upgrade function. Add a golden test: a payload captured from the previous release, committed as a fixture, that must still decode to the right values. Change a field in steps: add the new field, write both, and keep reading the old one. Before the reads move to the new field, wait until no old writer runs, then copy the old value into the new field where the two differ. Stop writing the old field when no supported reader needs it, and remove the old read when no stored data or supported backup holds the old shape.
 
 **Against APOSD:** a separate wire type with a one-to-one mapper starts as a pass-through. Use one type plus the golden test until the test breaks. Then split out a wire type for the format.
 

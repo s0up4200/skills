@@ -15,7 +15,7 @@ Don't mock:
 
 ## Where the mock's data comes from
 
-A hand-written mock returns the shape that you believe the system sends, so it agrees with your bug. Feed the adapter's tests from responses recorded from the real system, saved as fixtures, one set for each version that you support (Evans, _Domain-Driven Design_, ch. 14, "Testing at the CONTEXT Boundaries"). Before you save a fixture, replace each token, key, and personal value with a fake one, so that no secret or customer data reaches the repository.
+A hand-written mock returns the shape that you believe the system sends, so it agrees with your bug. Feed the adapter's tests from responses recorded from the real system, saved as fixtures, one set for each version that you support (Evans, _Domain-Driven Design_, ch. 14, "Testing at the CONTEXT Boundaries"). Record from a test account with fake data where you can. Before you save a fixture, replace each secret and each value of a real customer (names, addresses, amounts, account IDs) with a fake one.
 
 When one interface has two or more implementations (SQLite and Postgres, a fake and the real client), write one contract suite: the same tests check the state after each call, and they run against each implementation. A fake whose `Upsert` replaces a row where the real database merges it passes its own tests and fails in production (Evans, ch. 10, "Assertions").
 

@@ -18,7 +18,7 @@ A timestamp decides order, dedupe, or a "since" cursor across hosts: an item's r
 
 **Test:** a timestamp from another host, or from more than one writer, decides order or a cursor. A random ID is a sort key. An elapsed time computed from a value that went through `.UTC()`, `.In()`, `.Round()`, JSON, the database, or `Date.now()`.
 
-**Fix:** use the source's own cursor or a database sequence. When only time exists, read with an overlap window and dedupe by ID. Size the window from the latest arrival that the source allows, and state the lateness that it misses. Measure durations from a `time.Now()` value kept in memory, or from `performance.now()`.
+**Fix:** use the source's own cursor or a database sequence. A sequence value can commit out of order, so read a sequence cursor with an overlap too. When only time exists, read with an overlap window. Dedupe by ID, and keep the newer version of an item that comes back changed. Size the window from the latest arrival that the source allows, and state the lateness that it misses. Measure durations from a `time.Now()` value kept in memory, or from `performance.now()`.
 
 ### Copy without owner
 
@@ -26,7 +26,7 @@ The diff stores a value that already lives elsewhere (a cached setting, a count 
 
 **Test:** for each new copy, name its source, then find each path that writes the source (create, rename, delete, sync, import). Each one must update or invalidate the copy. Or the next read after a user's write must bypass the copy, or wait for a version at least as new as the write. A copy whose staleness the diff does not state is a hit.
 
-**Fix:** make each write path invalidate the copy, or store the source's ID in place of the copied value. A read that fetched the source before an invalidation must not store its result after it: keep a version for each key, and store a fill only when the version did not change since the read started. State the staleness that a user can see, and record the time of the last good sync so that staleness shows.
+**Fix:** make each write path invalidate the copy, or store the source's ID in place of the copied value. Invalidate and change the version of the key after the write commits. A read that fetched the source before an invalidation must not store its result after it: keep a version for each key, and store a fill only when the version did not change since the read started. State the staleness that a user can see, and record the time of the last good sync so that staleness shows.
 
 **Against APOSD:** a caching decorator around a read method is shallow, and it cannot see the writes. The module that owns the writes owns the cache, so that each write path invalidates it in one place.
 
