@@ -18,10 +18,10 @@ Ask git what changed. For a branch, take the fixed point that the caller passes.
 | "last commit", a commit hash | `git diff <hash>^ <hash>` |
 | a branch, committed work | `git diff <fixed-point>...HEAD` |
 | a branch with uncommitted changes too | `git diff $(git merge-base <fixed-point> HEAD)` |
-| a GitHub PR number or URL | `gh pr diff <number>` |
+| a GitHub PR number or URL | `gh pr diff -R "$(git remote get-url <remote>)" <number>`, where `<remote>` is the remote of the repository that holds the PR (the parent in a fork) |
 | "this file", "this package" | Read the named files directly |
 
-When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. For a GitHub PR, read the code at its head, not the current working tree: `git fetch <remote> pull/<number>/head`, where `<remote>` is the remote of the repository that holds the PR (the parent in a fork), then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
+When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short --untracked-files=all`, and read each new file in full. For a GitHub PR, read the code at its head, not the current working tree: `git fetch <remote> pull/<number>/head` from the same `<remote>`, then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
 
 ## Step 2: Read beyond the diff
 

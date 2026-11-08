@@ -20,10 +20,10 @@ Take the fixed point that the caller passes. With none, use the default branch: 
 | no commits yet | `git diff HEAD` |
 | commits and uncommitted changes | `git diff $(git merge-base <fixed-point> HEAD)` |
 | one commit | `git diff <hash>^ <hash>` |
-| a GitHub PR number or URL | `gh pr diff <number>` |
+| a GitHub PR number or URL | `gh pr diff -R "$(git remote get-url <remote>)" <number>`, where `<remote>` is the remote of the repository that holds the PR (the parent in a fork) |
 | named files | read them in full |
 
-When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. A new file that holds a sync loop is the main target. For a GitHub PR, read the code at its head, not the current working tree: `git fetch <remote> pull/<number>/head`, where `<remote>` is the remote of the repository that holds the PR (the parent in a fork), then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. Say what scope you chose.
+When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short --untracked-files=all`, and read each new file in full. A new file that holds a sync loop is the main target. For a GitHub PR, read the code at its head, not the current working tree: `git fetch <remote> pull/<number>/head` from the same `<remote>`, then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. Say what scope you chose.
 
 ## Step 2: Map the data
 

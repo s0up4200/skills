@@ -15,7 +15,7 @@ The installed skills are links into one checkout of this repo, `<checkout>`. Thi
 git -C "$(readlink -f ~/.claude/skills/code-review)" rev-parse --show-toplevel
 ```
 
-The checkout stays on `main` and holds only merged changes. Run steps 1 to 3 in it, because they change no file. Step 4 makes a worktree for the changes.
+The checkout stays on `main` and holds only merged changes. Before step 1, run `git -C <checkout> pull --ff-only`. Run steps 1 to 3 in the checkout, because they change no file. Step 4 makes a worktree for the changes.
 
 `UPSTREAM.md` is the source of truth for each source: the recorded upstream commit, the copied skills and their upstream paths, and the local changes. Read its section for the source before you start.
 
@@ -61,11 +61,10 @@ The step is done when every item has an answer and the user confirms the list.
 
 ## 4. Apply the accepted changes
 
-Make a worktree on a new branch, named for the upstream commit, and make every change of steps 4 and 5 in it. If `origin/HEAD` is not set, use `origin/main`.
+Make a worktree on a new branch, named for the upstream commit, and make every change of steps 4 and 5 in it. The worktree starts from the `main` that steps 1 to 3 read.
 
 ```sh
-git -C <checkout> fetch origin
-git -C <checkout> worktree add -b chore/sync-upstream-<short sha> ../.worktrees/skills-sync-upstream-<short sha> origin/HEAD
+git -C <checkout> worktree add -b chore/sync-upstream-<short sha> ../.worktrees/skills-sync-upstream-<short sha> main
 ```
 
 Apply only the answers from step 3. Then update `UPSTREAM.md`: the full commit SHA, its date and version, the diff command, each new local change, and each upstream change that the user skipped, so that the next sync does not ask again.

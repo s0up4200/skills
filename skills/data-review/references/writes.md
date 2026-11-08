@@ -2,13 +2,13 @@
 
 Check each write to a database, a key-value store, or a file that the app owns against these rules, and each write that changes state on a remote system. A shared store has more than one **writer**: request handlers, a background loop, an automation, a CLI on the same database file, a second browser tab. The diff shows one writer. The bug comes from the writer that the diff does not show, so use the writer list from step 2 of `SKILL.md`.
 
-Each rule gives what it is, a test at the diff, and the fix. A hit needs a **scenario** with concrete values that ends in the wrong stored state, a hang, or a lost effect: the order of the steps of two writers, or the steps of one writer and the failure or crash between two of them.
+Each rule gives what it is, a test at the diff, and the fix. A hit needs a **scenario** with concrete values that ends in the wrong stored state, a hang, or a lost effect: the order of the steps of two writers, the steps of one writer and the failure or crash between two of them, or one writer that skips a rule that the other writers call.
 
 ### Lost update
 
 App code reads a stored value, changes it, and writes it back (get, change, save). Two writers do this at the same time, and the second save silently erases the change of the first. Postgres at its default level (read committed) commits both, also inside a transaction. DDIA ch. 8, "Preventing Lost Updates", warns that ORMs make this unsafe cycle the easy path.
 
-**Test:** a value that app code reads, changes, and writes back, with none of these: an atomic `UPDATE ... SET x = x + ?`, an update of only the changed columns when no new value comes from the read, `WHERE version = ?` plus a check of the rows affected, `SELECT ... FOR UPDATE` in the same transaction as the write, or SQLite `BEGIN IMMEDIATE`. A settings or JSON blob that is loaded, changed in one field, and saved whole is the common case.
+**Test:** a value that app code reads, changes, and writes back, with none of these: an atomic `UPDATE ... SET x = x + ?`, an update of only the changed columns when no new value comes from the read and no rule ties a changed column to another column, `WHERE version = ?` plus a check of the rows affected, `SELECT ... FOR UPDATE` in the same transaction as the write, or SQLite `BEGIN IMMEDIATE`. A settings or JSON blob that is loaded, changed in one field, and saved whole is the common case.
 
 **Fix:** prefer the forms that make the conflict impossible: an atomic `SET`, or an update of only the changed columns (`Increment(id)` or `SetName(id, name)` in place of `Get` and `Save`). Use a version check only when the user must see the conflict, and then return it to the user. A whole-record write is acceptable only when the diff says that the loss is acceptable (last write wins, on purpose).
 
