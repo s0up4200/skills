@@ -56,9 +56,9 @@ Work that can outlive its owner (a sync tick that timed out, a loop that was rep
 
 ### Rule on one write path
 
-A new business rule sits in one handler or one component, and another path writes the same state without it: the background loop, an automation, a directory scan, an import, a restore, the CLI. Evans puts the rule in the domain layer, where every write passes (DDD ch. 7, "Allocation Checking").
+A new business rule sits in one handler or one component, and another path writes the same state without it: the background loop, an automation, a directory scan, an import, a restore, the CLI. The same bug comes from the other side when a new writer skips a rule that the old writers call. Evans puts the rule in the domain layer, where every write passes (DDD ch. 7, "Allocation Checking").
 
-**Test:** for each new rule (a block list, a limit, a "never delete X"), take the writer list from step 2 and check that each writer of that state calls it. One writer that skips it is a hit.
+**Test:** for each new rule (a block list, a limit, a "never delete X"), take the writer list from step 2 and check that each writer of that state calls it. For each new writer, list the checks that the other writers of the same state call before they write (search the other add, import, or delete paths), and check that the new writer calls each one. One writer that skips a check is a hit.
 
 **Fix:** move the rule into the function that every write path calls, usually the store method or the module that owns the state, and delete the copy in the handler.
 
