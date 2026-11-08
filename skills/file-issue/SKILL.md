@@ -29,7 +29,6 @@ Done when no field holds a guess. Ask soup for any value you cannot read.
 - Use the template headings, in order, and fill every required field.
 - Describe only the upstream code path: the API call, the component, the event that misbehaves. Leave out soup's own tools and other third-party products.
 - Put the upstream version number alone in the version field. Put branch names and build notes elsewhere, because bots match words like "develop" or "latest" there.
-- Run `simple-english` and `unslop` on the prose.
 
 Save the draft to the scratchpad and show it in full.
 
