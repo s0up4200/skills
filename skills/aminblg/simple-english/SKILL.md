@@ -32,7 +32,7 @@ When asked to write or rewrite documentation, apply these rules to the prose:
 2. Never touch code, identifiers, commands, flags, file paths, quoted errors, product names, terms that the project defines (a glossary entry, a field name), or facts. When the source gives no number or cause, keep the general statement.
 3. Condition before command, with a comma: "If the build fails, read the log."
 4. Use simple tenses and active voice. No present perfect ("has completed" → "completed"). No "-ing" verb after a comma (", making it easy" → new sentence). Name the actor: "You run the migration."
-5. Modals: can, will, must. Never should, would, may, might, could. A required "should" becomes "must". An optional one becomes "you can". A guess keeps its certainty: "it might be the cache" becomes "the cause is probably the cache" or "we do not know if the cause is the cache", never "the cause is the cache".
+5. Modals: can, will, must. Never should, would, may, might, could. A required "should" becomes "must". An optional one becomes "you can". A guess keeps its certainty: "it might be the cache" becomes "the cache can be the cause" or "we do not know if the cause is the cache", never "the cause is the cache".
 6. Use complete grammar. No contractions, keep articles, keep "that". Write short sentences, not telegraph style.
 7. No semicolons and no em-dashes. Write two sentences, or name the relation.
 8. One word, one meaning, for the whole document. Use `make sure that` for check, verify, confirm, validate, ensure. Use `configuration` for config, settings, options. Break noun chains over three words with a preposition ("the timeout value for the connection pool").
