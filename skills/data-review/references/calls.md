@@ -16,9 +16,9 @@ The code reports success for a change that the other system refused or has not a
 
 A retry loop has no cap, no growing delay, no jitter, or no check of `ctx`, or it retries errors that will not change (a 401, a 400, a validation error). Or it repeats a call that is not idempotent (not safe to run twice): after a timeout, the first attempt may have succeeded, and the retry adds, sends, or pushes a second time. An overloaded system that every client retries at a fixed rate stays overloaded (DDIA ch. 2, "When an Overloaded System Won't Recover").
 
-**Test:** for each new retry: a cap, a growing delay with jitter, a `ctx` check, and a split between transient and permanent errors. For each retried call that changes state: either it is idempotent (a set, a delete, an add keyed by a hash that the remote dedupes), or it carries a key that the receiver uses to drop duplicates, or the code reads the remote state before it retries. Each outbound call has a deadline. A timeout branch that runs the same compensation as a definite failure is a hit.
+**Test:** for each new retry: a cap, a growing delay with jitter, a `ctx` check, and a split between transient and permanent errors. For each retried call that changes state: either it is idempotent (a set, a delete, an add keyed by a hash that the remote dedupes), or it carries a key that the receiver uses to drop duplicates, or the code reads the remote state before it retries and the remote drops a duplicate that lands late. A read alone makes the window smaller but does not close it, because the first call can still land after the read. Each outbound call has a deadline. A timeout branch that runs the same compensation as a definite failure is a hit.
 
-**Fix:** put the policy in one retry helper with a cap, backoff, jitter, and error classes. Give a non-idempotent call a dedupe key, or read the remote state first. Treat a timeout as an unknown outcome, not as a failure.
+**Fix:** put the policy in one retry helper with a cap, backoff, jitter, and error classes. Give a non-idempotent call a dedupe key. Read the remote state first only when the remote also drops a late duplicate. Treat a timeout as an unknown outcome, not as a failure.
 
 **Against APOSD:** APOSD says to mask an error at a low level. A retry masks the error correctly only when the call is idempotent. For any other call, the caller must see three outcomes: ok, failed, and unknown. Flag a client that hides a timeout of a call that changes state.
 
@@ -64,7 +64,7 @@ One component signals another, and the receiver reads the subject from a differe
 
 **Test:** a signal and its data travel on different paths: an add followed by a read of a list, a message that carries an ID that the receiver then reads from a cache or a replica.
 
-**Fix:** carry the data or its key in the signal (use the hash or the ID that the add already knows), or make the receiver wait for a version at least as new as the write, with a deadline.
+**Fix:** carry the data in the signal, or carry its key (the hash or the ID that the add already knows) and read it from the store that took the write. When the receiver reads from a cache or a replica, make it wait for a version at least as new as the write, with a deadline.
 
 ## Sources
 

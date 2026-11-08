@@ -26,9 +26,9 @@ The code decodes a stored or remote record into a type, changes one field, and w
 
 A new field of a stored or decoded type reads as its zero value on old data, and the zero changes behavior: a new `Enabled bool` reads `false` on each old row, so each old filter turns off; a new `MaxRetries int` reads `0`. Or a `switch` on a value that another system defines has no case for a value that a newer version sends, and the new value falls into a branch by accident (DDIA ch. 5, "Schema evolution rules": a new branch of a union is backward compatible but not forward compatible).
 
-**Test:** for each new stored or decoded field, name the value that old records get and the behavior that it gives. It must give the old behavior, or a migration sets an explicit `DEFAULT`, or the field is nullable and the code handles null. Each `switch` on an external enum has a case for an unknown value that logs it.
+**Test:** for each new stored or decoded field, name the value that old records get and the behavior that it gives. It must give the old behavior, or a migration gives each old row the value (`ADD COLUMN ... NOT NULL DEFAULT`, or an `UPDATE`), or the field is nullable and the code handles null. A `SET DEFAULT` on an existing column changes only later inserts. Each `switch` on an external enum has a case for an unknown value that logs it.
 
-**Fix:** pick the field so that zero means the old behavior (`Disabled` in place of `Enabled`), or write the default in the migration. Handle an unknown external value on purpose, and log it.
+**Fix:** pick the field so that zero means the old behavior (`Disabled` in place of `Enabled`), or write the value of each old row in the migration. Handle an unknown external value on purpose, and log it.
 
 **Against APOSD:** "define errors out of existence" holds here only when the default is the correct behavior. Mask a missing value with a default only then. Otherwise the caller needs to know that the value is missing.
 
@@ -36,9 +36,9 @@ A new field of a stored or decoded type reads as its zero value on old data, and
 
 The diff renames, removes, or retypes a field that is stored or sent, or makes a request field required, as if every reader deploys with it. A cached web app sends the old shape, or a rolled-back image reads the new rows, and it breaks or reads zeros. The tests encode and decode with the new code, so they pass (DDIA ch. 5, "Modes of Dataflow"; DDD ch. 14, "Published Language": the format that other parties read is not the internal model).
 
-**Test:** a change to a name, a tag, a type, or an enum value of an encoded type, with no read path for the old shape, no single decoder that upgrades old shapes, or no test that decodes a payload of the previous release. A cast with no validation (`JSON.parse(raw) as Settings`) of stored data is a hit.
+**Test:** a change to a name, a tag, a type, or an enum value of an encoded type, with no read path for the old shape, no single decoder that upgrades old shapes, or no test that decodes a payload of the previous release. A write of only the new shape that a supported old reader still reads is a hit too. A cast with no validation (`JSON.parse(raw) as Settings`) of stored data is a hit.
 
-**Fix:** read every stored shape through one decode-and-upgrade function. Add a golden test: a payload captured from the previous release, committed as a fixture, that must still decode to the right values. Change a field in steps: add the new field and keep reading the old one, then remove the old read in a later release.
+**Fix:** read every stored shape through one decode-and-upgrade function. Add a golden test: a payload captured from the previous release, committed as a fixture, that must still decode to the right values. Change a field in steps: add the new field, write both, and keep reading the old one. Stop writing the old field when no supported reader needs it, and remove the old read when no stored data or supported backup holds the old shape.
 
 **Against APOSD:** a separate wire type with a one-to-one mapper starts as a pass-through. Use one type plus the golden test until the test breaks. Then split out a wire type for the format.
 

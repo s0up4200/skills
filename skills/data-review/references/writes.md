@@ -1,14 +1,14 @@
 # Writes to a shared store
 
-Check each write to a database, a key-value store, or a file that the app owns against these rules. A shared store has more than one **writer**: request handlers, a background loop, an automation, a CLI on the same database file, a second browser tab. The diff shows one writer. The bug comes from the writer that the diff does not show, so use the writer list from step 2 of `SKILL.md`.
+Check each write to a database, a key-value store, or a file that the app owns against these rules, and each write to a remote system that more than one path of the app makes. A shared store has more than one **writer**: request handlers, a background loop, an automation, a CLI on the same database file, a second browser tab. The diff shows one writer. The bug comes from the writer that the diff does not show, so use the writer list from step 2 of `SKILL.md`.
 
-Each rule gives what it is, a test at the diff, and the fix. A hit needs a **two-writer scenario**: the order of the steps of two writers, with concrete values, that ends in the wrong stored state.
+Each rule gives what it is, a test at the diff, and the fix. A hit needs a **scenario** with concrete values that ends in the wrong stored state: the order of the steps of two writers, or the steps of one writer and the failure or crash between two of them.
 
 ### Lost update
 
 App code reads a stored value, changes it, and writes it back (get, change, save). Two writers do this at the same time, and the second save silently erases the change of the first. Postgres at its default level (read committed) commits both, also inside a transaction. DDIA ch. 8, "Preventing Lost Updates", warns that ORMs make this unsafe cycle the easy path.
 
-**Test:** a value that app code reads, changes, and writes back, with none of these: an atomic `UPDATE ... SET x = x + ?`, an update of only the changed columns, `WHERE version = ?` plus a check of the rows affected, `SELECT ... FOR UPDATE`, or SQLite `BEGIN IMMEDIATE`. A settings or JSON blob that is loaded, changed in one field, and saved whole is the common case.
+**Test:** a value that app code reads, changes, and writes back, with none of these: an atomic `UPDATE ... SET x = x + ?`, an update of only the changed columns when no new value comes from the read, `WHERE version = ?` plus a check of the rows affected, `SELECT ... FOR UPDATE`, or SQLite `BEGIN IMMEDIATE`. A settings or JSON blob that is loaded, changed in one field, and saved whole is the common case.
 
 **Fix:** prefer the forms that make the conflict impossible: an atomic `SET`, or an update of only the changed columns (`Increment(id)` or `SetName(id, name)` in place of `Get` and `Save`). Use a version check only when the user must see the conflict, and then return it to the user. A whole-record write is acceptable only when the diff says that the loss is acceptable (last write wins, on purpose).
 
@@ -16,7 +16,7 @@ App code reads a stored value, changes it, and writes it back (get, change, save
 
 A read checks that a row is absent, or that a count is under a limit, and a later write depends on that answer. Two requests both pass the check, and both insert. A transaction around the two statements does not fix it under read committed or snapshot isolation, because the check finds no row to lock (DDIA ch. 8, "Phantoms causing write skew"). An in-process mutex fixes it only when one process owns the data. A CLI or a second instance on the same database file is a second process.
 
-**Test:** `if !exists { insert }`, `SELECT COUNT(*)` then `INSERT`, or "already claimed?" then claim, with no unique index, `ON CONFLICT`, conditional `UPDATE ... WHERE state = 'pending'` with a check of the rows affected, or serializable transaction that covers the pair.
+**Test:** `if !exists { insert }`, `SELECT COUNT(*)` then `INSERT`, or "already claimed?" then claim, with no unique index on the checked key, `ON CONFLICT` on it, conditional `UPDATE ... WHERE state = 'pending'` with a check of the rows affected, or serializable transaction that covers the pair. A unique index protects only the key that it covers: a count limit needs a conditional update of a counter row, a lock on the parent row, or a serializable transaction.
 
 **Fix:** one conditional write at the store: a unique index plus `INSERT ... ON CONFLICT DO NOTHING`, or a conditional `UPDATE` whose rows-affected count says who won. For "make sure it exists", the upsert removes the error. For "claim this" or a create that the user starts, the caller needs to know that someone else won, so return the conflict.
 
@@ -44,7 +44,7 @@ An external effect (an HTTP call, a notification, a push to another app) runs be
 
 **Test:** list the writes and the effects of the path in order. A hit is any of these: a network call between `Begin` and `Commit`; a done marker outside the transaction of the data that it guards, or with no unique constraint; a cursor saved before the effect, or after an effect that is not safe to repeat.
 
-**Fix:** write the data and its done marker in one transaction. Send each notification and remote effect after the commit. Store the cursor after the effect is durable, and make the effect safe to repeat, because a crash after the effect and before the cursor repeats it.
+**Fix:** write the data and its done marker in one transaction. Send each notification and remote effect after the commit. When the effect must happen also after a crash, write an outbox row in the same transaction, and send from it after the commit with retries and a dedupe key. Store the cursor after the effect is durable, and make the effect safe to repeat, because a crash after the effect and before the cursor repeats it.
 
 ### Stale writer
 

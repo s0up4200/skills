@@ -77,7 +77,7 @@ Issue both sub-agent calls together, in the foreground, and aggregate the report
 **Standards sub-agent prompt** should include:
 
 - The full diff command and the commit list with full messages. A lowered-bar hit clears on a reason in a commit message, and `--oneline` hides the commit body.
-- The list of standards-source files you found in step 3, **plus the smell baseline from `SMELLS.md`, the lowered-bar list from step 3, and each glossary from step 3** pasted in full (the sub-agent has no other access to them).
+- The list of standards-source files you found in step 3, **plus the smell baseline from `SMELLS.md`, the lowered-bar list from step 3, and each glossary from step 3** pasted in full (the sub-agent has no other access to them). With a `GLOSSARY-MAP.md`, paste it too, and name the glossary that covers each changed path, because one word can mean different things in two contexts.
 - The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); (b) each lowered-bar hit with no reason in the diff or a commit message: quote the hunk; and (c) any baseline smell you spot: name it and quote the hunk. Name each finding as a hard violation, a required fix, or a judgement call: documented-standard breaches can be hard, a lowered-bar hit is a required fix, and baseline smells are always judgement calls. A documented repo standard overrides the baseline and the list. Skip anything else that tooling enforces. Under 400 words."
 
 **Spec sub-agent prompt** should include:

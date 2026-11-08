@@ -32,7 +32,7 @@ Break the work into **tracer bullet** tickets.
 - A completed slice is demoable or verifiable on its own
 - Each slice is sized to fit in a single fresh context window
 - Any prefactoring should be done first
-- The first slice after the prefactoring exercises the core domain logic (the riskiest rule of the spec) end to end, even behind a crude UI. Settings, toggles, and plumbing come after it, so a wrong core shows before they merge. A wide refactor keeps its expand–contract order (below)
+- The first slice after the prefactoring exercises the core domain logic (the riskiest rule of the spec) end to end, even behind a crude UI. Settings, toggles that users can set, and plumbing come after it, so a wrong core shows before they merge. The switch that users cannot set (below) stays in the ticket whose logic it guards. A wide refactor keeps its expand–contract order (below)
 
 </vertical-slice-rules>
 

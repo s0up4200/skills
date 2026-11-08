@@ -18,7 +18,7 @@ A timestamp decides order, dedupe, or a "since" cursor across hosts: an item's r
 
 **Test:** a timestamp from another host, or from more than one writer, decides order or a cursor. A random ID is a sort key. An elapsed time computed from a value that went through `.UTC()`, `.In()`, `.Round()`, JSON, the database, or `Date.now()`.
 
-**Fix:** use the source's own cursor or a database sequence. When only time exists, read with an overlap window and dedupe by ID. Measure durations from a `time.Now()` value kept in memory, or from `performance.now()`.
+**Fix:** use the source's own cursor or a database sequence. When only time exists, read with an overlap window and dedupe by ID. Size the window from the latest arrival that the source allows, and state the lateness that it misses. Measure durations from a `time.Now()` value kept in memory, or from `performance.now()`.
 
 ### Copy without owner
 
@@ -26,7 +26,7 @@ The diff stores a value that already lives elsewhere (a cached setting, a count 
 
 **Test:** for each new copy, name its source, then find each path that writes the source (create, rename, delete, sync, import). Each one must update or invalidate the copy. Or the next read after a user's write must bypass the copy, or wait for a version at least as new as the write. A copy whose staleness the diff does not state is a hit.
 
-**Fix:** make each write path invalidate the copy, or store the source's ID in place of the copied value. State the staleness that a user can see, and record the time of the last good sync so that staleness shows.
+**Fix:** make each write path invalidate the copy, or store the source's ID in place of the copied value. A read that fetched the source before an invalidation must not store its result after it: keep a version for each key, and store a fill only when the version did not change since the read started. State the staleness that a user can see, and record the time of the last good sync so that staleness shows.
 
 **Against APOSD:** a caching decorator around a read method is shallow, and it cannot see the writes. The module that owns the writes owns the cache, so that each write path invalidates it in one place.
 
@@ -36,7 +36,7 @@ A sync or a merge has no rule for removals. An upsert-only sync, or a union merg
 
 **Test:** for each merge of collections, name what removes an item: the source's removal list (for example `torrents_removed`), a tombstone, or one side that is replaced in full. For each delete that comes from absence in a fetched list, check that the code tells "empty" apart from "failed or partial", and holds a delete that is far larger than the last run's.
 
-**Fix:** apply the source's removals, or replace the copy in full from a complete answer only. Before a mass delete, compare its size with the last run, and hold it when it is too large.
+**Fix:** apply the source's removals, or replace the copy in full from a complete answer only. Before a mass delete, compare its size with the last run, and hold it when it is too large. Show the held delete where the user sees it, and apply it when the user confirms it.
 
 **Against APOSD:** a setting for the threshold pushes the decision up to each user. Compute the limit automatically (for example a share of the last run's count), add no setting, and log each hold so that it is not a silent fallback.
 
@@ -62,7 +62,7 @@ A delete acts on a decision that is older than the delete. A scan lists the file
 
 **Test:** list the steps from the decision to the delete. A hit is any of these: no check of the item again at delete time; a candidate list kept across a slow step (a network call, a wait for the user, a long walk of the disk) with no check after it; a file compared only by path or name, with no compare of its identity (device and inode, `os.SameFile`, or a content hash) and no check of its link count.
 
-**Fix:** check each item again right before its delete, against the current state, and compare files by identity. Skip a file with more than one link, unless every link is in the delete set. When a preview showed the user the list, delete only items from that list: check each one again, skip and report each one that no longer qualifies, and add none.
+**Fix:** check each item again right before its delete, against the current state, and compare files by identity. For a row, make the check part of the delete (`DELETE ... WHERE <the condition>`, then check the rows affected). Skip a file with more than one link, unless every link is in the delete set. When a preview showed the user the list, delete only items from that list: check each one again, skip and report each one that no longer qualifies, and add none.
 
 ## Sources
 

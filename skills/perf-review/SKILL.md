@@ -10,7 +10,7 @@ Review code changes for performance problems and report them. Do not change code
 
 ## Step 1: Pick the scope
 
-Ask git what changed. For a branch, take the fixed point that the caller passes. With none, use the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (for example `origin/develop`). When `origin/HEAD` is not set, the command exits 128: use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds. With none of these, ask. A local `main` can be far behind, or missing. Pick the first case that matches the request:
+Ask git what changed. For a branch, take the fixed point that the caller passes. With none, use the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (for example `origin/develop`). When `origin/HEAD` is not set, the command exits 128: use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds. With none of these, ask. A local `main` can be far behind, or missing. If `origin` is a fork, use the remote of the parent repository in place of `origin`, as `code-review` does. Pick the first case that matches the request:
 
 | Request | Command |
 |---|---|
@@ -21,7 +21,7 @@ Ask git what changed. For a branch, take the fixed point that the caller passes.
 | a GitHub PR number or URL | `gh pr diff <number>` |
 | "this file", "this package" | Read the named files directly |
 
-`git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
+When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short`, and read each new file in full. For a GitHub PR, read the code at its head, not the current working tree: `git fetch origin pull/<number>/head`, then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
 
 ## Step 2: Read beyond the diff
 
@@ -76,6 +76,6 @@ Order findings by severity. If there are no findings, say so plainly — no low-
 
 Every high finding gets a way to confirm it — take the command from the Verification section of the language reference. Do not run benchmarks yourself unless asked; give the command.
 
-A speed claim, in the review or in a PR that you check, gives the N it ran at (the heaviest real user's size from step 2) and a distribution: p50 and p99 from one run, not only a mean. A mean hides the slow requests that users notice, and an average of percentiles means nothing (DDIA 2nd ed., ch. 2, "Computing Percentiles"). A claim with only a mean, or measured at a small N, is a finding of its own.
+A claim about how long a request or a job takes, in the review or in a PR that you check, gives the N it ran at (the heaviest real user's size from step 2) and a distribution: p50 and p99 from one run, not only a mean. A mean hides the slow requests that users notice, and an average of percentiles means nothing (DDIA 2nd ed., ch. 2, "Computing Percentiles"). A claim with only a mean, or measured at a small N, is a finding of its own.
 
 If you are not sure a finding is real, keep it, mark the severity honestly, and say what measurement decides it. A review that only reports certainties misses the expensive bugs; a review that states guesses as facts wastes the reader's day. Label which is which.

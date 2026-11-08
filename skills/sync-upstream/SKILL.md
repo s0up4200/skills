@@ -16,6 +16,8 @@ git -C ~/github/soup/skills fetch origin
 git -C ~/github/soup/skills worktree add -b chore/sync-upstream-<date> ../.worktrees/skills-sync-upstream-<date> origin/HEAD
 ```
 
+If `origin/HEAD` is not set, use `origin/main`.
+
 `UPSTREAM.md` is the source of truth for each source: the recorded upstream commit, the copied skills and their upstream paths, and the local changes. Read its section for the source before you start.
 
 ## 1. Read the release
