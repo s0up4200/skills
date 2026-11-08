@@ -132,7 +132,7 @@ General recommendations: keep "that" (GR-1), primary verb first and the tool aft
 | You wrote | Write instead |
 |---|---|
 | should (requirement) | must |
-| should (recommendation) | Delete it, or state it as fact: "X is better because Y." |
+| should (recommendation) | you can: "You can run X." Keep the reason when the source gives one: "X is better because Y." |
 | should (inverted conditional: "should a failure occur") | if: "If a failure occurs" |
 | may / might / could (possibility) | can |
 | may (permission) | can |
