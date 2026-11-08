@@ -50,21 +50,20 @@ A rule marked **Against APOSD** carries its agreement with _A Philosophy of Soft
 
 ## Step 4: Report
 
-Use this structure:
+Use the repo-wide report layout: the first line names the repo and the scope, the status comes next, then one short list for each section, and the last line says what the user can reply. Put one fact in each list item:
 
 ```markdown
 **<repo> · <scope>** · <n> findings, worst: <rule name> (<severity>)
+**Status:** one of: high findings, findings with no high one, or no findings.
 
-## Findings
+**Findings**
+1. **<severity>** · <rule name>: <short title> · `path/file.go:123`
+   - Scenario: <the steps, with concrete values, that end in the wrong state: two writers in order, the call that times out after the remote applied it, the old row and the value that it reads as>
+   - Fix: <the change, in a few lines or a minimal snippet, not applied>
+   - Proof: <the test that goes red on the bug, see step 5>
 
-### 1. <rule name>: <short title> — `path/file.go:123`
-**Severity:** high | medium | low
-**Scenario:** <the steps, with concrete values, that end in the wrong state: two writers in order, the call that times out after the remote applied it, the old row and the value that it reads as>
-**Fix:** <the change, in a few lines or a minimal snippet, not applied>
-**Proof:** <the test that goes red on the bug, see step 5>
-
-## Not flagged
-<one line for each risk that you saw and left alone, with the reason: "lost update on settings: one writer, the settings handler, and the loop only reads">
+**Not flagged**
+- <one risk that you saw and left alone, with the reason: "lost update on settings: one writer, the settings handler, and the loop only reads">
 
 **Reply with** the numbers to fix, or **all**.
 ```
