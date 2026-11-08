@@ -29,11 +29,12 @@ When the scope includes uncommitted work, `git diff` leaves out untracked files.
 
 A diff shows one writer, one call, and new data. The bugs come from what it does not show. For each table, key, file, or remote object that the diff writes, reads back, or deletes, list:
 
-- **Writers**: each code path that writes it. Grep for each write to the same table, key, or path: request handlers, background loops, automations, scans, imports, restores, the CLI.
+- **Writers**: each code path that writes it. Grep for each write to the same table, key, or path: request handlers, background loops, automations, scans, imports, restores, the CLI. For a remote object, grep for each call that makes the same change, such as each call that creates the same record.
+- **Checks**: for each writer, each check that it calls before the write: a block list, a limit, a filter, a dedupe, a permission. Read the code of each writer, not only the files in the scope, because a check that the scoped writer skips lives in the other writers.
 - **Remote calls**: each call to another system on the path, and what the code does with its status, its body, and a timeout.
 - **Old data and old readers**: rows, files, and backups from earlier releases, a web app bundle that a service worker still serves, and the previous release after a rollback.
 
-The step is done when each thing that the diff writes or deletes has its writer list.
+Write the map as a table, with one row for each writer and one column for each check that any writer calls. The step is done when each thing that the diff writes or deletes has its table, and each cell says yes or no with a file and line. Each no in a column that has a yes is a hit candidate for "Rule on one write path" in `references/writes.md`.
 
 ## Step 3: Apply the rules
 
