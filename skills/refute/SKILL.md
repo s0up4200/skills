@@ -47,6 +47,13 @@ Look for:
   path, command, or name that does not exist.
 - A concrete input or state that breaks the result, such as a failure halfway.
 - A choice that the plan leaves for the implementer to guess.
+- Two rules that act on one object with no stated precedence. Give a
+  scenario where both apply.
+- Two writers of one record, for example a request handler and a sync loop,
+  with no rule for what happens when they write at the same time.
+- An old reader of a changed stored or wire format, for example a cached web
+  app bundle, or the previous image after a rollback on the same database.
+- A rule that can trigger itself: its own write is an event that it reacts to.
 
 For each finding, give:
 - Severity: blocking (built as written, the plan fails a requirement or breaks

@@ -57,11 +57,11 @@ Apply only the answers from step 3. Then update `UPSTREAM.md`: the full commit S
 
 The step is done when every remaining line of `diff -ru` is a recorded local change or a recorded skip.
 
-## 5. Commit and install
+## 5. Commit and open a pull request
 
-Run the commit gate in `CODING_STANDARDS.md` of the global agent rules. This repo commits straight to `main`. The installed skills are links to this repo, so the commit installs the change.
+Run the commit gate in `CODING_STANDARDS.md` of the global agent rules. Commit on a branch, for example `git switch -c chore/sync-upstream-<date> origin/HEAD`, push it, and open a pull request with the `pr` skill. No commit goes to `main`. The installed skills are links to the live checkout on `main`, so the change installs when the user merges the pull request and the checkout pulls `main` (`git -C ~/github/soup/skills pull --ff-only`).
 
-The HTTPS push can wait on a credential prompt that has no terminal. If `git push` does not finish in 30 seconds, stop it and ask the user to run `! git -C ~/github/soup/skills push`.
+The HTTPS push can wait on a credential prompt that has no terminal. If `git push` does not finish in 30 seconds, stop it and ask the user to run `! git -C ~/github/soup/skills push -u origin <branch>`.
 
 ## 6. Find the affected repos
 
