@@ -61,12 +61,14 @@ Keep the discussion out of both sub-agent prompts: it holds the author's reasons
 
 Search the repo for every file that documents how code should be written. When `CODING_STANDARDS.md` or `CONTRIBUTING.md` exists, it must be on the list.
 
-On top of whatever the repo documents, the Standards axis always carries the **smell baseline** in [SMELLS.md](SMELLS.md): a fixed set of code smells, most from Fowler (_Refactoring_, ch.3) and some from Ousterhout (_A Philosophy of Software Design_), that applies even when a repo documents nothing. Read the file in full now: the Standards sub-agent gets it pasted. Two rules bind it:
+On top of whatever the repo documents, the Standards axis always carries the **smell baseline** in [SMELLS.md](SMELLS.md): a fixed set of code smells, most from Fowler (_Refactoring_, ch.3) some from Ousterhout (_A Philosophy of Software Design_), and some from Evans (_Domain-Driven Design_), that applies even when a repo documents nothing. Read the file in full now: the Standards sub-agent gets it pasted. Two rules bind it:
 
 - **The repo overrides.** A documented repo standard always wins; where it endorses something the baseline would flag, suppress the smell.
 - **Always a judgement call.** Each smell is a labelled heuristic ("possible Feature Envy"), never a hard violation. Like any standard here, skip anything tooling already enforces.
 
 The Standards axis also carries the **lowered-bar list**. A hit is one of: a threshold moved to the easier side, a test made easier, a new `nolint` or `t.Skip`, a stub or an empty catch, or a new entry in a rule's exception or allow list. A tighter limit or a new error type is not a hit. A hit is a required fix, unless the diff or a commit message gives a reason. A documented repo standard overrides the list.
+
+When the repo has a `GLOSSARY.md`, or a `GLOSSARY-MAP.md` that names several, read each glossary in full: the Standards sub-agent gets them pasted, for the Off-Glossary Name smell. Without a glossary, that smell does not apply.
 
 ### 4. Spawn both sub-agents in parallel
 
@@ -75,7 +77,7 @@ Issue both sub-agent calls together, in the foreground, and aggregate the report
 **Standards sub-agent prompt** should include:
 
 - The full diff command and the commit list with full messages. A lowered-bar hit clears on a reason in a commit message, and `--oneline` hides the commit body.
-- The list of standards-source files you found in step 3, **plus the smell baseline from `SMELLS.md` and the lowered-bar list from step 3** pasted in full (the sub-agent has no other access to them).
+- The list of standards-source files you found in step 3, **plus the smell baseline from `SMELLS.md`, the lowered-bar list from step 3, and each glossary from step 3** pasted in full (the sub-agent has no other access to them).
 - The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); (b) each lowered-bar hit with no reason in the diff or a commit message: quote the hunk; and (c) any baseline smell you spot: name it and quote the hunk. Name each finding as a hard violation, a required fix, or a judgement call: documented-standard breaches can be hard, a lowered-bar hit is a required fix, and baseline smells are always judgement calls. A documented repo standard overrides the baseline and the list. Skip anything else that tooling enforces. Under 400 words."
 
 **Spec sub-agent prompt** should include:
