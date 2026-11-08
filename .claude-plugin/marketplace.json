@@ -74,7 +74,7 @@
       "description": "Skills that rewrite replies for the reader or read them aloud",
       "source": "./skills",
       "skills": [
-        "./skills/tldr",
+        "./skills/terse",
         "./skills/speak",
         "./skills/cursor/unslop",
         "./skills/aminblg/simple-english"
