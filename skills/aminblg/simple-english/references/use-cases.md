@@ -24,9 +24,9 @@ Mode: procedural. An on-call runbook is a maintenance manual, which is the text 
 Mode: descriptive, simple past only. A timeline in present perfect ("we have identified") hides when things happened.
 
 > Before: We have identified an issue that may have impacted some users' ability to access the service.
-> After: Between 14:02 and 14:31 UTC, 12% of requests failed. A deploy at 14:00 removed the cache warmup step.
+> After: We found a problem that can stop users from reaching the service. We do not know yet if it stopped any users.
 
-STE bans hedges such as "may have impacted". The report states what is known and says "unknown" for the rest.
+STE bans hedges such as "may have impacted". The report states what is known and says "unknown" for the rest. When the source gives the times and the counts, state them in simple past: "Between 14:02 and 14:31 UTC, 12% of requests failed." Add no time, count, or cause that the source does not give.
 
 ## Commit messages and PR descriptions
 

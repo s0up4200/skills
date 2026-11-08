@@ -198,7 +198,7 @@ Upstream also has hooks, an output style, a system prompt, and evals. They are n
 
 ### Local changes
 
-- `simple-english` keeps the meaning of the source: an optional "should" becomes "you can", a guess keeps its certainty, and terms that the project defines stay as they are. The self-check compares each claim, condition, limit, option, and level of certainty of a rewrite with the source. Upstream deletes an optional "should" and maps every modal to can, will, or must, so a guess in an issue or a spec read as a fact, and an option got lost.
+- `simple-english` keeps the meaning of the source: an optional "should" becomes "you can", a guess keeps its certainty, and terms that the project defines stay as they are. The self-check compares each claim, condition, limit, option, and level of certainty of a rewrite with the source. The modal ladder in `references/rule-catalog.md` and the incident-report example in `references/use-cases.md` follow the same rules. Upstream deletes an optional "should" and maps every modal to can, will, or must, so a guess in an issue or a spec read as a fact, and an option got lost.
 
 ### Compare with upstream
 
