@@ -87,7 +87,7 @@ The commit message names what changed, not who suggested it. For a thread, the c
 
 ## 4. Refute the wrong findings, answer the reviews
 
-A refutation gets a reply, so that the disagreement is on record. Write it in plain first person, as the maintainer's own finding, with the evidence at file and line or the command output. Word it with the `simple-english` skill, in one or two sentences that give the verdict and the main reason. A voice skill for the user's chat replies is for Discord and issue chat, and stays out of review threads.
+A refutation gets a reply, so that the disagreement is on record. Write it in plain first person, as the maintainer's own finding, with the evidence at file and line or the command output. Word it in one or two sentences that give the verdict and the main reason. A voice skill for the user's chat replies is for Discord and issue chat, and stays out of review threads.
 
 Each statement in a reply or a review answer about what code does is a claim, and each claim needs its own evidence from this run: a file and line from `grep -n`, or command output. Evidence for the verdict does not cover the sentences around it. A statement about code that you take from the PR body, an issue, or an earlier comment is a claim to check at the code, the same as a finding. Before a reply goes in the report, list each claim in it next to its evidence, and cut each claim that has none. Cite code from another project at a release tag or a commit, because a branch moves.
 

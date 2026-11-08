@@ -38,19 +38,6 @@ gh issue view <parent> --json subIssues --jq '.subIssues.nodes[]|"#\(.number) \(
 
 If the PR closes every sub-issue that is still open, add `Closes #<parent>` too, so the parent closes when the PR merges. Skip a parent with the `wayfinder:map` label, because wayfinder decides when a map is done. On Forgejo, read the parent's `## Sub-issues` task list.
 
-## Prose
-
-Before you show or post the body, write all of its prose with the `simple-english` skill, then apply the `unslop` skill to it. Apply both to prose only: the template headings, checklists, code blocks, and diagrams stay as they are.
-
-If the Skill tool cannot start a skill, find its `SKILL.md` in the installed skills folder, read it, and apply it. The upstream `unslop` sets `disable-model-invocation`, so this is the path for it.
-
-If a skill is not installed, ask the user if they want to install it:
-
-- `simple-english`: `npx skills add aminblg/simpleenglish --skill simple-english` ([skills.sh](https://www.skills.sh/aminblg/simpleenglish/simple-english))
-- `unslop`: `npx skills add cursor/plugins --skill unslop` ([skills.sh](https://www.skills.sh/cursor/plugins/unslop))
-
-If the user says no, write the body without that skill and tell the user which pass you skipped.
-
 ## Sections
 
 Skip all preambles and keep prose brief. Use the user's domain language from `GLOSSARY.md`.
