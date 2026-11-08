@@ -52,7 +52,7 @@ Each candidate is one `<article>`:
 - **Badge row**: recommendation strength (`Strong` = emerald, `Worth exploring` = amber, `Speculative` = slate), plus a tag for the dependency category (`in-process`, `local-substitutable`, `ports & adapters`, `mock`).
 - **Files**: monospaced list, `font-mono text-sm`.
 - **Before / After diagram**: the centrepiece. Two columns, side by side. See patterns below.
-- **Problem**: one sentence. What hurts.
+- **Problem**: one sentence that starts with the red flag and its symptom, then what hurts. When no flag fits, start with the symptom. e.g. "Back-door leakage (unknown unknowns): the exporter and the importer both parse the CSV header, and no import shows it."
 - **Solution**: one sentence. What changes.
 - **Wins**: bullets, ≤6 words each. e.g. "Tests hit one interface", "Pricing logic stops leaking", "Delete 4 shallow modules".
 - **ADR callout** (if applicable): one line in an amber-tinted box.

@@ -27,16 +27,16 @@ This command is _informed_ by the project's domain model and built on a shared d
   ```
 
   If `git rev-list --count --since=6.months HEAD` is below about 50, drop `--since` and read all of the history. If the changes are scattered with no clear hot spot, widen the net.
-- Then list the file pairs that change in the same commits: run `scripts/change-coupling.sh 6.months` from this skill's folder, in the repo root (no argument reads all of the history). A pair above about 30 % that is not a file and its own test is a sign that one concept is split across a seam, which a code reading misses when no import joins the files.
+- Then list the file pairs that change in the same commits: run `scripts/change-coupling.sh 6.months` from this skill's folder, in the repo root (no argument reads all of the history). A pair above about 30 % that is not a file and its own test is a sign that one concept is split across a seam, which a code reading misses when no import joins the files. Label such a pair with no import between the files **back-door leakage**.
 
 Read the project's domain glossary (`GLOSSARY.md`) and any ADRs in the area you're touching first.
 
-Then spawn a sub-agent with a fresh context window to walk the codebase. A sub-agent sees none of what you loaded, so give it the paths in scope, the hot spots and coupled pairs, the codebase-design glossary and the deletion test, the `GLOSSARY.md` terms, and the decisions of the ADRs in the area. Don't follow rigid heuristics; explore organically and note where you experience friction:
+Then spawn a sub-agent with a fresh context window to walk the codebase. A sub-agent sees none of what you loaded, so give it the paths in scope, the hot spots and coupled pairs, the codebase-design glossary and the deletion test, the `GLOSSARY.md` terms, and the decisions of the ADRs in the area. Also give it `../codebase-design/RED-FLAGS.md` as an absolute path, because the sub-agent does not know this skill's folder, and tell it to read the red flags as friction prompts, not as a checklist, and to name the red flag and its symptom for each friction it reports. Don't follow rigid heuristics; explore organically and note where you experience friction:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow**, with an interface nearly as complex as the implementation?
 - Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
-- Where do tightly-coupled modules leak across their seams?
+- Where is one design decision, such as a format or an ordering, known to several modules (information leakage)?
 - Which parts of the codebase are untested, or hard to test through their current interface?
 
 Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
@@ -62,7 +62,7 @@ The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via C
 For each candidate, render a card with:
 
 - **Files**: which files/modules are involved
-- **Problem**: why the current architecture is causing friction
+- **Problem**: why the current architecture is causing friction. Name the red flag (Shallow Module counts) and its symptom: change amplification, cognitive load, or unknown unknowns. When no flag fits, describe the friction in your own words, and still name the symptom.
 - **Solution**: plain English description of what would change
 - **Benefits**: explained in terms of locality and leverage, and how tests would improve
 - **Before / After diagram**: side-by-side, custom-drawn, illustrating the shallowness and the deepening
