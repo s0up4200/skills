@@ -28,7 +28,7 @@
     },
     {
       "name": "review-skills",
-      "description": "Performance, security, design, and navigation review skills",
+      "description": "Performance, data, security, design, and navigation review skills",
       "source": "./skills",
       "skills": [
         "./skills/findability",
@@ -36,6 +36,7 @@
         "./skills/trim-agents-md",
         "./skills/sync-upstream",
         "./skills/perf-review",
+        "./skills/data-review",
         "./skills/security-audit",
         "./skills/go-proverbs",
         "./skills/refute",

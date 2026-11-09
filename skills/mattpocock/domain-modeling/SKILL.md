@@ -57,6 +57,12 @@ When the user uses vague or overloaded terms, propose a precise canonical term. 
 
 When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
 
+When two rules act on one object, write a scenario where both apply, for example "always grab freeleech" and "never exceed the ratio limit" on one freeleech torrent that would exceed the limit. Ask which rule wins, and record the answer in the plan. A rule set with no stated precedence leaves the implementer to pick the winner (Evans, ch. 1: rules are reconciled or placed out of scope).
+
+### Name the missing concept
+
+When the user names a concept that the code has no type or function for, record it as a glossary entry in the plan's Domain Docs. Vocabulary that the users speak and the design lacks is a sign of a missing concept (Evans, ch. 9, "Listen to Language"), and without a name the code assembles it again in each place that needs it.
+
 ### Cross-reference with code
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"

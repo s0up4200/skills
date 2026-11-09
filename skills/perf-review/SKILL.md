@@ -1,7 +1,7 @@
 ---
 name: perf-review
 effort: high
-description: Review Go and TypeScript code for performance problems. Use before you answer when the user asks "is this slow" or "will this scale" about code, says "perf review", "check performance", "find bad allocs", or "review allocations", or asks for a performance pass on a diff, branch, or PR. Covers allocations, GC pressure, O(n²) algorithms, N+1 queries, slow SQL statements, unbounded concurrency, blocked event loops, and re-render storms. Do not use for general correctness review or style review — this skill only hunts performance.
+description: Review Go and TypeScript code for performance problems. Use before you answer when the user asks "is this slow" or "will this scale" about code, says "perf review", "check performance", "find bad allocs", or "review allocations", or asks for a performance pass on a diff, branch, or PR. Covers allocations, GC pressure, O(n²) algorithms, N+1 queries, slow SQL statements, unbounded concurrency, blocked event loops, and re-render storms. Do not use for general correctness review or style review — this skill only hunts performance. The correctness of writes, retries, and syncs is data-review.
 ---
 
 # Performance Review
@@ -10,17 +10,18 @@ Review code changes for performance problems and report them. Do not change code
 
 ## Step 1: Pick the scope
 
-Ask git what changed. Pick the first case that matches the request:
+Ask git what changed. For a branch, take the fixed point that the caller passes. With none, use the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (for example `origin/develop`). When `origin/HEAD` is not set, the command exits 128: read the default branch from the remote with `git ls-remote --symref origin HEAD`, and only when that fails, use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds. With none of these, ask. A local `main` can be far behind, or missing. If `origin` is a fork, use the remote of the parent repository in place of `origin`, as `code-review` does. Fetch the default branch before the diff, also as `code-review` does, because a remote-tracking branch can be old. Pick the first case that matches the request:
 
 | Request | Command |
 |---|---|
 | "my changes", "uncommitted" | `git diff HEAD` (staged + unstaged) |
 | "last commit", a commit hash | `git diff <hash>^ <hash>` |
-| a branch or PR | `git diff $(git merge-base main HEAD)...HEAD` |
-| a GitHub PR number or URL | `gh pr diff <number>` |
+| a branch, committed work | `git diff <fixed-point>...HEAD` |
+| a branch with uncommitted changes too | `git diff $(git merge-base <fixed-point> HEAD)` |
+| a GitHub PR number or URL | `gh pr diff -R "$(git remote get-url <remote>)" <number>`, where `<remote>` is the remote of the repository that holds the PR (the parent in a fork) |
 | "this file", "this package" | Read the named files directly |
 
-If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
+When the scope includes uncommitted work, `git diff` leaves out untracked files. List them with `git status --short --untracked-files=all`, and read each new file in full. For a GitHub PR, read the code at its head, not the current working tree: `git fetch <remote> pull/<number>/head` from the same `<remote>`, then `git worktree add --detach <scratch dir> FETCH_HEAD`, and run the later steps there. Remove the worktree after the report. If the request is ambiguous and there are uncommitted changes, review those. Say what scope you chose.
 
 ## Step 2: Read beyond the diff
 
@@ -28,7 +29,7 @@ A diff hides the context that decides whether code is slow. Before you judge a h
 
 - **A loop around the call site changes everything.** One allocation is free. The same allocation inside a loop over a million rows is a GC storm. Grep for callers of each changed function to learn how hot it is.
 - **Hot path or cold path?** Request handlers, render functions, loops over datasets, and anything called per row or per frame are hot. Init code, CLI argument parsing, and error paths that fire once are cold. Only flag cold-path code when the problem is algorithmic (a real O(n²) grows into the hot path on its own).
-- **Data size matters.** `array.includes` in a loop over 20 items is fine. Over 20,000 it is a quadratic bug. When the size is not visible in the code, say what size makes the finding real.
+- **Data size matters.** `array.includes` in a loop over 20 items is fine. Over 20,000 it is a quadratic bug. When the size is not visible in the code, say what size makes the finding real. Size for the heaviest real user, not the typical one: a user with 50,000 torrents still waits seconds after a change that makes 20 torrents fast (DDIA 2nd ed., ch. 2, "Understanding Load": a few extreme cases can dominate the bottleneck).
 
 ## Step 3: Apply the language checklist
 
@@ -74,5 +75,7 @@ Order findings by severity. If there are no findings, say so plainly — no low-
 ## Step 5: Point at verification, not guesses
 
 Every high finding gets a way to confirm it — take the command from the Verification section of the language reference. Do not run benchmarks yourself unless asked; give the command.
+
+A claim about how long a request or a job takes, in the review or in a PR that you check, gives the N it ran at (the heaviest real user's size from step 2) and a distribution: p50 and p99 from one run, not only a mean. A mean hides the slow requests that users notice, and an average of percentiles means nothing (DDIA 2nd ed., ch. 2, "Computing Percentiles"). A claim with only a mean, or measured at a small N, is a finding of its own.
 
 If you are not sure a finding is real, keep it, mark the severity honestly, and say what measurement decides it. A review that only reports certainties misses the expensive bugs; a review that states guesses as facts wastes the reader's day. Label which is which.

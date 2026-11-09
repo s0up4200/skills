@@ -36,7 +36,14 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 6. If this changes the **frontier** of available tickets, kick off more **implementer subagents** to work on the new tickets. This allows for maximum concurrency.
 
-7. Once all tickets are complete, call the Skill tool with `code-review` on the integration branch. Fix all issues raised by the code review in a single fresh **implementer subagent**.
+7. Once all tickets are complete, compute one fixed point for the reviews: `git merge-base <default branch> <integration branch>`. The default branch is the output of `git symbolic-ref --short refs/remotes/origin/HEAD`. When `origin/HEAD` is not set, the command exits 128: read the default branch from the remote with `git ls-remote --symref origin HEAD`, and only when that fails, use the first of `origin/main`, `origin/master`, and `origin/develop` that `git rev-parse --verify --quiet <ref>` finds, and ask the user when none exists. If `origin` is a fork, use the remote of the parent repository in place of `origin`, as `code-review` does. Fetch the default branch first with `git fetch <remote> +refs/heads/<branch>:refs/remotes/<remote>/<branch>`. Pass that fixed point to each review:
+   - Call the Skill tool with `code-review` on the integration branch.
+   - If the diff adds or changes an SQL statement, or adds a loop over rows from a database or over a list that a request or a caller supplies, run `perf-review`.
+   - If the diff touches SQL or another store, a call to another system (an HTTP client, an API client, a fetch or a mutation in the web app), a background loop or goroutine, a cache, a stored or wire format, or a delete of files or rows, run `data-review`.
+
+   Run `perf-review` and `data-review` each in its own subagent with a fresh context window, which calls the Skill tool with the skill name and returns the report. Give it only the skill name and the fixed point, not the reasons for the code, because a reviewer that knows why each line is there agrees with it.
+
+   Fix all issues raised by the reviews in a single fresh **implementer subagent**.
 
 8. If the spec names a live proof, the repo instructions ask for a live run, or the spec changes something that a user sees in the UI, call the Skill tool with `field-test` on the integration branch, on a local rig. Run it yourself, once for the whole spec. Parallel rigs in the **implementer subagents** would compete for ports and browser tabs, and only you can ask the user for a confirmation. Fix each failure in a single fresh **implementer subagent**, then run the failed observable again.
 

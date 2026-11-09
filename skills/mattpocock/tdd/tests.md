@@ -75,3 +75,7 @@ test("calculateTotal sums line items", () => {
   expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
 });
 ```
+
+## Selectors and solvers: write the checker first
+
+For a search, selection, or packing algorithm (pick torrents to free 50 GB without a protected tag, choose a piece size), exact outputs on a few fixtures cover only those fixtures. First write a checker for the constraints of the output: the selection frees at least 50 GB, and holds no protected item. Run every test output through the checker, also on generated inputs, and ship a naive implementation first. Evans starts a packing problem the same way, because the checker makes the rules explicit and tests the final version (_Domain-Driven Design_, ch. 9, "Chemical Warehouse Packer"). The checker states constraints, not the algorithm, so it is not tautological.

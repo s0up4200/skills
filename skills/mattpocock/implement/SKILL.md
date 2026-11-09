@@ -35,7 +35,11 @@ If the spec names a live proof, the repo instructions ask for a live run, or the
 
 Once done, call the Skill tool with "code-review" to review the work.
 
-If the diff adds or changes an SQL statement, or adds a loop over rows from a database or over a list that a request or a caller supplies, also call the Skill tool with "perf-review" on the diff. Act on its findings as you act on the code-review findings.
+If the diff adds or changes an SQL statement, or adds a loop over rows from a database or over a list that a request or a caller supplies, also run "perf-review" on the diff.
+
+If the diff touches SQL or another store, a call to another system (an HTTP client, an API client, a fetch or a mutation in the web app), a background loop or goroutine, a cache, a stored or wire format, or a delete of files or rows, also run "data-review" on the diff.
+
+Run each of these reviews in its own subagent with a fresh context window. The subagent calls the Skill tool with the skill name and returns the report. Give it only the skill name and the scope of the diff, not your reasons for the code, because a reviewer that knows why each line is there agrees with it. Act on its findings as you act on the code-review findings.
 
 Then read the pull request template of the repo and each rule in your instructions that applies before a pull request opens, for example performance checks or a docs review. Do each check now, on the final code, so that the pull request needs no more work. Run each measurement in a subagent with a fresh context window, one at a time. Save its full report word for word to a file outside the repo, for example in the session scratchpad, and keep the path. The pull request body gets a short form of it, which the `pr` skill describes. Give each measured cost in absolute time with its unit, per request or per tick, next to the percent, because a large percent of a short path can be a cost that no user notices. If a measurement shows a regression beyond the noise, judge the absolute cost on the real path first. If a user can notice it, try one fix and measure again. If the regression stays, or if a fix costs more than the regression, commit, open no pull request, and ask the user in your final reply whether to accept the cost.
 
