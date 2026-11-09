@@ -45,7 +45,7 @@ Apply the **deletion test** to anything you suspect is shallow: would deleting i
 
 Before you write a card, check at the code each fact that its badge rests on: count the callers with a search, look for the tests of the module, and make sure that each listed file exists. Lower the badge or drop the card when a fact is wrong. Read `../codebase-design/DEEPENING.md` to pick the dependency category of each card.
 
-Write a single HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>/index.html` so each run gets a fresh folder.
+Write a single HTML file outside the repo: in the session scratchpad when the harness names one, or else in the OS temp directory. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows). Write to `<tmpdir>/architecture-review-<timestamp>/index.html` so each run gets a fresh folder.
 
 Serve the report on the tailnet, so the user can read it from any of their devices:
 
@@ -82,7 +82,7 @@ Do NOT propose interfaces yet. After the report is served, ask the user which ca
 
 File each picked candidate as one issue in the project issue tracker (`docs/agents/issue-tracker.md`). The body carries its card: files, problem, solution, the before/after structure in words, and the recommendation strength. Apply the `needs-grilling` triage label (`docs/agents/triage-labels.md` maps the role to its label string), and the repo's refactor label when `gh label list` shows one. If the repo has no `needs-grilling` label yet, ask the user, then create it and add its row to `docs/agents/triage-labels.md`. Each issue is grilled later in a fresh session, with the tracker carrying the state.
 
-**User rejects a candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones. On a yes, write the ADR to `docs/adr/` at once, with the `domain-modeling` format. A rejection is in force when the user makes it, because no code waits for it, so it does not wait for an implementation branch.
+**User rejects a candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones. On a yes, write the ADR to `docs/adr/` at once, with the `domain-modeling` format. A rejection is in force when the user makes it, because no code waits for it, so it does not wait for an implementation branch. When this session also writes a spec, put the ADR in the spec's Domain Docs instead, and the first ticket commits it. Otherwise, in a repo whose default branch takes no direct commit, "at once" means a docs branch and a pull request with only the ADR.
 
 ### 4. Grilling loop (when the user grills one now)
 

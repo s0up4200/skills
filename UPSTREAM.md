@@ -90,6 +90,8 @@ Each skill is in `skills/mattpocock/<name>` here. The upstream path is:
 - `tdd`: `mocking.md` feeds a mock from recorded responses with fake secrets and customer values and runs one contract suite against each implementation of an interface. `tests.md` writes an output checker first for a selector or a solver. They come from Evans, _Domain-Driven Design_, ch. 9, 10, and 14.
 - `to-tickets`: the first slice after the prefactoring exercises the core domain logic end to end, so that a wrong core shows before the settings and the plumbing merge. The switch that users cannot set stays in the ticket whose logic it guards. A wide refactor keeps its expand–contract order. It comes from Evans, _Domain-Driven Design_, ch. 15, "Project Risk Management".
 - `handoff` records each verification command with its result, the state of the working tree, and each approval still pending. A later session counts an approval only when the handoff or the tracker records it.
+- `to-tickets` removes the triage-role label from the parent issue when it publishes the tickets as children. On 2026-11-09, autobrr/qui#3941 (the spec from `to-spec`) and its first ticket both had `ready-for-agent`, so an implementer could build the work twice.
+- `improve-codebase-architecture` writes the report to the session scratchpad when the harness names one. A rejection ADR goes in the spec's Domain Docs when the same session writes a spec. Otherwise, in a repo whose default branch takes no direct commit, it gets its own docs pull request. On 2026-11-09, the qui session had to choose between these two places for the ADR, and the user picked the spec.
 
 ### Skipped upstream changes
 

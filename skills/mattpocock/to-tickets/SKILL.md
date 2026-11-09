@@ -84,7 +84,7 @@ Publish the approved tickets. **How** depends on the tracker `/setup-matt-pocock
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
-Keep the parent issue open. Change its description only when the tracker document's **Child ticket** operation requires a membership update. Read the current description first and preserve its other content.
+Keep the parent issue open. With children, the parent is a map, as in `to-spec`: remove its triage-role label, so that an implementer who picks the next `ready-for-agent` issue builds each ticket once and never the whole parent. Change its description only when the tracker document's **Child ticket** operation requires a membership update. Read the current description first and preserve its other content.
 
 <local-ticket-template>
 
