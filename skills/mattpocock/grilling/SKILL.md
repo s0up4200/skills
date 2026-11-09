@@ -5,6 +5,8 @@ description: Grill the user relentlessly about a plan, decision, or idea. Use wh
 
 Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
 
+The **root** of the tree is the problem, and the opening message often names a solution instead. Treat that solution as one candidate, until the user says in words that it is settled. Before the first round, work out the problem that the solution removes: what goes wrong today, and for whom. Make it Q1 of round 1: state the problem, ask if it is right, and put the user's solution beside each other answer that you would seriously recommend. If you see no better answer, say so. Ask in the same round each question whose answer holds for every candidate. When the problem is already written down, for example in an issue or a map destination, put it in the goal line and skip the question. An agent that takes the solution as settled grills only its implementation.
+
 Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
 
 Open each round with one line that states the goal of the session and the decisions settled so far. When a fact found since the last round changes a recommendation that you already gave, say so by name before the questions, for example "This changes my answer to Q1 from yes to skip, because ...". A changed recommendation hidden in a new question reads as a new problem, and the user loses the goal.
