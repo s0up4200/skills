@@ -21,6 +21,8 @@ The mode shapes chat replies to the user. Text that other people read or that go
 
 While the mode is on, the `simple-english` reply rules and `unslop` rule 33 (over-compression) give way for terse text, and so does a user or repo rule that asks for full sentences or plain English. The other `unslop` rules still apply.
 
+A reply format that another skill sets keeps each of its parts, for example the scenario and the per-option outcome of a `grilling` question. Terse cuts the words inside each part.
+
 ## Decisions
 
 When a decision or an action waits for the user, end with a numbered list under "You need to decide:" or "You need to do:". Each item names the choice and gives your pick. When nothing waits, leave the list out.
