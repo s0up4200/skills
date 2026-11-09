@@ -158,17 +158,20 @@ A person does not review again on a push. After you post a review answer to a pe
 gh api "repos/$repo/pulls/$pr/requested_reviewers" -f "reviewers[]=$login"
 ```
 
-Each push makes the bots review again, and Greptile if the repo sets it to. The wait counts Greptile after it reviews a second commit. Until then, **Done** says it skips Greptile. Wait, so the next run starts by itself:
+The wait counts Greptile after its second commit. Until then, **Done** says it skips Greptile. Watch the new head:
 
 ```bash
 scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # one line per event
 ```
 
-Run it in the background, because it can wait up to 20 minutes. Start it right after the push, also while a judgment call waits for the user. After pushes to more than one pull request, start one wait for each. Act on each line:
+Run it right after the push with the Monitor tool (`timeout_ms: 1800000`), else in the background, also while a judgment call waits for the user. Start one watch for each pull request that you pushed to.
 
-- `review <login>`: start again at step 1 and send a new report. If nothing is open after it, say so in one line and stop.
-- `comment <login> <url>`: start again at step 1. If no bot reviewed the head yet, start the wait again after the run.
-- `check-failed <name> <url>`: read `gh run view <run id> --log-failed`. Fix a failure that the change causes as a confirmed finding (step 3). Report any other failure, and wait again.
+A push starts every bot again, so a bot still on the old head may never finish. While the watch runs, a run is **held**: do steps 1 to 3 and commit each fix locally, with no push, no write of steps 4 and 5, and no report. Act on each line:
+
+- `review <bot> <sha>` or `comment <login> <url>`: do a held run.
+- `check-failed <name> <url>`: read `gh run view <run id> --log-failed`. Fix a failure that the change causes in a held run, as a confirmed finding. Report any other failure at `done`.
+- `done <sha>`: each bot finished. Start again at step 1, keep the verdicts of the held runs, then push, make the writes, and report. If nothing is open, say so in one line and stop.
+- `timeout <sha>`: as for `done`; say no bot finished.
 - `conflict <sha>`: report it and stop. The user decides on a rebase.
 
-When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. If the script exits 1, say that nothing happened on the new head in time, and stop. When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.
+When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.
