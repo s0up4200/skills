@@ -171,7 +171,7 @@ Step 6 of the main skill sends you here when the run has a visual change. If a c
 Proven 2026-10-01 for a before-and-after measurement:
 
 - On a rig, import `scripts/qui-page.mjs`. It opens the torrent list on a port and returns the bundle name, the page errors, a timed tick, a timed dialog open from the header bar or the row menu, and the script and task time of the page. Its header shows a full script. Proven 2026-11-10.
-- Use `scripts/stub-qbit.py` as it is. On 2026-11-10 a stub written for one run set `protocol_version = "HTTP/1.1"` on the single-thread server. qui kept its connection open, and the script's own fetch of `/_counts` hung.
+- Use `scripts/stub-qbit.py` as it is. On 2026-11-10 a stub written for one run set `protocol_version = "HTTP/1.1"` on the single-thread server. qui kept its connection open, and the fetch of `/_counts` from the measurement script of that run hung. `stub-qbit.py` sets no `protocol_version`, so it closes each connection.
 - Build the base in a worktree at the merge base, and run both binaries on separate ports with auth off. Compare the served `assets/index-*.js` names with what the tab loaded.
 - Use one tab, and switch between the two origins by navigation. Two tabs got different viewports, which changes render time.
 - Chrome: the test tab is hidden. After about 5 minutes hidden, Chrome runs `setTimeout` at most once a minute, and rAF does not run. Yield with a `MessageChannel` message instead, and detect the render with a MutationObserver on the target element.
