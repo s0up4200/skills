@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Watch a pushed commit of a pull request, and print one line per event as it arrives.
-# Usage: wait-review.sh <owner/repo> <pr-number> <head-sha> [minutes|once]
+# Usage: wait-review.sh <owner/repo> <pr-number> <head-sha> [minutes|status]
 # <head-sha> can be a short SHA or a ref. The script expands it to the full SHA.
 # Run it from the repository root. The host comes from the `origin` remote.
 # Run it under a monitor that makes each stdout line a notification (the Monitor tool in
@@ -34,14 +34,18 @@
 # Forgejo: prints `review forgejo-actions` when a forgejo-actions comment ends with
 # reviewed-sha <head-sha>, and exits.
 # Exits 0 after done or conflict. Exits 1 after timeout.
-# With `once`, the script polls one time, prints the new events, then prints one status
-# line and exits 0: `done <sha7>`, `ready <sha7>`, or `pending <sha7> <bots>`, where <bots>
-# are the bots that did not finish on <head-sha> (`none-yet` when no bot started). Use it
-# where the host wakes the agent on pull request events, so that no loop is needed.
+# With `status`, the script prints the new events, then one status line, and exits 0:
+#   pending <sha7> <bots>      a review check of <bots> still runs, or no bot finished yet
+#                              (`none-yet`). The script exits at once.
+#   ready <sha7>, done <sha7>  as above, after the same second poll and the same 2 minutes
+#                              for a bot with no check. The script runs for 30 seconds to
+#                              3 minutes.
+# Use it where the host wakes the agent on pull request events. <head-sha> is the pushed
+# head, not a local commit that is not pushed.
 set -euo pipefail
 export MISE_QUIET=1
-repo="${1:?owner/repo}"; pr="${2:?pr number}"; sha="${3:?head sha}"; minutes="${4:-20}"; once=0
-[ "$minutes" = once ] && { once=1; minutes=20; }
+repo="${1:?owner/repo}"; pr="${2:?pr number}"; sha="${3:?head sha}"; minutes="${4:-20}"; status=0
+[ "$minutes" = status ] && { status=1; minutes=4; }
 sha=$(git rev-parse --verify "$sha^{commit}")
 short=${sha:0:7}
 host=$(git remote get-url origin | sed -E 's#^[a-z+]+://([^@/]*@)?##; s#^[^@]*@##; s#[:/].*##')
@@ -137,13 +141,6 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
       | ((.expected - $f) + .pending) as $out
       | [(.pending - ["coderabbit"] | length), ($f | length),
          ((.expected - $f - ["coderabbit"]) | length), ($out | index("coderabbit") != null)] | @tsv' <<<"$bots")"
-    if [ "$once" -eq 1 ]; then
-      out=$(jq -r '((.reviewed + .checked) | unique) as $f | ((.expected - $f) + .pending) | unique | join(",")' <<<"$bots")
-      if [ "$finished" -gt 0 ] && [ -z "$out" ]; then echo "done $short"
-      elif [ "$finished" -gt 0 ] && [ "$out" = coderabbit ]; then echo "ready $short"
-      else echo "pending $short ${out:-none-yet}"; fi
-      exit 0
-    fi
     now=$(date +%s)
     if [ "$fast_pending" -eq 0 ] && [ "$finished" -gt 0 ]; then
       if [ "$fast_missing" -eq 0 ] || { [ "$grace" -gt 0 ] && [ "$now" -ge "$grace" ]; }; then
@@ -152,6 +149,7 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
         streak=$((streak + 1))
         if [ "$streak" -ge 2 ]; then
           [ "$slow" = false ] && { echo "done $short"; exit 0; }
+          [ "$status" -eq 1 ] && { echo "ready $short"; exit 0; }
           if [ "$ready" -eq 0 ]; then
             ready=1
             grep -qxF "ready $short" "$state" || { echo "ready $short" >>"$state"; echo "ready $short"; }
@@ -165,11 +163,20 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
       fi
     else
       streak=0
+      if [ "$status" -eq 1 ]; then
+        out=$(jq -r '((.reviewed + .checked) | unique) as $f | ((.expected - $f) + .pending) | unique | join(",")' <<<"$bots")
+        echo "pending $short ${out:-none-yet}"
+        exit 0
+      fi
     fi
   else
     who=$(forgejo_review)
-    if [ -n "$who" ]; then echo "review $who"; exit 0; fi
-    [ "$once" -eq 1 ] && { echo "pending $short forgejo-actions"; exit 0; }
+    if [ -n "$who" ]; then
+      echo "review $who"
+      [ "$status" -eq 1 ] && echo "done $short"
+      exit 0
+    fi
+    [ "$status" -eq 1 ] && { echo "pending $short forgejo-actions"; exit 0; }
   fi
   sleep 30
 done
