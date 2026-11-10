@@ -18,3 +18,5 @@ T3 Code wakes the thread on pull request events, so step 8 needs no Monitor and 
 A delegated child leaves the watch to the parent thread, which owns the pull request.
 
 Proven 2026-11-10 on autobrr/qui#3993: each wake, the `ready` line, and the `done` line. Codex finished with no finding, and the edit of its summary comment woke the thread.
+
+T3 Code sends no timeout wake. A bot whose review check stalls sends no event, so the thread waits, with any held fix, until the user asks. Then run the status command again and act as on `timeout`.
