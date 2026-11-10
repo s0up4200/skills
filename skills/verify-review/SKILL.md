@@ -79,7 +79,7 @@ The line between wrong and judgment matters more than any other in this skill. A
 
 Fix the class, not the site. Before you edit, find every sibling caller of the function the finding names.
 
-Before you remove a branch or a guard, show the input that branch handled, in a test or a trace. Keep the red test from step 2 as the regression test for the fix, so the next review round does not reopen it.
+Before you remove a branch or a guard, show the input that branch handled, in a test or a trace. Keep the red test from step 2, written to the repo's test standard, as the regression test for the fix, so the next review round does not reopen it.
 
 Keep the patch inside the findings. Report a defect that no bot named with the same evidence, and leave it out of the patch unless the user says otherwise.
 
@@ -142,7 +142,7 @@ gh api "repos/$repo/pulls/comments/$comment_id/reactions" -f content=+1   # or -
 
 ## 6. Report
 
-Account for every finding. Read `references/report.md`, and write the report in its layout and by its rules.
+Account for every finding. Write the report by `references/report.md`.
 
 ## 7. Act on the answer
 
@@ -164,7 +164,7 @@ The wait counts Greptile after its second commit. Until then, **Done** says it s
 scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # one line per event
 ```
 
-Run it right after the push with the Monitor tool (`timeout_ms: 1800000`), else in the background, also while a judgment call waits for the user. Start one watch for each pull request that you pushed to.
+In T3 Code, read `references/t3-code.md` now: it replaces this command with the built-in watch. Elsewhere, run it right after the push with the Monitor tool (`timeout_ms: 1800000`), else in the background, also while a judgment call waits for the user. Start one watch for each pull request that you pushed to.
 
 A push starts every bot again, so a bot still on the old head may never finish. While the watch runs, a run is **held**: do steps 1 to 3 and commit each fix locally, with no push, no write of steps 4 and 5, and no report. Act on each line:
 
@@ -175,4 +175,4 @@ A push starts every bot again, so a bot still on the old head may never finish. 
 - `timeout <sha>`: as for `done`; name each bot that did not finish.
 - `conflict <sha>`: report it and stop. The user decides on a rebase.
 
-When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.
+When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.
