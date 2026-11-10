@@ -164,7 +164,7 @@ The wait counts Greptile after its second commit. Until then, **Done** says it s
 scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse HEAD)"    # one line per event
 ```
 
-Run it right after the push with the Monitor tool (`timeout_ms: 1800000`), else in the background, also while a judgment call waits for the user. Start one watch for each pull request that you pushed to.
+In T3 Code, read `references/t3-code.md` now: it replaces this command with the built-in watch. Elsewhere, run it right after the push with the Monitor tool (`timeout_ms: 1800000`), else in the background, also while a judgment call waits for the user. Start one watch for each pull request that you pushed to.
 
 A push starts every bot again, so a bot still on the old head may never finish. While the watch runs, a run is **held**: do steps 1 to 3 and commit each fix locally, with no push, no write of steps 4 and 5, and no report. Act on each line:
 
