@@ -79,7 +79,7 @@ The line between wrong and judgment matters more than any other in this skill. A
 
 Fix the class, not the site. Before you edit, find every sibling caller of the function the finding names.
 
-Before you remove a branch or a guard, show the input that branch handled, in a test or a trace. Keep the red test from step 2 as the regression test for the fix, so the next review round does not reopen it.
+Before you remove a branch or a guard, show the input that branch handled, in a test or a trace. Keep the red test from step 2, written to the repo's test standard, as the regression test for the fix, so the next review round does not reopen it.
 
 Keep the patch inside the findings. Report a defect that no bot named with the same evidence, and leave it out of the patch unless the user says otherwise.
 
@@ -142,7 +142,7 @@ gh api "repos/$repo/pulls/comments/$comment_id/reactions" -f content=+1   # or -
 
 ## 6. Report
 
-Account for every finding. Read `references/report.md`, and write the report in its layout and by its rules.
+Account for every finding. Write the report by `references/report.md`.
 
 ## 7. Act on the answer
 
