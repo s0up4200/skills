@@ -175,4 +175,4 @@ A push starts every bot again, so a bot still on the old head may never finish. 
 - `timeout <sha>`: as for `done`; name each bot that did not finish.
 - `conflict <sha>`: report it and stop. The user decides on a rebase.
 
-When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.
+When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.
