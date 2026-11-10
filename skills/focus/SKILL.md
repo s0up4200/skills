@@ -115,14 +115,25 @@ owner/repo
   Epics:     #100 2/9 done, #140 0/4 done
 ```
 
-Link each number. Leave empty lines out.
+Link each number. Leave empty lines out. The `Epics` line shows progress only. For the tree of one epic, the user runs `/focus #N`.
 
-When the user asks for issues to implement, list up to five free ones from rank 6. Give each one the commands for its own worktree, so that the user can run several sessions at once:
+### Model
+
+Give the recommendation and each alternative a Claude model and an effort level, with the fact about the task that decided it. The user runs each task in a new session, and the model sets its cost: a model that is too large doubles the price of a small fix, and a model that is too small fails a migration. Pick the model with [`references/model-choice.md`](references/model-choice.md), from the kind of the task and its size (the diff of a PR, the labels and the body of an issue, a gate, a hot spot).
+
+```
+Next: review PR #118 by alice (team, review requested, 9 days).
+      Model: Sonnet 5.5, medium effort (a review of +340/-80, no migration).
+```
+
+A step with no session, such as a merge or a close, gets no model.
+
+When the user asks for issues to implement, list up to five free ones from rank 6. Give each one the commands for its own worktree, so that the user can run several sessions at once. Name the model for each issue beside its commands:
 
 ```
 git worktree add ../<repo>-wt-<N> -b fix/<slug> origin/HEAD
 /implement <issue URL>
-``` The `Epics` line shows progress only. For the tree of one epic, the user runs `/focus #N`.
+```
 
 ## 6. Ask only what changes the answer
 
