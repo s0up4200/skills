@@ -14,6 +14,9 @@
 #   comment <login> <url>      a person other than you commented or reviewed after the
 #                              first wait on this pull request
 #   conflict <head-sha>        the branch conflicts with its base branch. The script exits.
+#   ready <sha7>               each bot except CodeRabbit finished on <head-sha>, and
+#                              CodeRabbit still reviews it. The wait goes on for CodeRabbit,
+#                              at most 15 more minutes.
 #   done <sha7>                each bot finished on <head-sha>, and the script exits. A bot
 #                              finishes when it reviews the head or when its review checks
 #                              complete, because a clean re-review posts no review. The
@@ -22,7 +25,8 @@
 #                              can set it to review only when the pull request opens). When
 #                              no review check still runs, it waits at most 2 more minutes
 #                              for a bot with no check, such as Codex or Copilot.
-#   timeout <sha7>             no bot finished on <head-sha> in time (default 20 minutes)
+#   timeout <sha7>             no bot finished on <head-sha> in time (default 20 minutes),
+#                              or after ready, CodeRabbit did not finish
 # The script reports each event once per pull request (a conflict and a review once per
 # head). It keeps the reported events in ~/.local/state/wait-review/, so a wait that
 # starts again skips them. It exits 0 without a line when a newer commit replaces
@@ -55,7 +59,7 @@ github_fetch() {
 
 # One JSON object: expected (bots that reviewed an earlier commit), reviewed (bots that
 # reviewed the head), checked (bots whose review checks on the head all completed), and
-# pending (review checks on the head that still run).
+# pending (bots with a review check on the head that still runs).
 github_bots() {
   # A bot that answers a reply in a thread also makes a review of the head, with no
   # body and only reply comments. Count a review only when it has a body or a comment
@@ -76,7 +80,7 @@ github_bots() {
     | {expected: ([$rv[] | .user.login | bot | select(. != "greptile" or $greptile)] | unique),
        reviewed: (([$rv[] | select(.commit_id==$sha) | .user.login | bot] + $codex) | unique),
        checked: [$bc | group_by(.bot)[] | select(all(.done)) | .[0].bot],
-       pending: ([$bc[] | select(.done|not)] | length)}'
+       pending: ([$bc[] | select(.done|not) | .bot] | unique)}'
 }
 
 github_events() {
@@ -106,7 +110,7 @@ forgejo_review() {
 }
 
 [ "$host" = github.com ] && me=$(gh api user --jq .login)
-finished=0 streak=0
+finished=0 streak=0 grace=0 ready=0
 while [ "$(date +%s)" -lt "$deadline" ]; do
   if [ "$host" = github.com ]; then
     github_fetch
@@ -123,18 +127,29 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
       echo "$lines"
       grep -q '^conflict ' <<<"$lines" && exit 0
     fi
-    read -r pending finished missing <<<"$(jq -r '[.pending, ((.reviewed + .checked) | unique | length),
-      ((.expected - .reviewed - .checked) | length)] | @tsv' <<<"$bots")"
-    if [ "$pending" -eq 0 ] && [ "$finished" -gt 0 ]; then
-      if [ "$missing" -eq 0 ]; then
+    # CodeRabbit is the slowest bot, so `ready` lets the fixes for the others go out first.
+    read -r fast_pending finished fast_missing slow <<<"$(jq -r '((.reviewed + .checked) | unique) as $f
+      | ((.expected - $f) + .pending) as $out
+      | [(.pending - ["coderabbit"] | length), ($f | length),
+         ((.expected - $f - ["coderabbit"]) | length), ($out | index("coderabbit") != null)] | @tsv' <<<"$bots")"
+    now=$(date +%s)
+    if [ "$fast_pending" -eq 0 ] && [ "$finished" -gt 0 ]; then
+      if [ "$fast_missing" -eq 0 ] || { [ "$grace" -gt 0 ] && [ "$now" -ge "$grace" ]; }; then
         # A bot posts its review a few seconds before its check completes. One more poll
         # catches a review that lands in between.
         streak=$((streak + 1))
-        [ "$streak" -ge 2 ] && { echo "done $short"; exit 0; }
+        if [ "$streak" -ge 2 ]; then
+          [ "$slow" = false ] && { echo "done $short"; exit 0; }
+          if [ "$ready" -eq 0 ]; then
+            ready=1
+            grep -qxF "ready $short" "$state" || { echo "ready $short" >>"$state"; echo "ready $short"; }
+            [ $((now + 900)) -lt "$deadline" ] && deadline=$((now + 900))
+          fi
+        fi
       else
+        # A bot with no check, such as Codex or Copilot, gets 2 more minutes.
         streak=0
-        grace=$(( $(date +%s) + 120 ))
-        [ "$grace" -lt "$deadline" ] && deadline=$grace
+        [ "$grace" -eq 0 ] && grace=$((now + 120))
       fi
     else
       streak=0
@@ -145,6 +160,6 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
   fi
   sleep 30
 done
-[ "$finished" -gt 0 ] && { echo "done $short"; exit 0; }
+[ "$ready" -eq 0 ] && [ "$finished" -gt 0 ] && { echo "done $short"; exit 0; }
 echo "timeout $short"
 exit 1

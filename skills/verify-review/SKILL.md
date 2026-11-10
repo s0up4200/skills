@@ -48,7 +48,7 @@ When the user names any other plain PR comment, verify its claim the same way an
 
 Check out the pull request when the fixes need its branch. `gh pr checkout "$pr"` tracks the source repository, a fork included, so a plain `git push` lands there. Add `--worktree` when the current working tree must stay as it is.
 
-Take a note of the head SHA. A reviewer saw a specific commit, and later commits may already have changed the lines it saw.
+Note the head SHA. Later commits may have changed the lines a reviewer saw.
 
 ## 2. Verify each finding
 
@@ -129,7 +129,7 @@ The answer cites commit SHAs, so post it after the push.
 
 ## 5. Rate the Codex findings
 
-Codex (author `chatgpt-codex-connector`) ends each comment with "Useful? React with 👍 / 👎." Add one reaction to the first comment of each Codex thread, and rate no other bot:
+Add one reaction to the first comment of each Codex thread (author `chatgpt-codex-connector`), and rate no other bot:
 
 - 👍 for a finding that led to a fix: **confirmed**, or a **judgment** settled with a fix.
 - 👎 for a finding that did not: **wrong**, or a **judgment** settled without a fix.
@@ -170,8 +170,9 @@ A push starts every bot again, so a bot still on the old head may never finish. 
 
 - `review <bot> <sha>` or `comment <login> <url>`: do a held run.
 - `check-failed <name> <url>`: read `gh run view <run id> --log-failed`. Fix a failure that the change causes in a held run, as a confirmed finding. Report any other failure at `done`.
+- `ready <sha>`: CodeRabbit still reviews. With a held fix, act as on `done`; else keep the watch.
 - `done <sha>`: each bot finished. Start again at step 1, keep the verdicts of the held runs, then push, make the writes, and report. If nothing is open, say so in one line and stop.
-- `timeout <sha>`: as for `done`; say no bot finished.
+- `timeout <sha>`: as for `done`; name each bot that did not finish.
 - `conflict <sha>`: report it and stop. The user decides on a rebase.
 
 When the run stops with nothing that waits for the user and no wait running, and the session has the tool `mcp__compact__after_turn`, call it as the last step, with a `focus` that names the pull request and what is left. When no bot, or only Greptile on one commit, reviewed the pull request, skip the wait and stop after the writes.
