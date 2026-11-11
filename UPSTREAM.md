@@ -329,3 +329,47 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## t3dotgg/tstack
+
+`skills/council` is our own skill, not a copy. It adapts `skills/council/SKILL.md` from [t3dotgg/tstack](https://github.com/t3dotgg/tstack).
+
+**Upstream commit:** `11e37a74d0a6868c121cd0910ab2b3bd9873b92a` (2026-11-11)
+
+### Adapted parts
+
+- The steps, the round count, the scores table, and the rule against scope creep come from upstream.
+- Upstream triggers on the word "council". Our skill starts only when the user types it.
+- Upstream gives Claude Opus, GPT Sol, and Gemini Pro as an example. Our skill has an order of preference that puts Grok before Gemini, and it needs three different `driverKind` values, so that two Claude instances do not count as two providers.
+- Our skill pastes the main rules of `code-review` into the brief of each member, and leaves out the reasons of the author and the findings of earlier rounds, as `refute` does.
+- Our skill starts each round with new `delegate_task` calls, puts the read-only rule in the brief, and reports a failed member with `no score` and an incomplete council.
+- Upstream continues until all members are satisfied. Our skill uses the stop rules of `refute`: no blocking finding, 2 rounds in a row of rejected findings, or 3 rounds. A question gets one round.
+- Our skill uses the report layout of this repo, with the scores on one line. In the PR body it keeps the upstream table and edits only the `## Council review` section of the live body.
+
+### License
+
+The adapted parts use the license of the upstream repository:
+
+```
+MIT License
+
+Copyright (c) 2026 Theo Browne
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

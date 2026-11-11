@@ -40,7 +40,8 @@
         "./skills/security-audit",
         "./skills/go-proverbs",
         "./skills/refute",
-        "./skills/fix-one-thing"
+        "./skills/fix-one-thing",
+        "./skills/council"
       ]
     },
     {
