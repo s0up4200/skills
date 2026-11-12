@@ -2,12 +2,18 @@
 # shellcheck disable=SC2016 # the GraphQL queries hold $variables for gh, not for the shell
 # Print the open pull requests and issues of a GitHub repo in a compact form,
 # for the focus skill.
+# First line: the login of the current gh user ("me") and the default branch.
+# Release line, only when the default branch is ahead of the latest release:
+# the tag, its date, the commits since, and how many of them start with "fix"
+# or "feat" (counted in the first 250 commits).
 # PR line: number, title, author, "team" or "outside" (team means an OWNER,
 # MEMBER, or COLLABORATOR author), draft, review decision, mergeable, size,
 # created date, check state of the last commit, date of the last commit, the
 # latest review by the current gh user (state and date, or "none"), "new
-# commits since my review", and the requested reviewers ("me" for the user,
-# "team:SLUG" for a team).
+# commits since my review", the count of unresolved review threads, "review
+# threads: read 100 of N" when the PR has more than the 100 that the script
+# reads, and the requested reviewers ("me" for the user, "team:SLUG" for a
+# team).
 # Issue line: number, title (cut to 70 characters), assignees, labels, the
 # sub-issue progress when the issue is an epic, the parent epic, the OPEN
 # blocking and blockedBy edges (owner/repo#N for another repo), the
@@ -25,7 +31,18 @@ export MISE_QUIET=1
 repo=${1:?usage: open-work.sh OWNER/REPO}
 owner=${repo%%/*}
 name=${repo#*/}
-me=$(gh api user --jq .login)
+IFS=$'\t' read -r me branch tag published < <(gh api graphql -F owner="$owner" -F name="$name" -f query='
+query($owner:String!,$name:String!){viewer{login} repository(owner:$owner,name:$name){
+  defaultBranchRef{name} latestRelease{tagName publishedAt}}}' \
+  --jq '[.data.viewer.login, .data.repository.defaultBranchRef.name // "-",
+    .data.repository.latestRelease.tagName // "-", (.data.repository.latestRelease.publishedAt // "-")[:10]] | @tsv')
+echo "me: $me | default branch: $branch"
+
+if [[ $tag != - && $branch != - ]] && compare=$(gh api "repos/$repo/compare/$tag...$branch" 2>/dev/null); then
+  jq -r --arg tag "$tag" --arg published "$published" 'select(.ahead_by > 0)
+    | "release: \($tag) (\($published)) | \(.ahead_by) commits since"
+      + " | \([.commits[].commit.message | select(test("^(fix|feat)"; "i"))] | length) fix or feat"' <<<"$compare"
+fi
 
 # Pages of 50 keep each query far under the GitHub limit of 500,000 nodes.
 gh api graphql --paginate -F owner="$owner" -F name="$name" -F me="$me" -f query='
@@ -35,6 +52,7 @@ query($owner:String!,$name:String!,$me:String!,$endCursor:String){repository(own
     nodes{number title author{login} authorAssociation isDraft reviewDecision mergeable createdAt additions deletions
       reviews(author:$me,last:1){nodes{state submittedAt}}
       reviewRequests(first:10){nodes{requestedReviewer{... on User{login} ... on Team{slug}}}}
+      reviewThreads(first:100){totalCount nodes{isResolved}}
       commits(last:1){nodes{commit{committedDate statusCheckRollup{state}}}}}}}}' |
 jq -r --arg me "$me" '.data.repository.pullRequests.nodes[]
   | (.commits.nodes[0].commit) as $c | (.reviews.nodes[0]) as $r
@@ -48,6 +66,9 @@ jq -r --arg me "$me" '.data.repository.pullRequests.nodes[]
     + " | last commit \($c.committedDate[:10])"
     + " | my review \(if $r then "\($r.state) \($r.submittedAt[:10])" else "none" end)"
     + (if $r and $c.committedDate > $r.submittedAt then " | new commits since my review" else "" end)
+    + ([.reviewThreads.nodes[] | select(.isResolved | not)] | length
+       | if . > 0 then " | unresolved threads: \(.)" else "" end)
+    + (if .reviewThreads.totalCount > 100 then " | review threads: read 100 of \(.reviewThreads.totalCount)" else "" end)
     + (if ($rq | length) > 0 then " | review requested: \($rq | join(" "))" else "" end)'
 
 gh api graphql --paginate -F owner="$owner" -F name="$name" -f query='

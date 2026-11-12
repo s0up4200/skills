@@ -35,9 +35,13 @@ The article does not know the ranks of this skill. This mapping is a reading of 
 | Answer a teammate's question or plan (`/grilling`) | Unsure: Opus, `medium` | A question about architecture: Fable |
 | Merge, or close a done issue | No session needed | |
 | The user's PR with requested changes | Well-scoped coding: Sonnet, `medium` | The reviewer asks for a new design: Opus |
+| The user's PR with unresolved threads (`/verify-review`) | Well-scoped coding: Sonnet, `medium` | Many threads, or a thread that asks for a new design: Opus |
+| A live run before a merge (`/field-test`) | Everyday engineering: Opus, `medium` | |
 | Refactor | Everyday engineering: Opus, `medium` | A gate, or a refactor across many packages: Fable |
 | Implement a `ready-for-agent` issue (`/implement`) | Well-scoped coding: Sonnet, `medium` | A feature of many PRs, a hard bug with no known cause, a migration, or a performance fix: Opus |
+| A bug with no known cause (`/diagnosing-bugs`) | Everyday engineering, debugging: Opus, `medium` | |
 | Triage (`/triage`) | Repeated agent tasks: Sonnet, `medium` | |
+| Challenge a feature request (`/challenge-request`) | Repeated agent tasks: Sonnet, `medium` | A request that changes the architecture: Opus |
 | Grill a parked idea (`/grill-with-docs`) | Unsure: Opus, `medium` | The idea changes the architecture: Fable |
 
 ## When the model falls short
@@ -50,4 +54,4 @@ The article gives this order:
 
 ## A new model needs a new session
 
-A prompt cache belongs to the model that wrote it, so the first turn after a switch pays the full write price. A model also cannot read the thinking of a model above it. Thus the user starts the task in a new session on the suggested model (`/model` in Claude Code), not in the session that ran `/focus`.
+A prompt cache belongs to the model that wrote it, so the first turn after a switch pays the full write price. A model also cannot read the thinking of a model above it. Thus the user starts the task in a new session on the suggested model, not in the session that ran `/focus`. In Claude Code, `/model` sets the model. In T3 Code, `start` opens the new session.
