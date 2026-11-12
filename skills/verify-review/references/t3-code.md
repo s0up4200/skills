@@ -6,10 +6,10 @@ T3 Code wakes the thread on pull request events, so step 8 needs no Monitor and 
 2. On each wake, ask the script for the status of the pushed head, with a tool timeout of 5 minutes:
 
    ```bash
-   scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse '@{u}')" status
+   git fetch -q && scripts/wait-review.sh owner/repo "$pr" "$(git rev-parse '@{u}')" status
    ```
 
-   `@{u}` is the head that the bots review. A held fix moves `HEAD` away from it, and the script prints nothing for a commit that is not the head of the pull request.
+   `@{u}` is the head that the bots review. A held fix moves `HEAD` away from it, and the script prints nothing for a commit that is not the head of the pull request. The fetch brings a head that another person pushed. When `@{u}` is a commit that you did not push, report it and stop, as for `conflict`.
 
    The script prints the new event lines, then one status line: `done <sha>`, `ready <sha>`, or `pending <sha> <bots>`. Before `done` or `ready` it polls a second time and gives a bot with no review check its 2 minutes, as the loop does.
 3. Act on the event lines and on `done` and `ready` as step 8 says. On `pending`, do a held run for the new events and end the turn. The next event wakes the thread.
