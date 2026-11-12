@@ -57,9 +57,9 @@ fj issue view N comments
 
 ### Labels
 
-The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `needs-grilling`. An issue with no triage label has the role `needs-triage`.
+The repo's triage labels are in `docs/agents/triage-labels.md` when that file exists. Outside a clone of the repo, read it with `gh api repos/OWNER/REPO/contents/docs/agents/triage-labels.md -H 'Accept: application/vnd.github.raw'`. Map each label to its role: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `needs-grilling`. An issue with no triage label has the role `needs-triage`.
 
-Read the repo's labels once with `gh label list --json name,description`. Treat each label that means refactor, tech debt, or cleanup as a refactor label.
+Read the repo's labels once with `gh label list --repo OWNER/REPO --json name,description`. Treat each label that means refactor, tech debt, or cleanup as a refactor label.
 
 ### Hot spots
 
@@ -73,7 +73,7 @@ A file with many fixes is a hot spot. Leave out lock files, changelogs, and gene
 
 ## 3. Find the work that is done
 
-First find the issues that are done but still open: a comment says that the work is finished, and lists no open work. A PR with no closing keyword leaves its issue open. A status update that names merged PRs and also lists open work ("Open: ...", "left to do") is not done. Check each PR that a comment names with `gh pr view N --json state`, because a comment can be wrong. Report each done issue as one to close, not as work to rank.
+First find the issues that are done but still open: a comment says that the work is finished, and lists no open work. A PR with no closing keyword leaves its issue open. A status update that names merged PRs and also lists open work ("Open: ...", "left to do") is not done. Check each PR that a comment names with `gh pr view N --repo OWNER/REPO --json state`, because a comment can be wrong. Report each done issue as one to close, not as work to rank.
 
 A tracking issue with `epic M/M done` is done too: every sub-issue is closed. Report it as one to close, unless its body lists work that has no ticket yet.
 
@@ -146,5 +146,5 @@ git worktree add ../<repo>-wt-<N> -b fix/<slug> origin/HEAD
 
 Ask after the report, not before, and only when the answer changes the recommendation:
 
-- The best free issue is a gate: should the user claim it? Assign it only on a yes, with `gh issue edit N --add-assignee @me`.
-- An issue is done but still open: should the user close it? Close it only on a yes, with `gh issue comment N --body "Shipped in #X"` and then `gh issue close N`, because `gh issue close --comment` on an already-closed issue drops the comment and still exits 0.
+- The best free issue is a gate: should the user claim it? Assign it only on a yes, with `gh issue edit N --repo OWNER/REPO --add-assignee @me`.
+- An issue is done but still open: should the user close it? Close it only on a yes, with `gh issue comment N --repo OWNER/REPO --body "Shipped in #X"` and then `gh issue close N --repo OWNER/REPO`, because `gh issue close --comment` on an already-closed issue drops the comment and still exits 0.
