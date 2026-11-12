@@ -2,8 +2,8 @@
 # Read the open work of each repo where the current gh user has recent open
 # work, for `/focus all`.
 # A repo is in scope when an open issue or pull request that involves the user
-# (author, assignee, mention, comment, or review request) changed in the last
-# DAYS days, the user can push to the repo, the repo is not archived, and the
+# (author, assignee, mention, or comment), or an open pull request that asks
+# for the user's review, changed in the last DAYS days, the user can push to the repo, the repo is not archived, and the
 # skip file does not list it. The skip file is
 # ${XDG_CONFIG_HOME:-~/.config}/focus/skip, with one OWNER/REPO on each line.
 # Output: one line per repo in scope, most stars first: the repo, its stars,
@@ -25,8 +25,12 @@ since=$(date -u -v-"$days"d +%F 2>/dev/null || date -u -d "$days days ago" +%F)
 skip=${XDG_CONFIG_HOME:-$HOME/.config}/focus/skip
 out=$(mktemp -d "${TMPDIR:-/tmp}/focus.XXXXXX")
 
-names=$(gh search issues --involves @me --state open --include-prs --updated ">=$since" \
-  --limit 1000 --json repository --jq '[.[].repository.nameWithOwner] | unique | .[]')
+# The involves filter does not match a review request, so a second search reads those.
+involved=$(gh search issues --involves @me --state open --include-prs --updated ">=$since" \
+  --limit 1000 --json repository --jq '.[].repository.nameWithOwner')
+requested=$(gh search prs --review-requested @me --state open --updated ">=$since" \
+  --limit 1000 --json repository --jq '.[].repository.nameWithOwner')
+names=$(printf '%s\n' "$involved" "$requested" | sort -u | sed '/^$/d')
 [[ -n $names ]] || { echo "no open work that involves you changed in the last $days days"; exit 0; }
 
 # One query with an alias per repo reads all of them in one call.
