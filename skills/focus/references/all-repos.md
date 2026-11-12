@@ -20,7 +20,7 @@ acme/app | stars 4789 | open issues 134 | open PRs 12 | 148 lines | /tmp/focus.A
 
 The file holds the output of `open-work.sh` for that repo. A `failed` line names the file with the error: report that repo as not read, and go on with the others.
 
-The last lines name the repos that the skip file removed, and the repos that the user can only read. A read-only repo is not the user's to triage or merge, so it stays out.
+The last lines name the repos that the skip file removed, and the repos that the user can only read. A read-only repo is not the user's to triage or merge, so it stays out. An `incomplete` line means that repos can be missing: put it at the top of the report.
 
 ### The skip file
 

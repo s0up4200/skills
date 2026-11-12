@@ -11,7 +11,8 @@
 # file that holds those lines (the output of open-work.sh). A repo that
 # open-work.sh could not read shows "failed" and the file with the error.
 # Then one line for the repos that the skip file removed, and one line for the
-# repos that the user can only read.
+# repos that the user can only read. An "incomplete" line follows when a
+# search returned 1000 items, the most that GitHub gives: repos can be missing.
 # Usage: all-work.sh [DAYS]   (default 30)
 set -euo pipefail
 # A mise-managed gh wrapper prints status lines to stdout, which breaks jq.
@@ -26,10 +27,15 @@ skip=${XDG_CONFIG_HOME:-$HOME/.config}/focus/skip
 out=$(mktemp -d "${TMPDIR:-/tmp}/focus.XXXXXX")
 
 # The involves filter does not match a review request, so a second search reads those.
+limit=1000
 involved=$(gh search issues --involves @me --state open --include-prs --updated ">=$since" \
-  --limit 1000 --json repository --jq '.[].repository.nameWithOwner')
+  --limit "$limit" --json repository --jq '.[].repository.nameWithOwner')
 requested=$(gh search prs --review-requested @me --state open --updated ">=$since" \
-  --limit 1000 --json repository --jq '.[].repository.nameWithOwner')
+  --limit "$limit" --json repository --jq '.[].repository.nameWithOwner')
+incomplete=
+for found in "$involved" "$requested"; do
+  (($(grep -c . <<<"$found") < limit)) || incomplete=1
+done
 names=$(printf '%s\n' "$involved" "$requested" | sort -u | sed '/^$/d')
 [[ -n $names ]] || { echo "no open work that involves you changed in the last $days days"; exit 0; }
 
@@ -72,3 +78,4 @@ if ((${#scope[@]} > 0)); then
 fi
 ((${#skipped[@]} == 0)) || echo "skipped by $skip: ${skipped[*]}"
 ((${#readable[@]} == 0)) || echo "read only: ${readable[*]}"
+[[ -z $incomplete ]] || echo "incomplete: a search returned $limit items, the most that GitHub gives. Repos can be missing. Run it with fewer days."
