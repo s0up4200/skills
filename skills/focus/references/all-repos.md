@@ -44,7 +44,7 @@ Read the notifications of all repos once, with the command in step 2 of `SKILL.m
   3. For each rank, the count of the items that you did not return.
   ```
 
-  Add to the brief the notification lines of that repo.
+  Add to the brief the notification lines of that repo. When the user asked for one kind of work, for example only pull requests or only issues to implement, add: `Return only <that kind>.` A repo with five reviews to do otherwise returns no issue.
 
 The step is done when each repo of the script output has a ranked list or a `failed` note.
 
