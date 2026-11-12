@@ -31,7 +31,7 @@ If fewer than three providers can run a child, or a named member is not availabl
 
 ## 3. Start a round
 
-Start the members in parallel with `delegate_task`: one call for each member, `role: "review"` for a review, `isolation: "shared"`, and the `providerInstanceId`, model, and option from step 2. Keep each `taskId`.
+Start the members in parallel with `delegate_task`: one call for each member, `role: "review"` for a review, `isolation: "shared"`, and the `providerInstanceId`, model, and option from step 2. Keep each `taskId`. Steps 3 and 4 name the T3 Code tools. Outside T3 Code, use the tools of the harness that start a subagent, wait for its result, and answer its question, with the same model, option, and brief.
 
 A delegate gets no parent history, and it can run on a provider without the user's skills. So the `task` brief carries all that it needs:
 
@@ -78,6 +78,9 @@ Otherwise start the next round (step 3).
 **Status:** one of: no blocking finding left, incomplete because a member failed, stopped because I rejected every finding, stopped at 3 rounds, or waits for you.
 **Scores:** Claude Opus 7 → 9 · GPT Sol 8 → 10 · Grok 7 → no score
 
+**Answer**
+- For a question: the conclusion that the members support, checked at the code.
+
 **Fixed**
 - A finding that you fixed, by its effect on the app, and which members made it.
 
@@ -108,4 +111,4 @@ Rounds: 2
 | Grok | 7/10 | no score |
 ```
 
-Read the live body with `gh pr view <n> --json body --jq .body`. Replace the old section, or add the section at the end, above a closing model or harness line if the body has one. Save the new body to a scratch file, and write it back with `gh pr edit <n> --body-file <file>`. Change no other part of the body, and do not post a comment for this. If there is no pull request, put the report in the final reply only.
+Read the live body with `gh pr view <n> --json body --jq .body`. Replace the old section, or add the section at the end, above a closing model or harness line if the body has one. Save the new body to a scratch file, and write it back with `gh pr edit <n> --body-file <file>`. Change no other part of the body, and do not post a comment for this. Then read the live body again, and make sure that `diff` against the old body shows changes only in the `## Council review` section. If there is no pull request, put the report in the final reply only.
