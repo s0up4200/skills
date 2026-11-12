@@ -10,13 +10,17 @@ Do this before you print the table. Two threads on one issue give two pull reque
 
 1. Call `t3_project_list` once. A project belongs to a repo when its `repositoryIdentity` has the same `owner` and `name`.
 2. For each row whose repo has a project, call `t3_thread_search` with that `projectId` and the URL of the item as `query`. The search stays inside one project, and with no `projectId` it reads only the project of this thread. It matches a thread that is linked to the pull request, and a thread whose messages name the URL.
-3. On a match, put the `link` of the thread in the `Next` cell in place of the skill, exactly as the tool returns it. That row has its session, so `start` skips it.
+3. On a match, put the `link` of the thread in the `Next` cell after the step, exactly as the tool returns it. The step stays, because an old thread can be about an earlier step, for example a finished review of a pull request that now waits for a merge. `start` skips that row and names its thread. The user does the step in that thread.
+
+When a row names Fable, print one line under the table: "`start` runs a Fable row on Opus. Write `start N fable` for Fable." Step 1 below gives the reason.
 
 ## Start
 
 The user answers `start 1 3`. Start only the rows that the answer names. The answer is the user's request to run the `Next` step of each named row, also for a step that only the user may start.
 
 A row with an empty `Model` cell has no session. Say so, and start the others.
+
+Start at most one `/field-test` row for each repo in one answer, and name the rows that wait. Two live runs on one host replace the build of each other.
 
 ### 1. Pick the model
 
@@ -43,8 +47,8 @@ Call `t3_thread_launch` once for each row:
 - `title`: the step and the item, for example `review acme/app#4012` or `implement acme/cli#12`.
 - `projectId`: from step 2.
 - `modelSelection`: `{"instanceId": "<instance>", "model": "<model id>", "options": [{"id": "effort", "value": "medium"}]}`.
-- `workspaceStrategy`: `{"type": "worktree", "baseRef": "origin/<default branch>", "startFromOrigin": true}`. Each row gets its own worktree, so two threads never share a checkout. The default branch is on the first line of the `open-work.sh` output.
-- `message`: the `Next` skill and the URL of the item, for example `/implement https://github.com/acme/cli/issues/12`. The URL must be in the message, because the search above finds the thread by it. For a pull request, add: `Check out the pull request in this worktree first.` For an issue that asks the user a question, add: `Then draft one reply with the answers, and wait for my approval before you post it.`
+- `workspaceStrategy`: `{"type": "worktree", "baseRef": "origin/<default branch>", "startFromOrigin": true}`. Each row gets its own worktree, so two threads never share a checkout. The default branch is on the first line of the `open-work.sh` output. A pull request whose branch a worktree already holds is the exception, because git gives one branch to one worktree. Read the branch with `gh pr view N --repo OWNER/REPO --json headRefName`, and look for it in `git -C <workspaceRoot> worktree list --porcelain`. When a worktree has it, pass `{"type": "existing_worktree", "worktreePath": "<path>"}`.
+- `message`: the `Next` skill and the URL of the item, for example `/implement https://github.com/acme/cli/issues/12`. The URL must be in the message, because the search above finds the thread by it. For a pull request in a new worktree, add: `Check out the pull request in this worktree first.` For an issue that asks the user a question, add: `Then draft one reply with the answers, and wait for my approval before you post it.`
 - `clientRequestId`: one new id for each row. After an error or a lost reply, retry with the same id, so that the row gets one thread.
 
 Leave out `runtimeMode` and `interactionMode`. The thread takes the modes of this thread.
