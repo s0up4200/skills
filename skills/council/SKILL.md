@@ -13,7 +13,7 @@ A **council** is three delegates, one strong model from each of three providers.
 
 Skip this step for a question. Before a review, give the council the current implementation, not one with known defects:
 
-- Address the open review comments on the pull request, if there is one.
+- Leave the open review threads on the pull request to `verify-review`. Do not read, fix, or answer them in this skill.
 - Fix the known issues and run the relevant checks.
 - If the user wants to discard the implementation and explore new ideas, skip the fixes to the code that goes away.
 
