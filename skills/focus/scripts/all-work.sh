@@ -34,6 +34,12 @@ query=$(jq -Rrn '[inputs | split("/")] | to_entries
   | map("r\(.key):repository(owner:\(.value[0] | @json),name:\(.value[1] | @json)){nameWithOwner stargazerCount viewerPermission isArchived issues(states:OPEN){totalCount} pullRequests(states:OPEN){totalCount}}")
   | "{\(join(" "))}"' <<<"$names")
 
+meta=$(gh api graphql -f query="$query" --jq '[.data[] | select(. != null and (.isArchived | not))]
+  | sort_by(-.stargazerCount, -(.issues.totalCount + .pullRequests.totalCount)) | .[]
+  | [.nameWithOwner, .stargazerCount, .issues.totalCount, .pullRequests.totalCount,
+     (if .viewerPermission | IN("ADMIN", "MAINTAIN", "WRITE") then "push" else "read" end)] | @tsv')
+[[ -n $meta ]] || { echo "each repo with open work in the last $days days is archived"; exit 0; }
+
 scope=() skipped=() readable=()
 while IFS=$'\t' read -r repo stars issues prs access; do
   if [[ -f $skip ]] && grep -qixF -- "$repo" "$skip"; then
@@ -44,10 +50,7 @@ while IFS=$'\t' read -r repo stars issues prs access; do
     scope+=("$repo")
     echo "$repo | stars $stars | open issues $issues | open PRs $prs" >"$out/${repo//\//_}.head"
   fi
-done < <(gh api graphql -f query="$query" --jq '[.data[] | select(. != null and (.isArchived | not))]
-  | sort_by(-.stargazerCount, -(.issues.totalCount + .pullRequests.totalCount)) | .[]
-  | [.nameWithOwner, .stargazerCount, .issues.totalCount, .pullRequests.totalCount,
-     (if .viewerPermission | IN("ADMIN", "MAINTAIN", "WRITE") then "push" else "read" end)] | @tsv')
+done <<<"$meta"
 
 if ((${#scope[@]} > 0)); then
   # Four repos at a time keep the run under the GitHub limit on parallel requests.
