@@ -10,9 +10,10 @@
 # MEMBER, or COLLABORATOR author), draft, review decision, mergeable, size,
 # created date, check state of the last commit, date of the last commit, the
 # latest review by the current gh user (state and date, or "none"), "new
-# commits since my review", the count of unresolved review threads (among
-# the first 50), and the requested reviewers ("me" for the user, "team:SLUG"
-# for a team).
+# commits since my review", the count of unresolved review threads, "review
+# threads: read 100 of N" when the PR has more than the 100 that the script
+# reads, and the requested reviewers ("me" for the user, "team:SLUG" for a
+# team).
 # Issue line: number, title (cut to 70 characters), assignees, labels, the
 # sub-issue progress when the issue is an epic, the parent epic, the OPEN
 # blocking and blockedBy edges (owner/repo#N for another repo), the
@@ -51,7 +52,7 @@ query($owner:String!,$name:String!,$me:String!,$endCursor:String){repository(own
     nodes{number title author{login} authorAssociation isDraft reviewDecision mergeable createdAt additions deletions
       reviews(author:$me,last:1){nodes{state submittedAt}}
       reviewRequests(first:10){nodes{requestedReviewer{... on User{login} ... on Team{slug}}}}
-      reviewThreads(first:50){nodes{isResolved}}
+      reviewThreads(first:100){totalCount nodes{isResolved}}
       commits(last:1){nodes{commit{committedDate statusCheckRollup{state}}}}}}}}' |
 jq -r --arg me "$me" '.data.repository.pullRequests.nodes[]
   | (.commits.nodes[0].commit) as $c | (.reviews.nodes[0]) as $r
@@ -67,6 +68,7 @@ jq -r --arg me "$me" '.data.repository.pullRequests.nodes[]
     + (if $r and $c.committedDate > $r.submittedAt then " | new commits since my review" else "" end)
     + ([.reviewThreads.nodes[] | select(.isResolved | not)] | length
        | if . > 0 then " | unresolved threads: \(.)" else "" end)
+    + (if .reviewThreads.totalCount > 100 then " | review threads: read 100 of \(.reviewThreads.totalCount)" else "" end)
     + (if ($rq | length) > 0 then " | review requested: \($rq | join(" "))" else "" end)'
 
 gh api graphql --paginate -F owner="$owner" -F name="$name" -f query='

@@ -28,14 +28,14 @@ The base directory is printed when the skill loads. The first line names the use
 
 - `team` or `outside` on a PR. A team member is an author with the association OWNER, MEMBER, or COLLABORATOR. Each other author is an outside contributor.
 - `review requested: me` on a PR, and `new commits since my review`.
-- `unresolved threads` on a PR: review comments that nobody has resolved.
+- `unresolved threads` on a PR: review comments that nobody has resolved. `review threads: read 100 of N` means that the script did not read them all. Then count them on the page of the PR.
 - `asks me` on an issue: a comment after the user's last comment mentions the user. A team comment after the user's last comment that proposes a plan or asks to take the issue waits on the user too, with no mention. Read each `last:` line for it.
 - `blocking` and `blockedBy` on an issue, with only the open edges. An issue that blocks two or more open issues is a gate. Finishing a gate frees the most work.
 - `body blockers` on an issue: the issues and PRs that a "Blocked by" line or a "Blocked by" section of the body names. The script does not read their state. For each issue that you rank under Implement, read it with `gh issue view N --repo OWNER/REPO --json state`. An open one blocks the issue.
 - `closing PRs` on an issue: the open PRs that close it. Somebody already works on the issue.
 - `epic N/M done` on a tracking issue, and `epic #N` on its sub-issues.
 
-If a comment that the script cut can mean that the work is done, or that somebody asks the user a question, read the issue with `gh issue view N --json comments`.
+If a comment that the script cut can mean that the work is done, or that somebody asks the user a question, read the issue with `gh issue view N --repo OWNER/REPO --json comments`.
 
 The unread notifications show who waits on the user where the script sees no mention, for example in a review comment. Read them, and leave them unread. Drop `repos/OWNER/REPO/` from the path to read all repos:
 
