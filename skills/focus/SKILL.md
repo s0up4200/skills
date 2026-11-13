@@ -106,8 +106,8 @@ Next: row 1. Alice has waited 9 days for this review, and her PR blocks #4020.
 
 | # | Repo | Item | Summary | Next | Model |
 |---|---|---|---|---|---|
-| 1 | acme/app | [PR #4012](url) by alice, team, review requested, 9 d, +340/-80 | Fetches the torrents of one instance in a single batch | `/code-review` | Sonnet 5.5, medium |
-| 2 | acme/probe | [#311](url) asks me (bob) | Bob proposes a new schedule for the speed tests | `/grilling` | Opus 5.5, medium |
+| 1 | acme/app | [PR #4012](url) by alice, team, review requested, 9 d, +340/-80 | Fetches the torrents of one instance in a single batch | `/code-review` | Opus 5.5, high |
+| 2 | acme/probe | [#311](url) asks me (bob) | Bob proposes a new schedule for the speed tests | `/grilling` | Fable 5.2, high |
 | 3 | acme/app | [PR #4020](url), approved, CI green, +12/-3 | Fixes the wrong ratio in the torrent list | merge | |
 ```
 
@@ -115,7 +115,7 @@ Next: row 1. Alice has waited 9 days for this review, and her PR blocks #4020.
 - **Item**: the linked number, then the facts that put the item in its rank: the author, team or outside, the age, the size of a PR (`+additions/-deletions`), a gate and what it frees.
 - **Summary**: at most 12 words on what changes in the app for the person who uses it. A title that already says this needs no rewrite. Read the body when the title does not.
 - **Next**: the next step from step 4.
-- **Model**: a Claude model and an effort level for each row that needs a session, from [`references/model-choice.md`](references/model-choice.md). The user runs each row in a new session, and the model sets its cost: a model that is too large doubles the price of a small fix, and a model that is too small fails a migration. Pick by the kind of the task and its size (the diff of a PR, the labels and the body of an issue, a gate, a hot spot). A row with no session, such as a merge, has an empty cell.
+- **Model**: a Claude model and an effort level for each row that needs a session, from [`references/model-choice.md`](references/model-choice.md). The user runs each row in a new session. Pick Opus for work that a test can prove, and Fable for work that no test can prove, such as a design. Fable costs twice as much as Opus. A row with no session, such as a merge, has an empty cell.
 
 When the user asks for issues to implement, fill the table with up to five free ones from rank 6.
 

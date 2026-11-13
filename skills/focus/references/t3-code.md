@@ -46,7 +46,7 @@ Call `t3_thread_launch` once for each row:
 
 - `title`: the step and the item, for example `review acme/app#4012` or `implement acme/cli#12`.
 - `projectId`: from step 2.
-- `modelSelection`: `{"instanceId": "<instance>", "model": "<model id>", "options": [{"id": "effort", "value": "medium"}]}`.
+- `modelSelection`: `{"instanceId": "<instance>", "model": "<model id>", "options": [{"id": "effort", "value": "high"}]}`.
 - `workspaceStrategy`: `{"type": "worktree", "baseRef": "origin/<default branch>", "startFromOrigin": true}`. Each row gets its own worktree, so two threads never share a checkout. The default branch is on the first line of the `open-work.sh` output. A step that pushes to a pull request, such as `/verify-review`, needs the branch of that pull request, and git gives one branch to one worktree. For such a row, read `gh pr view N --repo OWNER/REPO --json headRefName,headRefOid,isCrossRepository`:
   - `isCrossRepository` is true, so the pull request comes from a fork: do not start the row. Print its commands, and say why. The branch name of a fork can be the name of a local branch with other work, for example `main`.
   - No worktree in `git -C <workspaceRoot> worktree list --porcelain` holds the branch: use the new worktree.

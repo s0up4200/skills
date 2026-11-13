@@ -1,56 +1,45 @@
 # Model choice for a task
 
-Read on 2026-11-10 from "Which Claude model should you build with?": https://claude.dev/blog/which-claude-model-should-you-build-with/
+Source: the video "I think I figured it out" by Theo (t3.gg), summarized on 2026-11-13. It is the opinion of one developer who had used Fable 5.2 for two days. It is not a guide from Anthropic.
 
-The model names and the table go stale when a new model ships. If the article names newer models than this file, use the article and tell the user that this file is old.
+The model names go stale when a new model ships. If a newer Opus or Fable is out, tell the user that this file is old.
 
 ## The rule
 
-Start on Opus 5.5 at `medium` effort. Opus is the default in Claude Code, and the article says to use it when unsure. Move away from it only for a reason in the table.
+Start each row on Opus 5.5 at `high`. Opus checks everything and rarely misses a detail, so it fits work that a test, a build, or a diff can prove: a fix, a migration, a rewrite, a review.
 
-A per-token price doubles at each step up: Sonnet 5.5 is $2 / $10 per million input / output tokens, Opus 5.5 is $4 / $20, and Fable 5.2 is $8 / $40. Haiku 5.5 is $0.10 / $0.50 for a prompt of 100K tokens or less.
+Use Fable 5.2 at `high` for work that no test can prove: a design, an architecture, a new idea, a plan. Fable challenges the premise and knows when to stop, but it sometimes misses a small detail. In code review, it lets small findings pass, so keep reviews on Opus.
 
-## The article's table
+Use `high` effort. `medium` and `xhigh` also work. `low` misses too much, and `max` makes the model overthink: Fable scores lower on `max` than on `xhigh`.
 
-| Task | Model | Effort |
-|---|---|---|
-| Everyday engineering, debugging, a feature of many PRs | Opus 5.5 | `medium`, then `high` |
-| Well-scoped coding: a bug fix, a feature built against a spec | Sonnet 5.5 | `medium`, then `high` |
-| Repeated agent tasks: investigation, review, drafting | Sonnet 5.5 | `medium` |
-| Major refactor, migration, architecture, leading many subagents | Fable 5.2 | `medium`, then `high` |
-| Deep research, scientific or quantitative analysis | Fable 5.2 | `medium`, then `high` |
-| Classification, routing, tagging, extraction in high volume | Haiku 5.5 | `medium` |
-| Subagents that search files, read logs, or summarize | Haiku 5.5 or Sonnet 5.5 | model default |
-| Unsure | Opus 5.5 | `medium` |
+Sonnet and Haiku get no row. Sonnet uses many tokens when the way to the fix is not clear, and Haiku is for classification in high volume, not for code.
 
-A clear spec is not enough for Sonnet. The article names a migration and a performance optimization as work that can have a clear spec and still need Opus, or Fable when it is major.
+Fable costs twice as much as Opus per token: $8 / $40 against $4 / $20 per million input / output tokens. On the $200 plan, Fable can use only half of the weekly limit.
 
 ## From a focus rank to a row
 
-The article does not know the ranks of this skill. This mapping is a reading of its table, so let the facts of the task overrule it.
+Let the facts of the task overrule this table.
 
-| Next step | Row | What moves it up |
+| Next step | Model | What moves it to Fable |
 |---|---|---|
-| Review a PR (`/code-review`) | Repeated agent tasks: Sonnet, `medium` | A large diff, or a diff that touches a migration, concurrency, or a hot spot: Opus |
-| Answer a teammate's question or plan (`/grilling`) | Unsure: Opus, `medium` | A question about architecture: Fable |
+| Review a PR (`/code-review`) | Opus, `high` | |
+| Answer a teammate's question or plan (`/grilling`) | Fable, `high` | |
 | Merge, or close a done issue | No session needed | |
-| The user's PR with requested changes | Well-scoped coding: Sonnet, `medium` | The reviewer asks for a new design: Opus |
-| The user's PR with unresolved threads (`/verify-review`) | Well-scoped coding: Sonnet, `medium` | Many threads, or a thread that asks for a new design: Opus |
-| A live run before a merge (`/field-test`) | Everyday engineering: Opus, `medium` | |
-| Refactor | Everyday engineering: Opus, `medium` | A gate, or a refactor across many packages: Fable |
-| Implement a `ready-for-agent` issue (`/implement`) | Well-scoped coding: Sonnet, `medium` | A feature of many PRs, a hard bug with no known cause, a migration, or a performance fix: Opus |
-| A bug with no known cause (`/diagnosing-bugs`) | Everyday engineering, debugging: Opus, `medium` | |
-| Triage (`/triage`) | Repeated agent tasks: Sonnet, `medium` | |
-| Challenge a feature request (`/challenge-request`) | Repeated agent tasks: Sonnet, `medium` | A request that changes the architecture: Opus |
-| Grill a parked idea (`/grill-with-docs`) | Unsure: Opus, `medium` | The idea changes the architecture: Fable |
+| The user's PR with requested changes | Opus, `high` | The reviewer asks for a new design |
+| The user's PR with unresolved threads (`/verify-review`) | Opus, `high` | A thread asks for a new design |
+| A live run before a merge (`/field-test`) | Opus, `high` | |
+| Refactor | Opus, `high` | The refactor needs a new design that no test can judge |
+| Implement a `ready-for-agent` issue (`/implement`) | Opus, `high` | |
+| A bug with no known cause (`/diagnosing-bugs`) | Opus, `high` | An earlier Opus session ran in circles on the bug |
+| Triage (`/triage`) | Opus, `high` | |
+| Challenge a feature request (`/challenge-request`) | Fable, `high` | |
+| Grill a parked idea (`/grill-with-docs`) | Fable, `high` | |
 
 ## When the model falls short
 
-The article gives this order:
-
 1. Make sure that the model can check its own work with a test, a build, or a script.
-2. Raise the effort one level. Effort helps when the model must think longer or check more. It does not add skill that the model lacks.
-3. Move to the next model up, at a lower effort than the smaller model used. Test Fable 5.2 before you raise Opus 5.5 past `high`.
+2. If an Opus session runs in circles on one problem, start a new session on Fable. In Theo's example, Opus built the test rig for a slow thread, and Fable then found a fix that cut the data sent by about 150 times.
+3. Raise the effort one level, to `xhigh` at most.
 
 ## A new model needs a new session
 
