@@ -37,11 +37,12 @@ The base directory is printed when the skill loads. The first line names the use
 
 If a comment that the script cut can mean that the work is done, or that somebody asks the user a question, read the issue with `gh issue view N --repo OWNER/REPO --json comments`.
 
-The unread notifications show who waits on the user where the script sees no mention, for example in a review comment. Read them, and leave them unread. Drop `repos/OWNER/REPO/` from the path to read all repos:
+The unread notifications show who waits on the user where the script sees no mention, for example in a review comment. Read them, and leave them unread. The query keeps the last 14 days, because old unread notifications are mostly about closed items. Drop `repos/OWNER/REPO/` from the path to read all repos:
 
 ```bash
 gh api repos/OWNER/REPO/notifications --paginate --jq '.[]
   | select(.reason | IN("mention", "team_mention", "review_requested", "assign"))
+  | select(.updated_at > (now - 14*86400 | todate))
   | "\(.reason) | \(.repository.full_name)#\((.subject.url // "") | split("/") | last) | \(.subject.title)"'
 ```
 
@@ -82,7 +83,7 @@ A tracking issue with `epic M/M done` is done too: every sub-issue is closed. Re
 Ignore drafts, `wontfix` issues, and `needs-info` issues with no reply from the reporter. Rank the rest, best first. Each rank names its next step, which is the skill that the user runs on the item:
 
 1. Unblock a teammate. A team PR that asks for the user's review, or that has no review from the user, or that has new commits since the user's last review. An issue with `asks me` from a team member. The user's issue or PR that blocks an issue that a teammate claimed. Next step for a PR: `/code-review`. Next step for an issue: `/grilling` on it, then one reply with the answers.
-2. Merge: a PR that is approved, has green checks, and has no conflicts. Next step: `merge`, with no session. When the repo's instructions ask for a live run before a merge and the PR shows none: `/field-test`.
+2. Merge: a PR that is approved, or the user's own PR with no unresolved threads, when it has green checks and no conflicts. A sole maintainer gets no approval on their own PR. Next step: `merge`, with no session. When the repo's instructions ask for a live run before a merge and the PR shows none: `/field-test`.
 3. The user's own work: the user's PR with requested changes or unresolved threads, then the user's ready claims, gates first. Next step for unresolved threads: `/verify-review`.
 4. Refactor: an open issue with a refactor label that is free or claimed by the user, and that nothing open blocks. Put first a refactor that is a gate or that touches a hot spot. When no refactor issue touches the top hot spot, name that file as a candidate for `/codebase-design`.
 5. Review an outside contributor's PR, with the same conditions as in rank 1. A review request to the user comes first.

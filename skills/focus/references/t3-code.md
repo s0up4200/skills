@@ -1,8 +1,8 @@
 # T3 Code
 
-Read this file when the session has the `t3_thread_launch` tool. It covers two things: how to mark a row that already has a thread, and how to start a thread for a row.
+Read this file when the session has the `t3_thread_launch` tool. It covers two things: how to mark a row that already has a thread, and how to start a thread for a row, on this machine or on another one.
 
-Read on 2026-11-12 from the tool schemas of T3 Code and its docs: https://github.com/pingdotgg/t3code/tree/main/docs/user
+Read on 2026-11-13 from the tool schemas of T3 Code and its docs: https://github.com/pingdotgg/t3code/tree/main/docs/user
 
 ## Rows that already have a thread
 
@@ -24,11 +24,24 @@ Start at most one `/field-test` row for each repo in one answer, and name the ro
 
 ### 1. Pick the model
 
-Call `orchestrator_capabilities` once. Take a Claude provider instance: the one of this thread (`inheritedProviderInstanceId`) when its `driverKind` is `claudeAgent`, or else the first `claudeAgent` instance with `canRunChildTask: true`. Take the id of the row's model from that instance, and the row's effort as the `effort` option.
+Call `orchestrator_capabilities` once. Take a Claude provider instance: the one of this thread (`inheritedProviderInstanceId`) when its `driverKind` is `claudeAgent`, or else the first `claudeAgent` instance with `canRunChildTask: true`. On another machine, the instance ids differ: take the `claudeAgent` instance whose `displayName` is the one of this thread's instance, because each instance is a separate Claude account. Take the id of the row's model from that instance, and the row's effort as the `effort` option.
 
 A row that names Fable starts on Opus at the same effort, unless the answer names Fable for that row (`start 3 fable`). Fable costs twice as much as Opus, and one answer can start many rows.
 
 With no Claude instance, print the commands of step 6 in `SKILL.md` for the row.
+
+### Another machine
+
+The answer names a machine: `start 7 8 on the macbook`. Take its `environmentId` from `t3_environment_links`, and pass it to each T3 tool in these steps and in the thread search above.
+
+A link goes one way, and the machine that starts the threads holds it. `t3_environment_links` lists only the links that this machine holds. A machine that the app window shows under Environments, but that this list leaves out, gets no threads from here.
+
+With no link, read `runtimeMode` from `orchestrator_capabilities`. `t3_environment_link` works only from a thread in `full-access` and `default` mode, and fails with `capability_denied` in each other mode. Then give the user these steps:
+
+1. In Settings, pick this machine in the environment picker at the top, then choose Environments → Linked environments → Link.
+2. When the stored address of the other machine is a plain-http IP address, the link fails. T3 accepts plain http only for loopback and Tailscale MagicDNS names, not for a `100.x` Tailscale IP. Type `http://<MagicDNS name>:<port>` instead, with the `DNSName` of the machine from `tailscale status --json`, and paste a pairing code from the other machine's Settings → Sharing & access.
+
+When a link still fails, read the link state on each machine: the `peer_environment_links` table in `~/.t3/userdata/statev2.sqlite`, and the `peerLinks.link` spans in `~/.t3/userdata/logs/server.trace.ndjson`.
 
 ### 2. Find the project
 
