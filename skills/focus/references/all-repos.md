@@ -28,7 +28,7 @@ The last lines name the repos that the skip file removed, and the repos that the
 
 ## 2. Rank each repo
 
-Read the notifications of all repos once, with the command in step 2 of `SKILL.md`.
+Read the notifications of all repos once, with `notifications.sh` from step 2 of `SKILL.md` and no repo.
 
 - **A file of 50 lines or fewer**: read it and rank its items yourself, with the fields of step 2 and the rules of steps 3 and 4.
 - **A file of more than 50 lines**: start one subagent for the repo, with a fresh context window. The lines of one large repo are up to 10,000 tokens, and several such repos would leave no room for the judgement. Start these subagents in parallel. Give each one only this brief:

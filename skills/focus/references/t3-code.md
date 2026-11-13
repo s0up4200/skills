@@ -69,6 +69,21 @@ Call `t3_thread_launch` once for each row:
 
 Leave out `runtimeMode` and `interactionMode`. The thread takes the modes of this thread.
 
+### Rows that work together
+
+The answer asks the rows to coordinate, or two rows change the same code, for example two issues of one epic. A thread that starts first cannot learn the ID of a thread that starts after it. A `t3_thread_send` to a thread that is still `preparing` fails, or waits in the queue until the whole run of that thread ends. Thus each thread finds the others and introduces itself. Add to the message of each such row:
+
+```
+Other threads work on <URLs of the other rows> at the same time. Find each one with
+t3_thread_search, with its URL as query and projectId <projectId>. When the search finds
+nothing, search again before your next shared change. Your own ID is currentThreadId in
+that result: put it in your first t3_thread_send to them, so that they can answer. Before
+you change a file, a migration number, or an API that the other rows also change, tell
+them what you plan, and agree on who goes first.
+```
+
+Send nothing to a started thread yourself.
+
 ### 4. Report
 
 Print the table of step 5 in `SKILL.md` again, with the same rows in the same order, so that the user sees in one place what runs and where. In the `Next` cell of each started row, put `started` and the `link` of its new thread after the step, exactly as the tool returns it. Each row that had a thread before keeps its link. In place of the `Next:` line above the table, write one line that names the started rows.

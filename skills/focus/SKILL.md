@@ -31,19 +31,16 @@ The base directory is printed when the skill loads. The first line names the use
 - `unresolved threads` on a PR: review comments that nobody has resolved. `review threads: read 100 of N` means that the script did not read them all. Then count them on the page of the PR.
 - `asks me` on an issue: a comment after the user's last comment mentions the user. A team comment after the user's last comment that proposes a plan or asks to take the issue waits on the user too, with no mention. Read each `last:` line for it.
 - `blocking` and `blockedBy` on an issue, with only the open edges. An issue that blocks two or more open issues is a gate. Finishing a gate frees the most work.
-- `body blockers` on an issue: the issues and PRs that a "Blocked by" line or a "Blocked by" section of the body names. The script does not read their state. For each issue that you rank under Implement, read it with `gh issue view N --repo OWNER/REPO --json state`. An open one blocks the issue.
+- `body blockers` on an issue: the open issues and PRs that a "Blocked by" line or a "Blocked by" section of the body names. Each one blocks the issue. With `(state unread)`, the state query failed: read each blocker of an Implement row with `gh issue view N --repo OWNER/REPO --json state`.
 - `closing PRs` on an issue: the open PRs that close it. Somebody already works on the issue.
 - `epic N/M done` on a tracking issue, and `epic #N` on its sub-issues.
 
 If a comment that the script cut can mean that the work is done, or that somebody asks the user a question, read the issue with `gh issue view N --repo OWNER/REPO --json comments`.
 
-The unread notifications show who waits on the user where the script sees no mention, for example in a review comment. Read them, and leave them unread. The query keeps the last 14 days, because old unread notifications are mostly about closed items. Drop `repos/OWNER/REPO/` from the path to read all repos:
+The unread notifications show who waits on the user where the script sees no mention, for example in a review comment or a discussion. This script prints the open items of the last 14 days, and leaves them unread. Leave out the repo to read all repos:
 
 ```bash
-gh api repos/OWNER/REPO/notifications --paginate --jq '.[]
-  | select(.reason | IN("mention", "team_mention", "review_requested", "assign"))
-  | select(.updated_at > (now - 14*86400 | todate))
-  | "\(.reason) | \(.repository.full_name)#\((.subject.url // "") | split("/") | last) | \(.subject.title)"'
+<skill base directory>/scripts/notifications.sh OWNER/REPO
 ```
 
 On a Forgejo repo, use `fj`. Inside a clone, it finds the host and the repo from the git remote. `fj whoami` shows the login.
@@ -87,7 +84,7 @@ Ignore drafts, `wontfix` issues, and `needs-info` issues with no reply from the 
 3. The user's own work: the user's PR with requested changes or unresolved threads, then the user's ready claims, gates first. Next step for unresolved threads: `/verify-review`.
 4. Refactor: an open issue with a refactor label that is free or claimed by the user, and that nothing open blocks. Put first a refactor that is a gate or that touches a hot spot. When no refactor issue touches the top hot spot, name that file as a candidate for `/codebase-design`.
 5. Review an outside contributor's PR, with the same conditions as in rank 1. A review request to the user comes first.
-6. Implement: a free `ready-for-agent` issue. Free means no assignee, no closing PR, no open `blockedBy` edge or body blocker, and no label whose description says that the fix needs a change in another project. Gates first, then bugs before enhancements, then the oldest issue. Next step: `/implement`, on a new branch. For a bug whose issue names no cause: `/diagnosing-bugs` first.
+6. Implement: a free `ready-for-agent` issue. Free means no assignee, no closing PR, no open `blockedBy` edge or body blocker, and no label whose description says that the fix needs a change in another project. Gates first, then bugs before enhancements, then the oldest issue (by `created`). Next step: `/implement`, on a new branch. For a bug whose issue names no cause: `/diagnosing-bugs` first.
 7. Triage: a `needs-triage` issue, or a `needs-info` issue that has a reply from the reporter after the last maintainer comment. An outside reporter's question that waits for an answer goes here too. Next step: `/triage`. For a feature request from an outside reporter: `/challenge-request`.
 8. `ready-for-human`: name it. The user does this work, not an agent.
 9. Grill: a `needs-grilling` issue, the maintainer's own parked idea. Next step: `/grill-with-docs`, then `/to-spec`.
