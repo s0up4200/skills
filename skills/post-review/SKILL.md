@@ -20,7 +20,7 @@ Find the review report in this conversation. Two kinds count:
 
 If there is a `/code-review` report and a `review-pr` report, merge them and remove duplicates. If you cannot tell which report to use, stop and ask the user. If there is no report, stop and tell the user to run a review first. Do not run the review yourself.
 
-If both sections report no findings, stop. A review with nothing to change is noise. Tell the user the review was clean.
+If both sections report no findings and the user did not ask for an approval, stop. A review with nothing to change is noise. Tell the user the review was clean.
 
 ## Step 1: Reshape the report
 
@@ -52,6 +52,7 @@ While you copy the findings:
 - Apply the repository's rules for public text. Read its `CLAUDE.md` or `AGENTS.md` before you write. Common rules: no private tracker links, no release names copied from a client.
 - Keep the note at the top. It tells the author that an agent wrote the review. Use the model name that the harness states, else the harness name, and the login from `gh api user --jq .login`. Repository attribution rules target commit trailers, not this note.
 - Recount the findings when you write the summary line. The report's own counts can drift from its bullets.
+- When the user asked for an approval, put the verdict first, under the note: the approval, its reason, and that the findings do not block the merge. Put evidence that the user produced for the approval, such as a benchmark, in a section before `## Standards`.
 
 ## Step 2: Record the code spans
 
@@ -80,7 +81,13 @@ Post only after the user answers yes in their own words. A review lands under th
 
 ## Step 6: Post
 
-Read the permission of the PR author on the repository:
+If the user asked for an approval, approve:
+
+```bash
+gh pr review [N] --approve --body-file post-review-body.md
+```
+
+Otherwise, read the permission of the PR author on the repository:
 
 ```bash
 author=$(gh pr view [N] --json author --jq .author.login)
