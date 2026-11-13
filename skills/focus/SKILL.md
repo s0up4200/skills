@@ -133,7 +133,7 @@ The `Epics` line shows progress only. For the tree of one epic, the user runs `/
 
 ## 6. Start the rows
 
-In T3 Code, the session has the `t3_thread_launch` tool. Read [`references/t3-code.md`](references/t3-code.md) before you print the table. It marks each row that already has a thread, and it starts a thread for each row that the user names with `start 1 3`.
+In T3 Code, the session has the `t3_thread_launch` tool. Read [`references/t3-code.md`](references/t3-code.md) before you print the table. It marks each row that already has a thread, and it starts a thread for each row that the user names with `start 1 3`, then prints the table again with the new threads.
 
 In each other harness, print the commands for each row that writes code, so that the user can run several sessions at once. Each row gets its own worktree:
 

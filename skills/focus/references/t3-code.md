@@ -16,7 +16,7 @@ When a row names Fable, print one line under the table: "`start` runs a Fable ro
 
 ## Start
 
-The user answers `start 1 3`. Start only the rows that the answer names. The answer is the user's request to run the `Next` step of each named row, also for a step that only the user may start.
+The user answers `start 1 3`, or asks to dispatch rows. Start only the rows that the answer names. The answer is the user's request to run the `Next` step of each named row, also for a step that only the user may start.
 
 A row with an empty `Model` cell has no session. Say so, and start the others.
 
@@ -58,4 +58,8 @@ Leave out `runtimeMode` and `interactionMode`. The thread takes the modes of thi
 
 ### 4. Report
 
-Print one line for each started row: its number, and the `link` of its thread exactly as the tool returns it. Do not wait for the threads. Each one reports in its own thread.
+Print the table of step 5 in `SKILL.md` again, with the same rows in the same order, so that the user sees in one place what runs and where. In the `Next` cell of each started row, put `started` and the `link` of its new thread after the step, exactly as the tool returns it. Each row that had a thread before keeps its link. In place of the `Next:` line above the table, write one line that names the started rows.
+
+Under the table, list each named row that did not start, and why: no session, a fork, a worktree with other work, or a second `/field-test` on one repo.
+
+Do not wait for the threads. Each one reports in its own thread.
