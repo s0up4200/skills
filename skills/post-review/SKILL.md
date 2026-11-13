@@ -52,7 +52,7 @@ While you copy the findings:
 - Apply the repository's rules for public text. Read its `CLAUDE.md` or `AGENTS.md` before you write. Common rules: no private tracker links, no release names copied from a client.
 - Keep the note at the top. It tells the author that an agent wrote the review. Use the model name that the harness states, else the harness name, and the login from `gh api user --jq .login`. Repository attribution rules target commit trailers, not this note.
 - Recount the findings when you write the summary line. The report's own counts can drift from its bullets.
-- When the user asked for an approval, put the verdict first, under the note: the approval, its reason, and that the findings do not block the merge. Put evidence that the user produced for the approval, such as a benchmark, in a section before `## Standards`.
+- When the user asked for an approval, put the verdict first, under the note: the approval and its reason. Put evidence that the user produced for the approval, such as a benchmark, in a section before `## Standards`. If the report holds a blocking finding, ask the user before you write the body, and write the approval as an override of that finding.
 
 ## Step 2: Record the code spans
 
