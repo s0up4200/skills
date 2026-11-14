@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Git runs this hook from the top of the work tree.
+exec ./check.sh

@@ -2,7 +2,7 @@
 
 This is a personal skills repository for Claude Code and compatible AI coding tools. Skills are self-contained instruction sets that teach Claude how to perform specialized tasks.
 
-The repo holds Markdown, JSON, and the shell scripts of some skills. It has no package.json and no dependencies. Before you commit, run `./check.sh`. CI runs it on each push.
+The repo holds Markdown, JSON, and the shell scripts of some skills. It has no package.json and no dependencies. The pre-commit hook in `.githooks/` runs `./check.sh` and blocks a commit that fails it. If `git config core.hooksPath` prints nothing, turn the hook on with `git config core.hooksPath .githooks`. CI runs the same check on each push.
 
 Before you create or edit a skill, run the `writing-for-agents` skill. It sets how to write the description, the body, and the reference files.
 
@@ -27,6 +27,8 @@ README.md            # Installation instructions and skill index
 LICENSE              # MIT
 UPSTREAM.md          # Upstream commit and license of the copied skills
 check.sh             # Checks the skills. CI runs it from .github/workflows/check.yml
+.githooks/
+  pre-commit         # Runs check.sh before each commit
 .gitignore
 .claude-plugin/
   marketplace.json   # Plugin manifest — how Claude Code discovers installable bundles
