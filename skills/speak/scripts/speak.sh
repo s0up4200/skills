@@ -9,18 +9,8 @@ run=${XDG_RUNTIME_DIR:?}/speak
 mkdir -p "$run"
 sock=$run/mpv.sock pidf=$run/pid log=$run/log targetf=$run/target
 
-# Where the audio plays. SPEAK_TARGET=local plays here, SPEAK_TARGET=<ssh host> plays there.
-# The default follows the user: if a Herdr client is attached over Tailscale SSH, and its keyboard or
-# mouse moved in the last 5 minutes, play on that machine. A client with no idle time (not a Mac) counts.
-# ponytail: finds only Tailscale SSH clients (the --remote-ip flag); plain sshd clients play here.
-idle_check='ioreg -c IOHIDSystem -d 4 | awk "/HIDIdleTime/ {print int(\$NF / 1000000000); exit}"'
-target() {
-  local t=${SPEAK_TARGET:-} idle
-  [[ -n $t ]] && { echo "$t"; return; }
-  t=$(pgrep -af '^[^ ]*tailscaled be-child ssh .*herdr-core' | sed -n 's/.*--remote-ip=\([^ ]*\).*/\1/p' | tail -1)
-  [[ -n $t ]] && idle=$(ssh -o BatchMode=yes -o ConnectTimeout=5 "$t" "$idle_check" 2>/dev/null)
-  [[ -n $t && ! ${idle:-0} -gt 300 ]] && echo "$t" || echo local
-}
+# Where the audio plays: here, or on SPEAK_TARGET=<ssh host>.
+target() { echo "${SPEAK_TARGET:-local}"; }
 # The remote player has the title speak-sh, so stop and pause can find it. [s] keeps pgrep off its own shell.
 remote_play='PATH=/opt/homebrew/bin:/usr/local/bin:$PATH exec ffplay -nodisp -autoexit -nostats -loglevel error -window_title speak-sh -'
 remote_stop='pkill -f "[s]peak-sh"'

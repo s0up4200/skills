@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs speak.sh against a local fake ElevenLabs server. It plays silence and sends no request to a real host.
-# Fake pgrep and ssh stand in for the Herdr client and the remote machine: the "remote" player runs here.
+# A fake ssh stands in for the remote machine: the "remote" player runs here.
 # Needs python3, ffmpeg, mpv, socat. Run: bash speak.test.sh
 set -uo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
@@ -13,16 +13,6 @@ ln -s "$real/pipewire-0" "$real/pulse" "$dir/"
 ffmpeg -loglevel error -f lavfi -i anullsrc=r=44100:cl=mono -t 3 -q:a 9 "$dir/silence.mp3"
 printf '#!/bin/sh\ncat "%s/key" 2>/dev/null\n' "$dir" >"$dir/bin/secret-tool"
 printf '#!/bin/sh\necho "$2" >>"%s/notices"\n' "$dir" >"$dir/bin/notify-send"
-cat >"$dir/bin/pgrep" <<EOF
-#!/bin/sh
-[ "\$*" = "-af ^[^ ]*tailscaled be-child ssh .*herdr-core" ] && { cat "$dir/clients" 2>/dev/null; exit 0; }
-exec /usr/bin/pgrep "\$@"
-EOF
-cat >"$dir/bin/ioreg" <<EOF
-#!/bin/sh
-[ -e "$dir/idle" ] || exit 1
-echo "  |   \"HIDIdleTime\" = \$(cat "$dir/idle")000000000"
-EOF
 cat >"$dir/bin/ssh" <<EOF
 #!/bin/sh
 for a; do host=\$cmd; cmd=\$a; done
@@ -112,26 +102,16 @@ echo hello | "$here/speak.sh" >/dev/null
 check "reports a missing key" waitfor noticed "No ElevenLabs key"
 
 echo good >"$dir/key"
-echo '1 /usr/bin/tailscaled be-child ssh --login-shell=/usr/bin/bash --remote-ip=100.64.0.9 --has-tty=false --cmd=sh -c '\''p=$(command -v herdr-core); exec "$p" connect'\' >"$dir/clients"
-echo hello | "$here/speak.sh" >/dev/null
-check "plays on the attached Herdr client" waitfor remote_playing
-check "connects to the client's address" grep -qx 100.64.0.9 "$dir/ssh-hosts"
+out=$(echo hello | SPEAK_TARGET=100.64.0.9 "$here/speak.sh")
+check "plays on the SPEAK_TARGET host" waitfor remote_playing
+check "connects to that host" grep -qx 100.64.0.9 "$dir/ssh-hosts"
+check "prints the target" [ "$out" = "speak.sh: reading 6 characters on 100.64.0.9" ]
 "$here/speak.sh" pause
 check "pause stops the remote player" waitfor remote_paused
 "$here/speak.sh" pause
 check "pause again resumes it" waitfor remote_playing
 "$here/speak.sh" stop
 check "stop ends the remote player" waitfor remote_gone
-
-echo 30 >"$dir/idle"
-out=$(echo hello | "$here/speak.sh")
-check "plays on a client used 30 seconds ago" [ "$out" = "speak.sh: reading 6 characters on 100.64.0.9" ]
-"$here/speak.sh" stop
-echo 600 >"$dir/idle"
-out=$(echo hello | "$here/speak.sh")
-check "plays here when the client was idle 10 minutes" [ "$out" = "speak.sh: reading 6 characters on local" ]
-"$here/speak.sh" stop
-rm -f "$dir/idle"
 
 rm -f "$dir/ssh-hosts"
 echo hello | SPEAK_TARGET=local "$here/speak.sh" >/dev/null

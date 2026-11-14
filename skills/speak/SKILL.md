@@ -8,7 +8,7 @@ argument-hint: "[what to read, for example \"summary\", a file path, or \"stop\"
 
 The user listens instead of reads, often away from the screen. They want to hear a text in a natural voice. `scripts/speak.sh` in this skill's folder does the audio: it reads text on stdin, strips Markdown, sends it to ElevenLabs, and plays it in the background. The command returns at once, and the voice keeps talking while the session goes on. Each new read stops the one before it.
 
-The voice plays where the user is. If a Herdr client is attached to this machine over Tailscale SSH, and someone used its keyboard or mouse in the last 5 minutes, the script sends the audio over SSH to that machine. Otherwise it plays here. The script prints the target, for example `reading 412 characters on 100.64.0.9`. When the user says that the voice plays on the wrong machine, run the script again with `SPEAK_TARGET=local` to play here, or `SPEAK_TARGET=<ssh host>` to play there.
+The voice plays on this machine. To play it on another machine, run the script with `SPEAK_TARGET=<ssh host>`, and the script sends the audio there over SSH. The script prints the target, for example `reading 412 characters on local`.
 
 ## Pick the mode
 
