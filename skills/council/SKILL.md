@@ -23,9 +23,9 @@ Outside T3 Code, use the subagent tool of the harness, and start each member wit
 
 In T3 Code, call `orchestrator_capabilities` first, also when the user names the members. Use only provider instances with `canRunChildTask: true`. A member on a provider other than yours also needs `canRunCrossProviderChildTask: true`.
 
-If the user names the members, resolve each name to a `providerInstanceId` and a model. Otherwise take the newest version of these models, in this order of preference: Claude Opus, Codex GPT Sol, Muse Spark Contributor, Gemini Pro. The list leaves some models out, so call `orchestrator_capabilities` with `search` when the model that you want is not in it. The three must come from different `driverKind` values, because two instances of one driver count as one provider.
+If the user names the members, resolve each name to a `providerInstanceId` and a model. Otherwise take the newest version of these models, in this order of preference: Claude Opus, Codex GPT Sol, Muse Wonder, Gemini Pro. The list leaves some models out, so call `orchestrator_capabilities` with `search` when the model that you want is not in it. The three must come from different `driverKind` values, because two instances of one driver count as one provider.
 
-Set the reasoning option (`effort` or `reasoningEffort`) to `high`, because most providers default to `low` or `medium`.
+Set the reasoning option (`effort` or `reasoningEffort`) to `high`, because most providers default to `low` or `medium`. Set Muse Wonder to `max`.
 
 If fewer than three providers can run a child, or a named member is not available, tell the user which one is missing and stop. A substitute from the same provider shares the blind spots that the council is there to find.
 
@@ -76,7 +76,7 @@ Otherwise start the next round (step 3).
 ```markdown
 **owner/repo#123** · the plan, diff, or question that the council read · 2 rounds
 **Status:** one of: no blocking finding left, incomplete because a member failed, stopped because I rejected every finding, stopped at 3 rounds, or waits for you.
-**Scores:** Claude Opus 7 → 9 · GPT Sol 8 → 10 · Muse Spark 7 → no score
+**Scores:** Claude Opus 7 → 9 · GPT Sol 8 → 10 · Muse Wonder 7 → no score
 
 **Answer**
 - For a question: the conclusion that the members support, checked at the code.
@@ -108,7 +108,7 @@ Rounds: 2
 | --- | --- | --- |
 | Claude Opus | 7/10 | 9/10 |
 | GPT Sol | 8/10 | 10/10 |
-| Muse Spark | 7/10 | no score |
+| Muse Wonder | 7/10 | no score |
 ```
 
 Read the live body with `gh pr view <n> --json body --jq .body`. Replace the old section, or add the section at the end, above a closing model or harness line if the body has one. Save the new body to a scratch file, and write it back with `gh pr edit <n> --body-file <file>`. Change no other part of the body, and do not post a comment for this. Then read the live body again, and make sure that `diff` against the old body shows changes only in the `## Council review` section. If there is no pull request, put the report in the final reply only.
