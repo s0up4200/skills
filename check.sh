@@ -22,7 +22,7 @@ while read -r file; do
   ((lines < 500)) || { echo "$file: $lines lines, keep it under 500"; fail=1; }
   bytes=$(awk 'f>=2; /^---$/ && f<2 {f++}' "$file" | wc -c)
   ((bytes < 15000)) || { echo "$file: body has $bytes bytes, keep it under 15000"; fail=1; }
-done < <(find skills -name SKILL.md | sort)
+done < <(find skills -name SKILL.md ! -path '*-workspace/*' | sort)
 
 # The *-workspace folders hold local eval output that git ignores.
 while read -r file; do

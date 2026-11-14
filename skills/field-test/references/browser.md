@@ -38,7 +38,7 @@ await browser.close();
 ```
 
 - `PW` is the absolute path of the global Playwright package, so the script needs no `node_modules` and no `NODE_PATH`. A `.cjs` script loads it with `require(process.env.PW)`. When mise installs Playwright, the first `playwright` on `PATH` can be a wrapper script outside the package, so the lookup asks `mise which` first. `mise which playwright` fails until `playwright` ran once through mise, because mise installs it on first use. If `$PW/index.mjs` does not exist, find the package before you decide that Playwright is not installed.
-- Launch the system Chromium through `executablePath`, so the run never depends on a browser that Playwright downloads.
+- Launch the system Chromium through `executablePath`, so the run never depends on a browser that Playwright downloads. On macOS, use `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`; Homebrew puts Playwright at `/opt/homebrew/lib/node_modules/playwright`.
 - A new context starts with no service worker, no cache, and no cookies. Each run loads the bundle that the rig serves now.
 - The `dialog` handler dismisses a native `confirm` or `alert`, so the dialog traps of Chrome do not apply.
 - `page.route()` answers a request with a fake response. Use it in place of a patch of `window.fetch`. Add `serviceWorkers: 'block'` to the context, unless the service worker is under test: a route does not see a request that the service worker answers.
@@ -135,8 +135,9 @@ In Playwright, set `viewport` on the context, and `isMobile` and `hasTouch` when
 
 In Chrome, `~/github/soup/dotfiles/agents/docs/browser.md` covers phone-width views. Ask the user to toggle
 DevTools device emulation (Ctrl+Shift+M) on the tab and wait for their "done", then continue.
-Landscape phone, folding-phone outer screen, and iOS keyboard cases need a real device; say so in
-the verdict rather than approximating.
+For iOS Safari (toolbars, `vh` and `dvh`, the on-screen keyboard), read `ios-simulator.md` and
+use the iOS Simulator on a Mac. Landscape phone and folding-phone outer screen cases need a real
+device; say so in the verdict rather than approximating.
 
 ## Observables that work in the browser
 
