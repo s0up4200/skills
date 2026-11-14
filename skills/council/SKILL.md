@@ -23,9 +23,9 @@ Outside T3 Code, use the subagent tool of the harness, and start each member wit
 
 In T3 Code, call `orchestrator_capabilities` first, also when the user names the members. Use only provider instances with `canRunChildTask: true`. A member on a provider other than yours also needs `canRunCrossProviderChildTask: true`.
 
-If the user names the members, resolve each name to a `providerInstanceId` and a model. Otherwise take the newest version of these models, in this order of preference: Claude Opus, Codex GPT Sol, Muse Wonder, Gemini Pro. The list leaves some models out, so call `orchestrator_capabilities` with `search` when the model that you want is not in it. The three must come from different `driverKind` values, because two instances of one driver count as one provider.
+If the user names the members, resolve each name to a `providerInstanceId` and a model. Otherwise take the newest version of these three models: Claude Opus, Codex GPT Sol, and Muse Wonder. The list leaves some models out, so call `orchestrator_capabilities` with `search` when the model that you want is not in it. The three must come from different `driverKind` values, because two instances of one driver count as one provider.
 
-Set the reasoning option (`effort` or `reasoningEffort`) to `high`, because most providers default to `low` or `medium`. Set Muse Wonder to `max`.
+Set the reasoning option (`effort` or `reasoningEffort`) to `high`, because most providers default to `low` or `medium`. Set Muse Wonder to `xhigh`.
 
 If fewer than three providers can run a child, or a named member is not available, tell the user which one is missing and stop. A substitute from the same provider shares the blind spots that the council is there to find.
 
