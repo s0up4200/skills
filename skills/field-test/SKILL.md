@@ -59,9 +59,9 @@ The steps below are written for a compose deployment with SQLite. A deployment t
 
 Order matters:
 
-1. Back up the compose file: `cp compose.yaml compose.yaml.bak-pr<N>`.
+1. Find the file that sets the image. If `grep QUI_IMAGE compose.yaml` prints a line, `.env` sets it. On the qui server, compose-sync owns `compose.yaml` and puts back a hand edit within 5 minutes. Back up the file that sets the image: `cp .env .env.bak-pr<N>` or `cp compose.yaml compose.yaml.bak-pr<N>`.
 2. Compare migrations: `git diff --name-status <running revision> <image revision> -- <migrations folder>`. A running build behind the base branch also gets migrations that the PR did not add. If the diff lists one, tell the user what it changes, and snapshot the live SQLite first: `sqlite3 -readonly qui.db ".backup backups/pre-pr<N>-<UTC stamp>.db"`. Migrations are one way. A `develop` image starts with an extra migration row and extra columns, but a rename or drop needs the snapshot to go back.
-3. Repoint `image:` to `ghcr.io/autobrr/qui:pr-<N>`, then `docker compose pull qui && docker compose up -d qui`.
+3. Set `QUI_IMAGE=ghcr.io/autobrr/qui:pr-<N>` in `.env`, or else repoint `image:` to it. Then run `docker compose pull qui && docker compose up -d qui`.
 4. Verify: container up, revision label matches, first log lines show the expected version, the UI answers on its usual address.
 
 Record the swap at once in the user's notes, where their instructions say notes go (image tag, backup file names, whether the user wants it kept). The user restarts the stack on their own schedule, and a forgotten pin looks like a revert.
@@ -120,7 +120,7 @@ Tear down a local rig in the same turn that reads the last observable, also when
 
 - Delete synthetic torrents from qBittorrent (with files if the rig created them) and any rig files on the host. On a production host, name each one before deleting it so the user can object.
 - Kill every process the test started, local and remote. Keep a ledger of process groups and listeners as you create them; a killed SSH session leaves remote zsh wrappers and tails behind. Use `pkill -xf "<exact command line>"`; `pgrep -f` without `-x` matches your own shell and kills the session.
-- Revert the compose file to `:develop` and `docker compose pull qui && docker compose up -d qui`, unless the user said to keep the PR image running. Keep the pull when the swap applied a migration, because a row that an older build writes can miss a value that the new build needs. A PR image left pinned must be in the user's notes with the reason, and flipped back after the PR merges.
+- Remove the `QUI_IMAGE` line from `.env`, or else revert the compose file to `:develop`. Then run `docker compose pull qui && docker compose up -d qui`, unless the user said to keep the PR image running. Keep the pull when the swap applied a migration, because a row that an older build writes can miss a value that the new build needs. A PR image left pinned must be in the user's notes with the reason, and flipped back after the PR merges.
 - Leave DB snapshots in place; note their names and sizes so the user can delete them after the merge.
 - Tell the user the temporary API key can be revoked.
 - Watch the log for one polling interval after cleanup and confirm it stays quiet.
