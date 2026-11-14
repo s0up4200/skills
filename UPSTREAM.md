@@ -341,7 +341,7 @@ SOFTWARE.
 - The steps, the round count, the scores table, and the rule against scope creep come from upstream.
 - Upstream triggers on the word "council". Our skill starts only when the user types it.
 - Upstream addresses the open PR comments before a review. Our skill leaves them to `verify-review`, which verifies each one and keeps the record on the pull request.
-- Upstream gives Claude Opus, GPT Sol, and Gemini Pro as an example. Our skill uses Claude Opus, GPT Sol, and Muse Wonder by default, and it needs three different `driverKind` values, so that two Claude instances do not count as two providers.
+- Upstream gives Claude Opus, GPT Sol, and Gemini Pro as an example. Our skill uses Claude Opus, GPT Sol, and Muse Spark Contributor by default, and it needs three different `driverKind` values, so that two Claude instances do not count as two providers.
 - Our skill pastes the main rules of `code-review` into the brief of each member, and leaves out the reasons of the author and the findings of earlier rounds, as `refute` does.
 - Our skill starts each round with new `delegate_task` calls, puts the read-only rule in the brief, and reports a failed member with `no score` and an incomplete council.
 - Upstream continues until all members are satisfied. Our skill uses the stop rules of `refute`: no blocking finding, 2 rounds in a row of rejected findings, or 3 rounds. A question gets one round.
